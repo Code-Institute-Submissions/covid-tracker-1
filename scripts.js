@@ -29,11 +29,13 @@ let eu = [
   "United-Kingdom",
 ];
 
+// Need to code so that more calls will be made if this array is not empty
 let failedCalls = [];
+
 
 Promise.all(
   eu
-    .slice(0, 8)
+    .slice(0, 9)
     .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
 ).then((firstCallResponse) => {
   firstCallResponse
@@ -42,15 +44,15 @@ Promise.all(
 
   Promise.all(
     firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())
-  ).then((data1) => {
-    console.log("data1", data1);
+  ).then((firstCallData) => {
+    console.log("firstCallData", firstCallData);
     
 
 
     setTimeout(
       () => Promise.all(
       eu
-        .slice(9, 17)
+        .slice(9, 18)
         .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
     ).then((secondCallResponse) => {
 
@@ -59,8 +61,30 @@ Promise.all(
 
         Promise.all(
     secondCallResponse.filter((e) => e.status === 200).map((res) => res.json())
-  ).then(data2 => {
-      console.log('data2', data2)
+  ).then(secondCallData => {
+      console.log('secondCallData', secondCallData)
+
+          setTimeout(
+      () => Promise.all(
+      eu
+        .slice(18)
+        .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
+    ).then((thirdCallResponse) => {
+
+        console.log('secondCallResponse', thirdCallResponse)
+      thirdCallResponse.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
+
+        Promise.all(
+    thirdCallResponse.filter((e) => e.status === 200).map((res) => res.json())
+  ).then(thirdCallData => {
+      console.log('thirdCallData', thirdCallData)
+  })
+
+
+    }),
+      5000
+    );
+
   })
 
 
