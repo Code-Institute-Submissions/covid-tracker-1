@@ -29,39 +29,19 @@ let eu = [
   "United-Kingdom",
 ];
 
-console.log("slice", eu.slice(0, 8));
+let failedCalls = []
 
-// let secondCalls = eu.slice(9,17).map(e => fetch(`https://api.covid19api.com/dayone/country/${e}`))
 
-// Promise.all(urls.map(u=>fetch(u))).then(responses =>
-
-//     Promise.all(responses.map(res => res.text()))
-// )
-
-// .then(texts => {
-//     …
-// })
-
-// Promise.all(urls.map(u=>fetch(u))).then(responses =>
-//     Promise.all(responses.map(res => res.text()))
-// ).then(texts => {
-
-// })
 
 Promise.all(
   eu
     .slice(0, 8)
     .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-).then((responses) => {
-  responses.forEach((e, i) => {
-    if (e.status !== 200) {
-      //push to an array so you can try them again at the end
-      console.log(`status ${e.status} for ${e.url}`);
-      responses.splice(i, 1);
-    }
-  });
+).then((firstCallResponse) => {
 
-  Promise.all(responses.map((res) => res.text())).then((data1) => {
+    firstCallResponse.filter((e) => e.status !== 200).forEach(e => failedCalls.push(e.url))
+
+  Promise.all(firstCallResponse.filter((e) => e.status === 200).map((res) => res.text())).then((data1) => {
     data1 = data1.map((e) => JSON.parse(e));
 
     console.log("data1", data1);
@@ -73,10 +53,7 @@ Promise.all(
             .slice(9, 17)
             .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
         ).then((secondCallResponse) => {
-          console.log(
-            "failedcalls",
-            secondCallResponse.filter((e) => e.status !== 200)
-          );
+            secondCallResponse.forEach(e => failedCalls.push(e.url))
 
           console.log(
             "successfulcalls",
@@ -90,20 +67,20 @@ Promise.all(
 
 // repeating code - use function
 
-//         console.log('responses2 before splice', responses2)
+//         console.log('firstCallResponse2 before splice', firstCallResponse2)
 
-//             responses2.forEach((e,i )=> {
-//                 console.log('in responses2', e.url)
+//             firstCallResponse2.forEach((e,i )=> {
+//                 console.log('in firstCallResponse2', e.url)
 //                 console.log(e.status)
 //                 console.log('----------')
 //         if(e.status !== 200){
 //             //push to an array so you can try them again at the end
 //             // console.log(`status ${e.status} for ${e.url}`)
-//             responses2.splice(i,1)
+//             firstCallResponse2.splice(i,1)
 //         }
 //     })
 
-//     console.log('responses2 after splice', responses2)
+//     console.log('firstCallResponse2 after splice', firstCallResponse2)
 
 //     })
 // })
