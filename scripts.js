@@ -1,39 +1,49 @@
+//local storage
+
+//deal with failedCalls
+
+localStorage.setItem(e.country, e.data)
+
+console.log('local storage request', localStorage.getItem("Ireland"))
+
+
+
+
+
+
 let eu = [
-  "Austria",
-  "Belgium",
-  "Bulgaria",
-  "Croatia",
-  "Cyprus",
-  "Czech-Republic",
-  "Denmark",
-  "Estonia",
-  "Finland",
-  "France",
-  "Germany",
-  "Greece",
-  "Hungary",
-  "Ireland",
-  "Italy",
-  "Latvia",
-  "Lithuania",
-  "Luxembourg",
-  "Malta",
-  "Netherlands",
-  "Poland",
-  "Portugal",
-  "Romania",
-  "Slovakia",
-  "Slovenia",
-  "Spain",
-  "Sweden",
-  "United-Kingdom",
+  "austria",
+  "belgium",
+  "bulgaria",
+  "croatia",
+  "cyprus",
+  "czech-Republic",
+  "denmark",
+  "estonia",
+  "finland",
+  "france",
+  "germany",
+  "greece",
+  "hungary",
+  "ireland",
+  "italy",
+  "latvia",
+  "lithuania",
+  "luxembourg",
+  "malta",
+  "netherlands",
+  "poland",
+  "portugal",
+  "romania",
+  "slovakia",
+  "slovenia",
+  "spain",
+  "sweden",
+  "unitedKingdom",
 ];
 
 const dealWithData = (data) => {
-
-    data
-    .filter((e) => e.status !== 200)
-    .forEach((e) => failedCalls.push(e.url));
+  data.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
 
   // Manipulate data on successful calls
 
@@ -77,76 +87,70 @@ const dealWithData = (data) => {
       };
     });
 
-    countryData = [...countryData, ...newData]
-    console.log('countryData', countryData)
-})
-}
+    
 
+    newData.forEach(e=> {localStorage.setItem(e.country, e.data)})
 
+    console.log('ie', localStorage.getItem('Ireland'))
 
+    console.log('sw', localStorage.getItem('Sweden'))
 
-
-
-
+  
+  });
+};
 
 // Need to code so that more calls will be made if this array is not empty
 let failedCalls = [];
 
-let countryData = [];
 
 // Make API call for first 9 countries
 
-Promise.all(
+const getData = () => {
+
+    Promise.all(
   eu
     .slice(0, 9)
     .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
 ).then((firstCallResponse) => {
+  dealWithData(firstCallResponse);
 
-    dealWithData(firstCallResponse)
+  // Cause dealy before next batch of countries are sent to api (to prevent too many calls error)
 
-    // Cause dealy before next batch of countries are sent to api (to prevent too many calls error)
+  setTimeout(
+    // Make API call for next 9 countries
+    () =>
+      Promise.all(
+        eu
+          .slice(9, 18)
+          .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
+      ).then((secondCallResponse) => {
+        dealWithData(secondCallResponse);
 
-    setTimeout(
-        // Make API call for next 9 countries
-      () =>
-        Promise.all(
-          eu
-            .slice(9, 18)
-            .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-        ).then((secondCallResponse) => {
+        // Cause dealy before next batch of countries are sent to api (to prevent too many calls error)
 
-            dealWithData(secondCallResponse)
+        setTimeout(
+          () =>
+          // Make API call for final 10 countries
 
-        //       // Record failed calls to re-try later
-        //   secondCallResponse
-        //     .filter((e) => e.status !== 200)
-        //     .forEach((e) => failedCalls.push(e.url));
+            Promise.all(
+              eu
+                .slice(18)
+                .map((e) =>
+                  fetch(`https://api.covid19api.com/dayone/country/${e}`)
+                )
+            ).then((thirdCallResponse) => {
+              dealWithData(thirdCallResponse);
+            }),
+          5000
+        );
+      }),
+    5000
+  );
+});
 
-        //   Promise.all(
-        //     secondCallResponse
-        //       .filter((e) => e.status === 200)
-        //       .map((res) => res.json())
-        //   ).then((secondCallData) => {
-        //     console.log("secondCallData", secondCallData);
 
-            setTimeout(
-              () =>
-                Promise.all(
-                  eu
-                    .slice(18)
-                    .map((e) =>
-                      fetch(`https://api.covid19api.com/dayone/country/${e}`)
-                    )
-                ).then((thirdCallResponse) => {
 
-                    dealWithData(thirdCallResponse)
+}
 
-                }),
-              5000
-            );
-          }), 5000
-        // }),
-     
-      );
-  });
-// });
+// getData()
+
