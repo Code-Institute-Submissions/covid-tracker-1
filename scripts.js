@@ -32,6 +32,22 @@ let eu = [
 let failedCalls = []
 
 
+// Promise.all([
+// 	fetch('https://jsonplaceholder.typicode.com/posts'),
+// 	fetch('https://jsonplaceholder.typicode.com/users')
+// ]).then(function (responses) {
+// 	// Get a JSON object from each of the responses
+// 	return Promise.all(responses.map(function (response) {
+// 		return response.json();
+// 	}));
+// }).then(function (data) {
+// 	// Log the data to the console
+// 	// You would do something with both sets of data here
+// 	console.log(data);
+// }).catch(function (error) {
+// 	// if there's an error, log it
+// 	console.log(error);
+// });
 
 Promise.all(
   eu
@@ -41,8 +57,8 @@ Promise.all(
 
     firstCallResponse.filter((e) => e.status !== 200).forEach(e => failedCalls.push(e.url))
 
-  Promise.all(firstCallResponse.filter((e) => e.status === 200).map((res) => res.text())).then((data1) => {
-    data1 = data1.map((e) => JSON.parse(e));
+  Promise.all(firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())).then((data1) => {
+    // data1 = data1.map((e) => JSON.parse(e));
 
     console.log("data1", data1);
 
