@@ -49,11 +49,51 @@ Promise.all(
   ).then((firstCallData) => {
     console.log("firstCallData", firstCallData);
 
-             let newData = firstCallData.map((e,i )=> {
-return(e.filter(f => f.Province === ""))
+             let newData = firstCallData.map((e)=> {
+return(
+    e.filter(f => f.Province === "")
+    
+    // .map((g,i) => {
+        
+    //     if(i===0){console.log('i', i)}
+        
+    //     return(
+    //     {country: g.Country,
+    //         countryCode: g.CountryCode,
+    //         data: g
+    //     }
+    // )})
+    
+    )
+
 
             })
+
+
+                    let newData2 = newData.map(e => {return(
+        {country: e[0].Country,
+            countryCode: e[0].CountryCode,
+            data: e.map((f,i) => {
+                
+                let todaysCases, todaysDeaths
+
+                i==0 ? todaysCases = f.Confirmed : todaysCases = f.Confirmed - e[i-1].Confirmed
+                i==0 ? todaysDeaths = f.Deaths : todaysDeaths = f.Deaths - e[i-1].Deaths
+                
+                return(
+                {casesToDate: f.Confirmed,
+                deathsToDate: f.Deaths,
+                date: f.Date,
+                todaysCases: todaysCases,
+                todaysDeaths: todaysDeaths
+                }
+            )})
+        }
+    )})
+
         console.log('newData', newData)
+
+        console.log('newData2', newData2)
    
         return
  
