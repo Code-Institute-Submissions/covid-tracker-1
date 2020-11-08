@@ -32,6 +32,8 @@ let eu = [
 // Need to code so that more calls will be made if this array is not empty
 let failedCalls = [];
 
+let data = []
+
 
 Promise.all(
   eu
@@ -46,6 +48,15 @@ Promise.all(
     firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())
   ).then((firstCallData) => {
     console.log("firstCallData", firstCallData);
+
+             let newData = firstCallData.map((e,i )=> {
+return(e.filter(f => f.Province === ""))
+
+            })
+        console.log('newData', newData)
+   
+        return
+ 
     
 
 
@@ -63,6 +74,8 @@ Promise.all(
     secondCallResponse.filter((e) => e.status === 200).map((res) => res.json())
   ).then(secondCallData => {
       console.log('secondCallData', secondCallData)
+
+
 
           setTimeout(
       () => Promise.all(

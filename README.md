@@ -16,7 +16,11 @@ Wireframe is available [here](./docs/wireframe.png)
 
 API CALLS:
 
-Free version of the api only allows data for one country to be received per call. I did a promise all to get all 27 countries at once. I received an error after data for the first ten countries were received. This seems to be the limit using promise all. I am now going to get the data for all 27 countries in three batches of 9. This still requires an artificial delay using settimeout.
+Free version of the api only allows data for one country to be received per call. I did a promise all to get all 27 countries at once. I received an error after data for the first ten countries were received. This seems to be the limit using promise all. I am now going to get the data for all 27 countries in three batches of 9. This still requires an artificial delay using settimeout. There are 28 countries in EU!
+
+COLONIES:
+
+Denmark, Netherlands, France and the UK include former colonies from different parts of the world in their data. I used `.filter` to remove this data.
 
 ## Credits
 
