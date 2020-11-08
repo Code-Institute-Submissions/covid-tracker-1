@@ -34,3 +34,5 @@ https://ipinfo.io/pricing
 
 https://gomakethings.com/waiting-for-multiple-all-api-responses-to-complete-with-the-vanilla-js-promise.all-method/
 
+https://www.youtube.com/watch?v=4A1cUp2wK2c
+
