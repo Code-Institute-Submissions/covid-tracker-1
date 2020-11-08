@@ -32,3 +32,5 @@ https://stackoverflow.com/questions/391979/how-to-get-clients-ip-address-using-j
 
 https://ipinfo.io/pricing
 
+https://gomakethings.com/waiting-for-multiple-all-api-responses-to-complete-with-the-vanilla-js-promise.all-method/
+
