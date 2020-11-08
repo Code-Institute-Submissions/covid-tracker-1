@@ -29,53 +29,37 @@ let eu = [
   "United-Kingdom",
 ];
 
-let failedCalls = []
-
-
-// Promise.all([
-// 	fetch('https://jsonplaceholder.typicode.com/posts'),
-// 	fetch('https://jsonplaceholder.typicode.com/users')
-// ]).then(function (responses) {
-// 	// Get a JSON object from each of the responses
-// 	return Promise.all(responses.map(function (response) {
-// 		return response.json();
-// 	}));
-// }).then(function (data) {
-// 	// Log the data to the console
-// 	// You would do something with both sets of data here
-// 	console.log(data);
-// }).catch(function (error) {
-// 	// if there's an error, log it
-// 	console.log(error);
-// });
+let failedCalls = [];
 
 Promise.all(
   eu
     .slice(0, 8)
     .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
 ).then((firstCallResponse) => {
+  firstCallResponse
+    .filter((e) => e.status !== 200)
+    .forEach((e) => failedCalls.push(e.url));
 
-    firstCallResponse.filter((e) => e.status !== 200).forEach(e => failedCalls.push(e.url))
-
-  Promise.all(firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())).then((data1) => {
-    // data1 = data1.map((e) => JSON.parse(e));
-
+  Promise.all(
+    firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())
+  ).then((data1) => {
     console.log("data1", data1);
 
-    setTimeout(
-      () =>
-        Promise.all(
-          eu
-            .slice(9, 17)
-            .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-        ).then((secondCallResponse) => {
-            secondCallResponse.forEach(e => failedCalls.push(e.url))
+    let SecondCall = Promise.all(
+      eu
+        .slice(9, 17)
+        .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
+    ).then((secondCallResponse) => {
+      secondCallResponse.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
 
-          console.log(
-            "successfulcalls",
-            secondCallResponse.filter((e) => e.status === 200)
-          );
-        }),
+      console.log(
+        "successfulcalls",
+        secondCallResponse.filter((e) => e.status === 200)
+      );
+    });
+
+    setTimeout(
+      () => SecondCall,
       5000
     );
   });
