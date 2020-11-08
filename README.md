@@ -14,3 +14,15 @@ Wireframe is available [here](./docs/wireframe.png)
 
 ## Credits
 
+https://stackoverflow.com/questions/313893/how-to-measure-time-taken-by-a-function-to-execute
+
+https://documenter.getpostman.com/view/10808728/SzS8rjbc#4b88f773-be9b-484f-b521-bb58dda0315c
+
+https://stackoverflow.com/questions/54896470/how-to-return-the-promise-all-fetch-api-json-data
+
+https://stackoverflow.com/questions/31710768/how-can-i-fetch-an-array-of-urls-with-promise-all
+
+https://stackoverflow.com/questions/391979/how-to-get-clients-ip-address-using-javascript
+
+https://ipinfo.io/pricing
+
