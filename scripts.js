@@ -29,30 +29,18 @@ let eu = [
   "United-Kingdom",
 ];
 
-// Need to code so that more calls will be made if this array is not empty
-let failedCalls = [];
+const dealWithData = (data) => {
 
-let countryData = [];
-
-// Make API call for first 9 countries
-
-Promise.all(
-  eu
-    .slice(0, 9)
-    .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-).then((firstCallResponse) => {
-  // Record failed calls to re-try later
-
-  firstCallResponse
+    data
     .filter((e) => e.status !== 200)
     .forEach((e) => failedCalls.push(e.url));
 
   // Manipulate data on successful calls
 
   Promise.all(
-    firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())
-  ).then((firstCallData) => {
-    let firstBatch = firstCallData.map((e) => {
+    data.filter((e) => e.status === 200).map((res) => res.json())
+  ).then((jsonData) => {
+    let newData = jsonData.map((e) => {
       // remove data from British, French, Dutch and Danish colonies
 
       let coloniesRemoved = e.filter((f) => f.Province === "");
@@ -89,30 +77,57 @@ Promise.all(
       };
     });
 
-    countryData = [...firstBatch];
+    countryData = [...countryData, ...newData]
+    console.log('countryData', countryData)
+})
+}
 
-    console.log("countryData", countryData);
 
-    return;
+
+
+
+
+
+
+// Need to code so that more calls will be made if this array is not empty
+let failedCalls = [];
+
+let countryData = [];
+
+// Make API call for first 9 countries
+
+Promise.all(
+  eu
+    .slice(0, 9)
+    .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
+).then((firstCallResponse) => {
+
+    dealWithData(firstCallResponse)
+
+    // Cause dealy before next batch of countries are sent to api (to prevent too many calls error)
 
     setTimeout(
+        // Make API call for next 9 countries
       () =>
         Promise.all(
           eu
             .slice(9, 18)
             .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
         ).then((secondCallResponse) => {
-          console.log("secondCallResponse", secondCallResponse);
-          secondCallResponse
-            .filter((e) => e.status !== 200)
-            .forEach((e) => failedCalls.push(e.url));
 
-          Promise.all(
-            secondCallResponse
-              .filter((e) => e.status === 200)
-              .map((res) => res.json())
-          ).then((secondCallData) => {
-            console.log("secondCallData", secondCallData);
+            dealWithData(secondCallResponse)
+
+        //       // Record failed calls to re-try later
+        //   secondCallResponse
+        //     .filter((e) => e.status !== 200)
+        //     .forEach((e) => failedCalls.push(e.url));
+
+        //   Promise.all(
+        //     secondCallResponse
+        //       .filter((e) => e.status === 200)
+        //       .map((res) => res.json())
+        //   ).then((secondCallData) => {
+        //     console.log("secondCallData", secondCallData);
 
             setTimeout(
               () =>
@@ -123,24 +138,15 @@ Promise.all(
                       fetch(`https://api.covid19api.com/dayone/country/${e}`)
                     )
                 ).then((thirdCallResponse) => {
-                  console.log("secondCallResponse", thirdCallResponse);
-                  thirdCallResponse
-                    .filter((e) => e.status !== 200)
-                    .forEach((e) => failedCalls.push(e.url));
 
-                  Promise.all(
-                    thirdCallResponse
-                      .filter((e) => e.status === 200)
-                      .map((res) => res.json())
-                  ).then((thirdCallData) => {
-                    console.log("thirdCallData", thirdCallData);
-                  });
+                    dealWithData(thirdCallResponse)
+
                 }),
               5000
             );
-          });
-        }),
-      5000
-    );
+          }), 5000
+        // }),
+     
+      );
   });
-});
+// });
