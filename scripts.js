@@ -2,9 +2,8 @@
 
 //deal with failedCalls
 
-localStorage.setItem(e.country, e.data)
 
-console.log('local storage request', localStorage.getItem("Ireland"))
+
 
 
 
@@ -81,19 +80,31 @@ const dealWithData = (data) => {
       //   return array for each country in the format I want
 
       return {
-        country: e[0].Country,
-        countryCode: e[0].CountryCode,
+        country: e[0].Country.toLowerCase(),
+        countryCode: e[0].CountryCode.toLowerCase(),
         data: dataINeed,
       };
     });
 
+    console.log('newData', newData)
+
+    newData.forEach(e=> {
+     
+        
+        localStorage.setItem(e.country, JSON.stringify(e.data))
+
+        if(e.countryCode === 'ie'){
+            console.log('irl')
+            document.getElementById(e.countryCode).innerText(localStorage.getItem("ireland"))
+        }
+        
+        
     
+    })
+       
+        
 
-    newData.forEach(e=> {localStorage.setItem(e.country, e.data)})
 
-    console.log('ie', localStorage.getItem('Ireland'))
-
-    console.log('sw', localStorage.getItem('Sweden'))
 
   
   });
@@ -152,5 +163,5 @@ const getData = () => {
 
 }
 
-// getData()
+getData()
 
