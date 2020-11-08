@@ -32,116 +32,114 @@ let eu = [
 // Need to code so that more calls will be made if this array is not empty
 let failedCalls = [];
 
-let data = []
+let countryData = [];
 
+// Make API call for first 9 countries
 
 Promise.all(
   eu
     .slice(0, 9)
     .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
 ).then((firstCallResponse) => {
+  // Record failed calls to re-try later
+
   firstCallResponse
     .filter((e) => e.status !== 200)
     .forEach((e) => failedCalls.push(e.url));
 
+  // Manipulate data on successful calls
+
   Promise.all(
     firstCallResponse.filter((e) => e.status === 200).map((res) => res.json())
   ).then((firstCallData) => {
-    console.log("firstCallData", firstCallData);
+    let firstBatch = firstCallData.map((e) => {
+      // remove data from British, French, Dutch and Danish colonies
 
-             let newData = firstCallData.map((e)=> {
-return(
-    e.filter(f => f.Province === "")
-    
-    // .map((g,i) => {
-        
-    //     if(i===0){console.log('i', i)}
-        
-    //     return(
-    //     {country: g.Country,
-    //         countryCode: g.CountryCode,
-    //         data: g
-    //     }
-    // )})
-    
-    )
+      let coloniesRemoved = e.filter((f) => f.Province === "");
+      let dataINeed = coloniesRemoved.map((e, i) => {
+        // calculate daily totals from data
 
+        let todaysCases, todaysDeaths;
 
-            })
-
-
-                    let newData2 = newData.map(e => {return(
-        {country: e[0].Country,
-            countryCode: e[0].CountryCode,
-            data: e.map((f,i) => {
-                
-                let todaysCases, todaysDeaths
-
-                i==0 ? todaysCases = f.Confirmed : todaysCases = f.Confirmed - e[i-1].Confirmed
-                i==0 ? todaysDeaths = f.Deaths : todaysDeaths = f.Deaths - e[i-1].Deaths
-                
-                return(
-                {casesToDate: f.Confirmed,
-                deathsToDate: f.Deaths,
-                date: f.Date,
-                todaysCases: todaysCases,
-                todaysDeaths: todaysDeaths
-                }
-            )})
+        if (i == 0) {
+          todaysCases = e.Confirmed;
+          todaysDeaths = e.Deaths;
+        } else {
+          todaysCases = e.Confirmed - coloniesRemoved[i - 1].Confirmed;
+          todaysDeaths = e.Deaths - coloniesRemoved[i - 1].Deaths;
         }
-    )})
 
-        console.log('newData', newData)
+        // return daily data that I want
 
-        console.log('newData2', newData2)
-   
-        return
- 
-    
+        return {
+          casesToDate: e.Confirmed,
+          deathsToDate: e.Deaths,
+          date: e.Date,
+          todaysCases: todaysCases,
+          todaysDeaths: todaysDeaths,
+        };
+      });
 
+      //   return array for each country in the format I want
+
+      return {
+        country: e[0].Country,
+        countryCode: e[0].CountryCode,
+        data: dataINeed,
+      };
+    });
+
+    countryData = [...firstBatch];
+
+    console.log("countryData", countryData);
+
+    return;
 
     setTimeout(
-      () => Promise.all(
-      eu
-        .slice(9, 18)
-        .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-    ).then((secondCallResponse) => {
-
-        console.log('secondCallResponse', secondCallResponse)
-      secondCallResponse.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
-
+      () =>
         Promise.all(
-    secondCallResponse.filter((e) => e.status === 200).map((res) => res.json())
-  ).then(secondCallData => {
-      console.log('secondCallData', secondCallData)
+          eu
+            .slice(9, 18)
+            .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
+        ).then((secondCallResponse) => {
+          console.log("secondCallResponse", secondCallResponse);
+          secondCallResponse
+            .filter((e) => e.status !== 200)
+            .forEach((e) => failedCalls.push(e.url));
 
+          Promise.all(
+            secondCallResponse
+              .filter((e) => e.status === 200)
+              .map((res) => res.json())
+          ).then((secondCallData) => {
+            console.log("secondCallData", secondCallData);
 
+            setTimeout(
+              () =>
+                Promise.all(
+                  eu
+                    .slice(18)
+                    .map((e) =>
+                      fetch(`https://api.covid19api.com/dayone/country/${e}`)
+                    )
+                ).then((thirdCallResponse) => {
+                  console.log("secondCallResponse", thirdCallResponse);
+                  thirdCallResponse
+                    .filter((e) => e.status !== 200)
+                    .forEach((e) => failedCalls.push(e.url));
 
-          setTimeout(
-      () => Promise.all(
-      eu
-        .slice(18)
-        .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-    ).then((thirdCallResponse) => {
-
-        console.log('secondCallResponse', thirdCallResponse)
-      thirdCallResponse.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
-
-        Promise.all(
-    thirdCallResponse.filter((e) => e.status === 200).map((res) => res.json())
-  ).then(thirdCallData => {
-      console.log('thirdCallData', thirdCallData)
-  })
-
-
-    }),
-      5000
-    );
-
-  })
-
-
-    }),
+                  Promise.all(
+                    thirdCallResponse
+                      .filter((e) => e.status === 200)
+                      .map((res) => res.json())
+                  ).then((thirdCallData) => {
+                    console.log("thirdCallData", thirdCallData);
+                  });
+                }),
+              5000
+            );
+          });
+        }),
       5000
     );
   });
