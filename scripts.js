@@ -39,7 +39,7 @@ let eu = [
   "slovenia",
   "spain",
   "sweden",
-  "unitedKingdom",
+  "united-Kingdom",
 ];
 
 const dealWithData = (data) => {
