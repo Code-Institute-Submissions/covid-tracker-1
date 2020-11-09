@@ -30,10 +30,12 @@ let eu = [
   "slovenia",
   "spain",
   "sweden",
-  "united-Kingdom",
+  "united-kingdom",
 ];
 
-const dealWithData = (data, firstCall, lastCall) => {
+let failedCalls = [];
+
+const dealWithData = (data, firstCall, countries) => {
   data.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
 
   // Manipulate data on successful calls
@@ -87,8 +89,6 @@ const dealWithData = (data, firstCall, lastCall) => {
 
     let currentTotal = Number(localStorage.getItem("eu"));
 
-    console.log("currentTotal from local storage", currentTotal);
-
     newData.forEach((e) => {
       localStorage.setItem(e.country, JSON.stringify(e.data));
 
@@ -107,8 +107,6 @@ const dealWithData = (data, firstCall, lastCall) => {
       .map((e) => e.data[e.data.length - 1].casesToDate)
       .reduce((a, b) => a + b);
 
-    console.log("totalCases", totalCases);
-
     localStorage.setItem(
       "countriesDownloaded",
       countriesDownloaded + newData.length
@@ -123,55 +121,29 @@ const dealWithData = (data, firstCall, lastCall) => {
     document.getElementById("euTotalCases").innerHTML = localStorage.getItem(
       "eu"
     );
+
+    if (countries.length > 0) {
+      getData(countries, false);
+    }
   });
 };
 
-// Need to code so that more calls will be made if this array is not empty
-let failedCalls = [];
+const getData = (countries, firstCall) => {
+  if (firstCall) {
+    MakeAPICalls(countries, firstCall);
+  } else {
+    setTimeout(() => MakeAPICalls(countries, firstCall), 5000);
+  }
+};
 
-// Make API call for first 9 countries
-
-const getData = () => {
+const MakeAPICalls = (countries, firstCall) => {
   Promise.all(
-    eu
-      .slice(0, 9)
+    countries
+      .splice(0, 10)
       .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-  ).then((firstCallResponse) => {
-    dealWithData(firstCallResponse, true);
-
-    // Cause dealy before next batch of countries are sent to api (to prevent too many calls error)
-
-    setTimeout(
-      // Make API call for next 9 countries
-      () =>
-        Promise.all(
-          eu
-            .slice(9, 18)
-            .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-        ).then((secondCallResponse) => {
-          dealWithData(secondCallResponse);
-
-          // Cause dealy before next batch of countries are sent to api (to prevent too many calls error)
-
-          setTimeout(
-            () =>
-              // Make API call for final 10 countries
-
-              Promise.all(
-                eu
-                  .slice(18)
-                  .map((e) =>
-                    fetch(`https://api.covid19api.com/dayone/country/${e}`)
-                  )
-              ).then((thirdCallResponse) => {
-                dealWithData(thirdCallResponse, false, true);
-              }),
-            5000
-          );
-        }),
-      5000
-    );
+  ).then((response) => {
+    dealWithData(response, firstCall, countries);
   });
 };
 
-getData();
+getData(eu, true);
