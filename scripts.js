@@ -33,10 +33,15 @@ let eu = [
   "united-kingdom",
 ];
 
-let failedCalls = [];
 
-const dealWithData = (data, firstCall, countries) => {
-  data.filter((e) => e.status !== 200).forEach((e) => failedCalls.push(e.url));
+const dealWithData = (data, firstCall, countries, failedCalls) => {
+
+
+  data.filter((e) => e.status !== 200).forEach((e) => {
+
+    
+        
+    failedCalls.push(e.url.split("country/").pop())});
 
   // Manipulate data on successful calls
 
@@ -44,7 +49,7 @@ const dealWithData = (data, firstCall, countries) => {
     data.filter((e) => e.status === 200).map((res) => res.json())
   ).then((jsonData) => {
     let newData = jsonData.map((e) => {
-      // remove data from British, French, Dutch and Danish colonies
+      // remove British, French, Dutch and Danish colonies from data
 
       let coloniesRemoved = e.filter((f) => f.Province === "");
       let dataINeed = coloniesRemoved.map((e, i) => {
@@ -103,9 +108,13 @@ const dealWithData = (data, firstCall, countries) => {
       localStorage.getItem("countriesDownloaded")
     );
 
-    let totalCases = newData
+    let totalCases = 0
+    
+    if(newData.length > 0){
+        totalCases = newData
       .map((e) => e.data[e.data.length - 1].casesToDate)
       .reduce((a, b) => a + b);
+    }
 
     localStorage.setItem(
       "countriesDownloaded",
@@ -123,27 +132,38 @@ const dealWithData = (data, firstCall, countries) => {
     );
 
     if (countries.length > 0) {
-      getData(countries, false);
+      getData(countries, false, failedCalls);
+    }else if(failedCalls.length >0){
+        console.log('FAILED CALL TRIGGERED')
+        console.log('countries', countries.length)
+        console.log('failedCalls',failedCalls.length)
+        countries = failedCalls.splice(0,10)
+        getData(countries, false, failedCalls);
     }
   });
 };
 
-const getData = (countries, firstCall) => {
+const getData = (countries, firstCall, failedCalls) => {
+
+    console.log('in get data')
+            console.log('countries', countries.length)
+        console.log('failedCalls',failedCalls.length)
+
   if (firstCall) {
-    MakeAPICalls(countries, firstCall);
+    MakeAPICalls(countries, firstCall, failedCalls);
   } else {
-    setTimeout(() => MakeAPICalls(countries, firstCall), 5000);
+    setTimeout(() => MakeAPICalls(countries, firstCall, failedCalls), 4000);
   }
 };
 
-const MakeAPICalls = (countries, firstCall) => {
+const MakeAPICalls = (countries, firstCall, failedCalls) => {
   Promise.all(
     countries
       .splice(0, 10)
       .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
   ).then((response) => {
-    dealWithData(response, firstCall, countries);
+    dealWithData(response, firstCall, countries, failedCalls);
   });
 };
 
-getData(eu, true);
+getData(eu, true, []);
