@@ -4,44 +4,48 @@
 
 //pull their country data and display while the rest is loading
 
-let eu = [
-  "austria",
-  "belgium",
-  "bulgaria",
-  "croatia",
-  "cyprus",
-  "czech-Republic",
-  "denmark",
-  "estonia",
-  "finland",
-  "france",
-  "germany",
-  "greece",
-  "hungary",
-  "ireland",
-  "italy",
-  "latvia",
-  "lithuania",
-  "luxembourg",
-  "malta",
-  "netherlands",
-  "poland",
-  "portugal",
-  "romania",
-  "slovakia",
-  "slovenia",
-  "spain",
-  "sweden",
-  "united-kingdom",
+const euDataSet = [
+  { country: "austria", countryCode: "au", population: 8.8588 },
+  { country: "belgium", countryCode: "be", population: 8.9011 },
+  { country: "bulgaria", countryCode: "bg", population: 6.9515 },
+  { country: "croatia", countryCode: "hr", population: 4.0582 },
+  { country: "cyprus", countryCode: "cy", population: 0.888 },
+  { country: "czech-republic", countryCode: "cz", population: 10.6939 },
+  { country: "denmark", countryCode: "dk", population: 5.8228 },
+  { country: "estonia", countryCode: "ee", population: 1.329 },
+  { country: "finland", countryCode: "fi", population: 5.5253 },
+  { country: "france", countryCode: "fr", population: 67.0988 },
+  { country: "germany", countryCode: "de", population: 83.1667 },
+  { country: "greece", countryCode: "gr", population: 10.7097 },
+  { country: "hungary", countryCode: "hu", population: 9.7695 },
+  { country: "ireland", countryCode: "ie", population: 4.9638 },
+  { country: "italy", countryCode: "it", population: 60.2446 },
+  { country: "latvia", countryCode: "lv", population: 1.9077 },
+  { country: "lithuania", countryCode: "lt", population: 2.7941 },
+  { country: "luxembourg", countryCode: "lu", population: 0.6261 },
+  { country: "malta", countryCode: "mt", population: 0.5146 },
+  { country: "netherlands", countryCode: "nl", population: 17.4076 },
+  { country: "poland", countryCode: "pl", population: 37.9581 },
+  { country: "portugal", countryCode: "pt", population: 10.2959 },
+  { country: "romania", countryCode: "ro", population: 19.318 },
+  { country: "slovakia", countryCode: "sk", population: 5.4579 },
+  { country: "slovenia", countryCode: "si", population: 2.0959 },
+  { country: "spain", countryCode: "es", population: 47.33 },
+  { country: "sweden", countryCode: "se", population: 10.3276 },
+  { country: "united-kingdom", countryCode: "gb", population: 67.0255 },
 ];
 
+let eu = euDataSet.map((e) => e.country);
+
+const countryCodes = euDataSet.map((e) => e.countryCode);
 
 const cleanData = (jsonData) => {
-   let cleanedData =  jsonData.map((e) => {
-      // remove British, French, Dutch and Danish colonies from data
+  let cleanedData = jsonData.map((e) => {
+    // remove British, French, Dutch and Danish colonies from data
 
-      let changeDataFormat = e.filter((f) => f.Province === "").map((e) => {
-
+    let changeDataFormat = e
+      .filter((f) => f.Province === "")
+      .map((e) => {
         return {
           casesToDate: e.Confirmed,
           deathsToDate: e.Deaths,
@@ -49,38 +53,35 @@ const cleanData = (jsonData) => {
         };
       });
 
-      //   return array for each country in the format I want
+    //   return array for each country in the format I want
 
-      return {
-        country: e[0].Country.toLowerCase(),
-        countryCode: e[0].CountryCode.toLowerCase(),
-        data: changeDataFormat,
-      };
-    });
+    return {
+      country: e[0].Country.toLowerCase(),
+      countryCode: e[0].CountryCode.toLowerCase(),
+      data: changeDataFormat,
+    };
+  });
 
-    return cleanedData
-}
-
+  return cleanedData;
+};
 
 const dealWithData = (data, firstCall, countries, failedCalls) => {
+  //Record failed calls so that I can re-call them later
 
-    //Record failed calls so that I can re-call them later
+  data
+    .filter((e) => e.status !== 200)
+    .forEach((e) => {
+      // I based this on similar code that I found here: https://stackoverflow.com/questions/3568921/how-to-remove-part-of-a-string
 
-  data.filter((e) => e.status !== 200).forEach((e) => { 
-      
-    
-    // I based this on similar code that I found here: https://stackoverflow.com/questions/3568921/how-to-remove-part-of-a-string
-
-    failedCalls.push(e.url.split("country/").pop())});
+      failedCalls.push(e.url.split("country/").pop());
+    });
 
   // Manipulate data on successful calls
 
   Promise.all(
     data.filter((e) => e.status === 200).map((res) => res.json())
   ).then((jsonData) => {
-    let countryData = cleanData(jsonData)
-
-    console.log("countryData", countryData);
+    let countryData = cleanData(jsonData);
 
     if (firstCall) {
       localStorage.setItem("eu", 0);
@@ -89,33 +90,35 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
     let currentTotal = Number(localStorage.getItem("eu"));
 
-    countryData.forEach((e) => {
-      localStorage.setItem(e.country, JSON.stringify(e.data));
+    countryData.forEach((e, i) => {
+      localStorage.setItem(e.countryCode, JSON.stringify(e.data));
 
- 
+      // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
+      //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
 
-    // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
-    //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
-   
-  let node = document.createElement("LI");
-  let textnode = document.createTextNode(`${e.country}: ${e.data[e.data.length-1].casesToDate}`);
-  node.appendChild(textnode);
-  document.getElementById("countries").appendChild(node).setAttribute("id", e.countryCode);
-
-
-
+      let node = document.createElement("LI");
+      let textnode = document.createTextNode(
+        `${e.country}: ${e.data[e.data.length - 1].casesToDate}`
+      );
+      node.appendChild(textnode);
+      document
+        .getElementById("countries")
+        .appendChild(node)
+        .setAttribute("id", e.countryCode);
     });
 
     let countriesDownloaded = Number(
       localStorage.getItem("countriesDownloaded")
     );
 
-    let totalCases = 0
-    
-    if(countryData.length > 0){
-        totalCases = countryData
-      .map((e) => e.data[e.data.length - 1].casesToDate)
-      .reduce((a, b) => a + b);
+    let totalCases = 0;
+
+    if (countryData.length > 0) {
+      totalCases = countryData
+        .map((e) => e.data.casesToDate)
+        .reduce((a, b) => a + b);
+
+        console.log('totalCases', totalCases)
     }
 
     localStorage.setItem(
@@ -125,7 +128,6 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
     localStorage.setItem("eu", currentTotal + totalCases);
 
-
     document.getElementById("downloads").innerHTML = localStorage.getItem(
       "countriesDownloaded"
     );
@@ -134,70 +136,72 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
       "eu"
     );
 
-    if(countriesDownloaded+countryData.length === 28){
+    if (countriesDownloaded + countryData.length === 28) {
+      let cyprus = localStorage.getItem("cyprus");
 
-       let ireland = localStorage.getItem("ireland");
+      let unitedKingdom = localStorage.getItem("united-kingdom");
 
-    //    console.log('ireland', ireland)
+      console.log("cyprus", cyprus);
 
-    //    console.log('ireland parsed', JSON.parse(ireland))
- 
-        // console.log(JSON.parse(allData.ireland))
+      console.log("UK", unitedKingdom);
 
-        // let allData = Object.entries(localStorage)
+      console.log(
+        "euDataSet.map(e=>e.countryCode)",
+        euDataSet.map((e) => e.countryCode)
+      );
 
-    //    let colmData = allData.map(e=>{e.map((f,i)=>{
+      let allData = euDataSet
+        .map((e) => e.countryCode.toLowerCase())
+        .map((e) => JSON.parse(localStorage.getItem(e)));
 
-    //         if(i===0){
-    //             return f
-    //         }else{
-    //             console.log('f', f)
-    //             console.log('parsed f', f)
-    //             return (JSON.parse(f))
-    //         }
+      console.log("allData", allData);
 
-    //     })
-    //     return e
-    // })
+      // console.log('allData', JSON.parse(allData))
 
-        // console.log('colmData', colmData)
+      // console.log('eu', eu)
 
+      //    let colmData = allData.map(e=>{e.map((f,i)=>{
 
-        // console.log('allData[0]', allData[0])
+      //         if(i===0){
+      //             return f
+      //         }else{
+      //             console.log('f', f)
+      //             console.log('parsed f', f)
+      //             return (JSON.parse(f))
+      //         }
 
-        // console.log('allData[0][0]', allData[0][0])
-        // console.log('allData[0][1]', allData[0][1])
+      //     })
+      //     return e
+      // })
 
-        //  console.log('allData[0][1] PARSED', JSON.parse(allData[0][1]))
+      // console.log('colmData', colmData)
+
+      // console.log('allData[0]', allData[0])
+
+      // console.log('allData[0][0]', allData[0][0])
+      // console.log('allData[0][1]', allData[0][1])
+
+      //  console.log('allData[0][1] PARSED', JSON.parse(allData[0][1]))
     }
-    
-
-
-
-
-
 
     if (countries.length > 0) {
       getData(countries, false, failedCalls);
-    }else if(failedCalls.length >0){
-
-        countries = failedCalls.splice(0,10)
-        getData(countries, false, failedCalls);
+    } else if (failedCalls.length > 0) {
+      countries = failedCalls.splice(0, 10);
+      getData(countries, false, failedCalls);
     }
   });
 };
 
 const getData = (countries, firstCall, failedCalls) => {
-
-
   if (firstCall) {
-    MakeAPICalls(countries, firstCall, failedCalls);
+    makeAPICalls(countries, firstCall, failedCalls);
   } else {
-    setTimeout(() => MakeAPICalls(countries, firstCall, failedCalls), 5000);
+    setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
   }
 };
 
-const MakeAPICalls = (countries, firstCall, failedCalls) => {
+const makeAPICalls = (countries, firstCall, failedCalls) => {
   Promise.all(
     countries
       .splice(0, 10)
@@ -207,4 +211,4 @@ const MakeAPICalls = (countries, firstCall, failedCalls) => {
   });
 };
 
-getData(eu, true, []);
+getData([...eu], true, []);
