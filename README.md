@@ -22,6 +22,11 @@ COLONIES:
 
 Denmark, Netherlands, France and the UK include former colonies from different parts of the world in their data. I used `.filter` to remove this data.
 
+FAILED API CALLS
+
+
+PROMISE ALL AND FETCHES
+
 ## Credits
 
 https://stackoverflow.com/questions/313893/how-to-measure-time-taken-by-a-function-to-execute
@@ -40,3 +45,11 @@ https://gomakethings.com/waiting-for-multiple-all-api-responses-to-complete-with
 
 https://www.youtube.com/watch?v=4A1cUp2wK2c
 
+https://stackoverflow.com/questions/9422974/createelement-with-id
+
+  // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
+    //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
+
+    https://stackoverflow.com/questions/11301438/return-index-of-greatest-value-in-an-array
+
+    https://ec.europa.eu/eurostat/documents/2995521/11081093/3-10072020-AP-EN.pdf/d2f799bf-4412-05cc-a357-7b49b93615f1
