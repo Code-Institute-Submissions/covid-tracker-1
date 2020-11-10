@@ -5,7 +5,7 @@
 //pull their country data and display while the rest is loading
 
 const euDataSet = [
-  { country: "austria", countryCode: "au", population: 8.8588 },
+  { country: "austria", countryCode: "at", population: 8.8588 },
   { country: "belgium", countryCode: "be", population: 8.9011 },
   { country: "bulgaria", countryCode: "bg", population: 6.9515 },
   { country: "croatia", countryCode: "hr", population: 4.0582 },
@@ -113,12 +113,11 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
     let totalCases = 0;
 
-    if (countryData.length > 0) {
-      totalCases = countryData
-        .map((e) => e.data.casesToDate)
-        .reduce((a, b) => a + b);
+    console.log('countryData', countryData)
 
-        console.log('totalCases', totalCases)
+    if (countryData.length > 0) {
+      
+        totalCases = countryData.map(e=>e.data[e.data.length-1].casesToDate).reduce((a, b) => a + b) 
     }
 
     localStorage.setItem(
@@ -141,47 +140,12 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
       let unitedKingdom = localStorage.getItem("united-kingdom");
 
-      console.log("cyprus", cyprus);
-
-      console.log("UK", unitedKingdom);
-
-      console.log(
-        "euDataSet.map(e=>e.countryCode)",
-        euDataSet.map((e) => e.countryCode)
-      );
 
       let allData = euDataSet
         .map((e) => e.countryCode.toLowerCase())
         .map((e) => JSON.parse(localStorage.getItem(e)));
 
-      console.log("allData", allData);
 
-      // console.log('allData', JSON.parse(allData))
-
-      // console.log('eu', eu)
-
-      //    let colmData = allData.map(e=>{e.map((f,i)=>{
-
-      //         if(i===0){
-      //             return f
-      //         }else{
-      //             console.log('f', f)
-      //             console.log('parsed f', f)
-      //             return (JSON.parse(f))
-      //         }
-
-      //     })
-      //     return e
-      // })
-
-      // console.log('colmData', colmData)
-
-      // console.log('allData[0]', allData[0])
-
-      // console.log('allData[0][0]', allData[0][0])
-      // console.log('allData[0][1]', allData[0][1])
-
-      //  console.log('allData[0][1] PARSED', JSON.parse(allData[0][1]))
     }
 
     if (countries.length > 0) {
