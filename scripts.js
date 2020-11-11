@@ -39,6 +39,28 @@ let eu = euDataSet.map((e) => e.country);
 
 const countryCodes = euDataSet.map((e) => e.countryCode);
 
+function dataForGraphs() {
+  let allData = euDataSet
+    .map((e) => e.countryCode)
+    .map((e) => JSON.parse(localStorage.getItem(e)));
+
+  // let checkCountries = Object.keys(allData)
+
+  //code to make sure data is available for all countries for this day
+
+  let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
+
+  latestDay = latestDay.map((e, i) => {
+    e.casesPerCapita = e.casesToDate / euDataSet[i].population;
+    e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
+    e.countryCode = euDataSet[i].countryCode;
+    e.country = euDataSet[i].country;
+    return e;
+  });
+
+  console.log("latestDay2", latestDay);
+}
+
 const cleanData = (jsonData) => {
   let cleanedData = jsonData.map((e) => {
     // remove British, French, Dutch and Danish colonies from data
@@ -90,6 +112,8 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
     let currentTotal = Number(localStorage.getItem("eu"));
 
+    console.log("countryData", countryData);
+
     countryData.forEach((e, i) => {
       localStorage.setItem(e.countryCode, JSON.stringify(e.data));
 
@@ -113,10 +137,10 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
     let totalCases = 0;
 
-
     if (countryData.length > 0) {
-      
-        totalCases = countryData.map(e=>e.data[e.data.length-1].casesToDate).reduce((a, b) => a + b) 
+      totalCases = countryData
+        .map((e) => e.data[e.data.length - 1].casesToDate)
+        .reduce((a, b) => a + b);
     }
 
     localStorage.setItem(
@@ -135,29 +159,31 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
     );
 
     if (countriesDownloaded + countryData.length === 28) {
-  
-      let allData = euDataSet
-        .map((e) => e.countryCode.toLowerCase())
-        .map((e) => JSON.parse(localStorage.getItem(e)));
-
-        // let checkCountries = Object.keys(allData)
-
-        //code to make sure data is available for all countries for this day
-
-        let latestDay = Object.values(allData).map(e=>e[e.length-1])
 
 
-        latestDay = latestDay.map((e,i) => {
-            e.casesPerCapita = e.casesToDate/euDataSet[i].population
-            e.deathsPerCapita = e.deathsToDate/euDataSet[i].population
-            e.countryCode = euDataSet[i].countryCode
-            e.country = euDataSet[i].country
-            return e
-        })
+        dataForGraphs()
 
-        console.log('latestDay2', latestDay)
+    //   let allData = euDataSet
+    //     .map((e) => e.countryCode.toLowerCase())
+    //     .map((e) => JSON.parse(localStorage.getItem(e)));
 
-        //capture highest and lowest values and EU average
+    //   // let checkCountries = Object.keys(allData)
+
+    //   //code to make sure data is available for all countries for this day
+
+    //   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
+
+    //   latestDay = latestDay.map((e, i) => {
+    //     e.casesPerCapita = e.casesToDate / euDataSet[i].population;
+    //     e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
+    //     e.countryCode = euDataSet[i].countryCode;
+    //     e.country = euDataSet[i].country;
+    //     return e;
+    //   });
+
+    //   console.log("latestDay2", latestDay);
+
+    //   //capture highest and lowest values and EU average
     }
 
     if (countries.length > 0) {
