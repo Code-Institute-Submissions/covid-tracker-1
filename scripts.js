@@ -39,6 +39,8 @@ let eu = euDataSet.map((e) => e.country);
 
 const countryCodes = euDataSet.map((e) => e.countryCode);
 
+dataForGraphs()
+
 function dataForGraphs() {
   let allData = euDataSet
     .map((e) => e.countryCode)
@@ -50,15 +52,26 @@ function dataForGraphs() {
 
   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
 
-  latestDay = latestDay.map((e, i) => {
-    e.casesPerCapita = e.casesToDate / euDataSet[i].population;
-    e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
-    e.countryCode = euDataSet[i].countryCode;
-    e.country = euDataSet[i].country;
-    return e;
+  casesPerCapita = latestDay.map((e, i) => {
+    return (e.casesPerCapita = e.casesToDate / euDataSet[i].population)
+    // e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
+    // e.countryCode = euDataSet[i].countryCode;
+    // e.country = euDataSet[i].country;
+    // return e;
   });
 
-  console.log("latestDay2", latestDay);
+    //  console.log("latestDay2", latestDay);
+
+    // Below code is from https://scrimba.com/learn/d3js/data-loading-and-binding-d3-tutorial-cGZNpU7
+
+d3.select('body')
+    .selectAll('p')
+    .data(casesPerCapita)
+    .enter()
+    .append('p') 
+    .text((casesPerCapita) => {return casesPerCapita})
+
+ 
 }
 
 const cleanData = (jsonData) => {
@@ -163,27 +176,7 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
         dataForGraphs()
 
-    //   let allData = euDataSet
-    //     .map((e) => e.countryCode.toLowerCase())
-    //     .map((e) => JSON.parse(localStorage.getItem(e)));
 
-    //   // let checkCountries = Object.keys(allData)
-
-    //   //code to make sure data is available for all countries for this day
-
-    //   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
-
-    //   latestDay = latestDay.map((e, i) => {
-    //     e.casesPerCapita = e.casesToDate / euDataSet[i].population;
-    //     e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
-    //     e.countryCode = euDataSet[i].countryCode;
-    //     e.country = euDataSet[i].country;
-    //     return e;
-    //   });
-
-    //   console.log("latestDay2", latestDay);
-
-    //   //capture highest and lowest values and EU average
     }
 
     if (countries.length > 0) {
@@ -213,4 +206,4 @@ const makeAPICalls = (countries, firstCall, failedCalls) => {
   });
 };
 
-getData([...eu], true, []);
+// getData([...eu], true, []);
