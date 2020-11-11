@@ -52,7 +52,7 @@ function dataForGraphs() {
 
   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
 
-  casesPerCapita = latestDay.map((e, i) => {
+  let casesPerCapita = latestDay.map((e, i) => {
     return (e.casesPerCapita = e.casesToDate / euDataSet[i].population)
     // e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
     // e.countryCode = euDataSet[i].countryCode;
@@ -60,16 +60,38 @@ function dataForGraphs() {
     // return e;
   });
 
+  console.log('casesPErCapita', casesPerCapita)
+
     //  console.log("latestDay2", latestDay);
 
-    // Below code is from https://scrimba.com/learn/d3js/data-loading-and-binding-d3-tutorial-cGZNpU7
+    // Below code is from https://scrimba.com/learn/d3js/creating-a-simple-bar-chart-d3-tutorial-ckV6eHM
 
-d3.select('body')
-    .selectAll('p')
+
+
+    let svgWidth = 500, svgHeight = 300, barPadding = 5;
+let barWidth = (svgWidth / casesPerCapita.length);
+
+
+let svg = d3.select('svg')
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
+    
+let barChart = svg.selectAll("rect")
     .data(casesPerCapita)
     .enter()
-    .append('p') 
-    .text((casesPerCapita) => {return casesPerCapita})
+    .append("rect")
+    .attr("y", function(d) {
+         return svgHeight - d 
+    })
+    .attr("height", function(d) { 
+        return d; 
+    })
+    .attr("width", barWidth - barPadding)
+    .attr("transform", function (d, i) {
+        let translate = [barWidth * i, 0]; 
+        return "translate("+ translate +")";
+    });
+
 
  
 }
