@@ -5,95 +5,112 @@
 //pull their country data and display while the rest is loading
 
 const euDataSet = [
-  { country: "austria", countryCode: "at", population: 8.8588 },
-  { country: "belgium", countryCode: "be", population: 8.9011 },
-  { country: "bulgaria", countryCode: "bg", population: 6.9515 },
-  { country: "croatia", countryCode: "hr", population: 4.0582 },
-  { country: "cyprus", countryCode: "cy", population: 0.888 },
-  { country: "czech-republic", countryCode: "cz", population: 10.6939 },
-  { country: "denmark", countryCode: "dk", population: 5.8228 },
-  { country: "estonia", countryCode: "ee", population: 1.329 },
-  { country: "finland", countryCode: "fi", population: 5.5253 },
-  { country: "france", countryCode: "fr", population: 67.0988 },
-  { country: "germany", countryCode: "de", population: 83.1667 },
-  { country: "greece", countryCode: "gr", population: 10.7097 },
-  { country: "hungary", countryCode: "hu", population: 9.7695 },
-  { country: "ireland", countryCode: "ie", population: 4.9638 },
-  { country: "italy", countryCode: "it", population: 60.2446 },
-  { country: "latvia", countryCode: "lv", population: 1.9077 },
-  { country: "lithuania", countryCode: "lt", population: 2.7941 },
-  { country: "luxembourg", countryCode: "lu", population: 0.6261 },
-  { country: "malta", countryCode: "mt", population: 0.5146 },
-  { country: "netherlands", countryCode: "nl", population: 17.4076 },
-  { country: "poland", countryCode: "pl", population: 37.9581 },
-  { country: "portugal", countryCode: "pt", population: 10.2959 },
-  { country: "romania", countryCode: "ro", population: 19.318 },
-  { country: "slovakia", countryCode: "sk", population: 5.4579 },
-  { country: "slovenia", countryCode: "si", population: 2.0959 },
-  { country: "spain", countryCode: "es", population: 47.33 },
-  { country: "sweden", countryCode: "se", population: 10.3276 },
-  { country: "united-kingdom", countryCode: "gb", population: 67.0255 },
+  { country: "austria", countryCode: "at", population: 88.588 },
+  { country: "belgium", countryCode: "be", population: 89.011 },
+  { country: "bulgaria", countryCode: "bg", population: 69.515 },
+  { country: "croatia", countryCode: "hr", population: 40.582 },
+  { country: "cyprus", countryCode: "cy", population: 08.88 },
+  { country: "czech-republic", countryCode: "cz", population: 106.939 },
+  { country: "denmark", countryCode: "dk", population: 58.228 },
+  { country: "estonia", countryCode: "ee", population: 13.29 },
+  { country: "finland", countryCode: "fi", population: 55.253 },
+  { country: "france", countryCode: "fr", population: 670.988 },
+  { country: "germany", countryCode: "de", population: 831.667 },
+  { country: "greece", countryCode: "gr", population: 107.097 },
+  { country: "hungary", countryCode: "hu", population: 97.695 },
+  { country: "ireland", countryCode: "ie", population: 49.638 },
+  { country: "italy", countryCode: "it", population: 602.446 },
+  { country: "latvia", countryCode: "lv", population: 19.077 },
+  { country: "lithuania", countryCode: "lt", population: 27.941 },
+  { country: "luxembourg", countryCode: "lu", population: 6.261},
+  { country: "malta", countryCode: "mt", population: 5.146 },
+  { country: "netherlands", countryCode: "nl", population: 174.076 },
+  { country: "poland", countryCode: "pl", population: 379.581 },
+  { country: "portugal", countryCode: "pt", population: 102.959 },
+  { country: "romania", countryCode: "ro", population: 193.18 },
+  { country: "slovakia", countryCode: "sk", population: 54.579 },
+  { country: "slovenia", countryCode: "si", population: 20.959 },
+  { country: "spain", countryCode: "es", population: 473.3 },
+  { country: "sweden", countryCode: "se", population: 103.276 },
+  { country: "united-kingdom", countryCode: "gb", population: 670.255 },
 ];
 
 let eu = euDataSet.map((e) => e.country);
 
 const countryCodes = euDataSet.map((e) => e.countryCode);
 
-dataForGraphs()
+const svg = d3.select('svg')
+const width = +svg.attr('width')
+const height = +svg.attr('height')
+
+
+// This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
+
+const render = (data,metric, countryID) => {
+
+    data = data.sort((a, b) => b[metric] - a[metric])
+
+    const xValue = d => d[metric]
+    const yValue = d => d[countryID]
+    const margin = {top: 20, right: 20, bottom: 20, left: 25}
+    const innerWidth = width - margin.left - margin.right
+    const innerHeight = height - margin.top - margin.bottom
+
+    const xScale = d3.scaleLinear( )
+    .domain([0, d3.max(data, xValue)])
+    .range([0, innerWidth])
+
+  
+
+    const yScale = d3.scaleBand( )
+    .domain(data.map(yValue))
+    .range([0, innerHeight])
+    .padding(0.15)
+
+    const g = svg.append('g')
+    .attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+    g.append('g').call(d3.axisLeft(yScale) )
+    g.append('g').call(d3.axisBottom(xScale) )
+    .attr('transform', `translate(0, ${innerHeight})`)
+
+  g
+    .selectAll("rect")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr('y', d => yScale(yValue(d)))
+    .attr("width", d => xScale(xValue(d)))
+    .attr("height", yScale.bandwidth());
+};
+
+// dataForGraphs();
 
 function dataForGraphs() {
   let allData = euDataSet
     .map((e) => e.countryCode)
     .map((e) => JSON.parse(localStorage.getItem(e)));
 
-  // let checkCountries = Object.keys(allData)
-
   //code to make sure data is available for all countries for this day
 
   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
 
   let casesPerCapita = latestDay.map((e, i) => {
-    return (e.casesPerCapita = e.casesToDate / euDataSet[i].population)
-    // e.deathsPerCapita = e.deathsToDate / euDataSet[i].population;
-    // e.countryCode = euDataSet[i].countryCode;
-    // e.country = euDataSet[i].country;
-    // return e;
+    return (e.casesPerCapita = e.casesToDate / euDataSet[i].population);
   });
 
-  console.log('casesPErCapita', casesPerCapita)
+  let testArray = [];
 
-    //  console.log("latestDay2", latestDay);
+  euDataSet.forEach((e, i) => {
 
-    // Below code is from https://scrimba.com/learn/d3js/creating-a-simple-bar-chart-d3-tutorial-ckV6eHM
+    testArray.push({ ['countryCode']: e.countryCode,
+                    ['casesPerCapita'] : Math.round(casesPerCapita[i]) 
+     });
 
+    // testArray.push({ [e.countryCode]: Math.round(casesPerCapita[i]) });
+  });
 
-
-    let svgWidth = 500, svgHeight = 300, barPadding = 5;
-let barWidth = (svgWidth / casesPerCapita.length);
-
-
-let svg = d3.select('svg')
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
-    
-let barChart = svg.selectAll("rect")
-    .data(casesPerCapita)
-    .enter()
-    .append("rect")
-    .attr("y", function(d) {
-         return svgHeight - d 
-    })
-    .attr("height", function(d) { 
-        return d; 
-    })
-    .attr("width", barWidth - barPadding)
-    .attr("transform", function (d, i) {
-        let translate = [barWidth * i, 0]; 
-        return "translate("+ translate +")";
-    });
-
-
- 
+  render(testArray, 'casesPerCapita', 'countryCode');
 }
 
 const cleanData = (jsonData) => {
@@ -194,11 +211,7 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
     );
 
     if (countriesDownloaded + countryData.length === 28) {
-
-
-        dataForGraphs()
-
-
+      dataForGraphs();
     }
 
     if (countries.length > 0) {
@@ -228,4 +241,4 @@ const makeAPICalls = (countries, firstCall, failedCalls) => {
   });
 };
 
-// getData([...eu], true, []);
+getData([...eu], true, []);
