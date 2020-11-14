@@ -92,7 +92,6 @@ const height = +svg.attr("height");
     .select('.domain')
   .remove()
 
-  xAxisG.append('text').attr('y', -10).attr('x', innerWidth/2).attr('fill', 'black').text('cases')
 
   g.selectAll("rect")
     .data(data)
