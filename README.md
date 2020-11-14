@@ -24,6 +24,8 @@ Denmark, Netherlands, France and the UK include former colonies from different p
 
 FAILED API CALLS
 
+GETTING CHART TO UPDATE AS COUNTRY DATA IS DOWNLOADED
+
 
 PROMISE ALL AND FETCHES
 
