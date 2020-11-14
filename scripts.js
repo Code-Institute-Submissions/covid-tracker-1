@@ -40,16 +40,53 @@ let eu = euDataSet.map((e) => e.country);
 const countryCodes = euDataSet.map((e) => e.countryCode);
 
 
-
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
+
+const colmRender = (data, metric, countryID) => {
+
+const svg = d3.select("svg");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+
+  const xScale = d3.scaleLinear()
+  .domain([0, d3.max(data, d => d[metric])])
+  .range([0,width])
+
+  const yScale = d3.scaleBand()
+  .domain(data.map(d => d[countryID]))
+  .range([0, height])
+
+
+
+  svg.selectAll('rect').data(data)
+  .enter()
+  .append('rect')
+  .attr('y', d => yScale(d[countryID]))
+  .attr('width', d => xScale(d[metric]))
+  .attr('height', yScale.bandwidth())
+
+    svg.selectAll('rect').data(data)
+//   .enter()
+//   .append('rect')
+  .attr('y', d => yScale(d[countryID]))
+  .attr('width', d => xScale(d[metric]))
+  .attr('height', yScale.bandwidth())
+
+  
+}
+
+
+
+
+
+
+// dataForGraphs();
 
 const render = (data, metric, countryID) => {
 
-  data = data.sort((a, b) => b[metric] - a[metric]);
-
   const svg = d3.select("svg");
-const width = +svg.attr("width");
-const height = +svg.attr("height");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
 
   const xValue = (d) => d[metric];
   const yValue = (d) => d[countryID];
@@ -57,14 +94,10 @@ const height = +svg.attr("height");
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-
-
-
   const xScale = d3
     .scaleLinear()
     .domain([0, d3.max(data, xValue)])
-    .range([0, innerWidth])
- 
+    .range([0, innerWidth]);
 
   const yScale = d3
     .scaleBand()
@@ -76,22 +109,19 @@ const height = +svg.attr("height");
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    const xAxis = d3.axisBottom(xScale).tickSize(-innerWidth)
+  const xAxis = d3.axisBottom(xScale).tickSize(-innerWidth);
 
+  g.append("g")
+    .call(d3.axisLeft(yScale))
+    .selectAll(".domain, .tick line")
+    .remove();
 
-
-  g.append("g").call(d3.axisLeft(yScale))
-  .selectAll('.domain, .tick line')
-  .remove()
-
-    const xAxisG = g.append("g")
+  const xAxisG = g
+    .append("g")
     .call(xAxis)
-    .attr("transform", `translate(0, ${innerHeight})`)
+    .attr("transform", `translate(0, ${innerHeight})`);
 
-    xAxisG
-    .select('.domain')
-  .remove()
-
+  xAxisG.select(".domain").remove();
 
   g.selectAll("rect")
     .data(data)
@@ -101,29 +131,21 @@ const height = +svg.attr("height");
     .attr("width", (d) => xScale(xValue(d)))
     .attr("height", yScale.bandwidth());
 
-    g.append('text')
-    .attr('y', -8)
-    .text('Covid Cases Per 100,000 People by Country')
+  g.append("text")
+    .attr("y", -8)
+    .text("Covid Cases Per 100,000 People by Country");
 };
 
-dataForGraphs();
 
-function dataForGraphs() {
+
+function dataForGraphs(countriesDownloaded) {
   let allData = euDataSet
     .map((e) => e.countryCode)
-    .map((e) => JSON.parse(localStorage.getItem(e)));
+    .map((e) => JSON.parse(localStorage.getItem(e))).filter(e=>e!==null)
 
   //code to make sure data is available for all countries for this day
 
   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
-
-  let totalEuCases = latestDay
-    .map((e) => e.casesToDate)
-    .reduce((a, b) => a + b);
-  let euPopulation = euDataSet.map((e) => e.population).reduce((a, b) => a + b);
-
-  console.log("totalEU", totalEuCases);
-  console.log("euPopulation", euPopulation);
 
   let casesPerCapita = latestDay.map((e, i) => {
     return (e.casesPerCapita = e.casesToDate / euDataSet[i].population);
@@ -136,14 +158,24 @@ function dataForGraphs() {
     };
   });
 
+  if(countriesDownloaded === 28){
+      let totalEuCases = latestDay
+    .map((e) => e.casesToDate)
+    .reduce((a, b) => a + b);
+
+  let euPopulation = euDataSet.map((e) => e.population).reduce((a, b) => a + b);
+
   casesPerCapitaObjects.push({
     countryCode: "eu",
     casesPerCapita: Math.round(totalEuCases / euPopulation),
   });
+  }
 
 
 
-  render(casesPerCapitaObjects, "casesPerCapita", "countryCode");
+//   render(casesPerCapitaObjects, "casesPerCapita", "countryCode");
+
+colmRender(casesPerCapitaObjects, "casesPerCapita", "countryCode", true);
 }
 
 const cleanData = (jsonData) => {
@@ -197,8 +229,6 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
     let currentTotal = Number(localStorage.getItem("eu"));
 
-    console.log("countryData", countryData);
-
     countryData.forEach((e, i) => {
       localStorage.setItem(e.countryCode, JSON.stringify(e.data));
 
@@ -243,9 +273,9 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
       "eu"
     );
 
-    if (countriesDownloaded + countryData.length === 28) {
-      dataForGraphs();
-    }
+    
+      dataForGraphs(countriesDownloaded + countryData.length);
+  
 
     if (countries.length > 0) {
       getData(countries, false, failedCalls);
@@ -258,6 +288,7 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
 const getData = (countries, firstCall, failedCalls) => {
   if (firstCall) {
+      localStorage.clear()
     makeAPICalls(countries, firstCall, failedCalls);
   } else {
     setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
@@ -274,4 +305,4 @@ const makeAPICalls = (countries, firstCall, failedCalls) => {
   });
 };
 
-// getData([...eu], true, []);
+getData([...eu], true, []);
