@@ -53,7 +53,7 @@ const height = +svg.attr("height");
 
   const xValue = (d) => d[metric];
   const yValue = (d) => d[countryID];
-  const margin = { top: 20, right: 20, bottom: 20, left: 25 };
+  const margin = { top: 40, right: 20, bottom: 20, left: 25 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -87,6 +87,10 @@ const height = +svg.attr("height");
     .attr("y", (d) => yScale(yValue(d)))
     .attr("width", (d) => xScale(xValue(d)))
     .attr("height", yScale.bandwidth());
+
+    g.append('text')
+    .attr('y', -10)
+    .text('Cases Per 100,000 People')
 };
 
 dataForGraphs();
