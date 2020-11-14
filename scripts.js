@@ -48,6 +48,7 @@ const height = +svg.attr('height')
 
 const render = (data,metric, countryID) => {
 
+
     data = data.sort((a, b) => b[metric] - a[metric])
 
     const xValue = d => d[metric]
@@ -95,22 +96,52 @@ function dataForGraphs() {
 
   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
 
+          let totalEuCases = latestDay.map(e => e.casesToDate).reduce((a,b) => a+b)
+  let euPopulation = euDataSet.map(e=>e.population).reduce((a,b) => a+b)
+
+  console.log('totalEU', totalEuCases)
+  console.log('euPopulation', euPopulation)
+
   let casesPerCapita = latestDay.map((e, i) => {
     return (e.casesPerCapita = e.casesToDate / euDataSet[i].population);
   });
 
-  let testArray = [];
 
-  euDataSet.forEach((e, i) => {
 
-    testArray.push({ ['countryCode']: e.countryCode,
-                    ['casesPerCapita'] : Math.round(casesPerCapita[i]) 
-     });
 
-    // testArray.push({ [e.countryCode]: Math.round(casesPerCapita[i]) });
-  });
+  
 
-  render(testArray, 'casesPerCapita', 'countryCode');
+//   euDataSet.forEach((e, i) => {
+
+//     testArray.push({ ['countryCode']: e.countryCode,
+//                     ['casesPerCapita'] : Math.round(casesPerCapita[i]) 
+//      });
+
+
+
+//     // testArray.push({ [e.countryCode]: Math.round(casesPerCapita[i]) });
+
+let colmEu = {['countrycode']: 'eu', ['casesPerCapita']: Math.round(totalEuCases/euPopulation)}
+//   })
+
+  let testArray =      euDataSet.map((e,i)=>{return{['countryCode']: e.countryCode,
+                                ['casesPerCapita']: Math.round(casesPerCapita[i]) 
+                                }})
+
+
+
+    
+   
+                                
+    testArray.push({countrycode: 'eu', casesPerCapita: Math.round(totalEuCases/euPopulation)})
+
+    let clonedArray = [...testArray]
+
+    console.log('clonedArray', clonedArray)
+
+ 
+
+  render(clonedArray, 'casesPerCapita', 'countryCode');
 }
 
 const cleanData = (jsonData) => {
