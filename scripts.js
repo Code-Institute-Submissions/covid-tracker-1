@@ -22,7 +22,7 @@ const euDataSet = [
   { country: "italy", countryCode: "it", population: 602.446 },
   { country: "latvia", countryCode: "lv", population: 19.077 },
   { country: "lithuania", countryCode: "lt", population: 27.941 },
-  { country: "luxembourg", countryCode: "lu", population: 6.261},
+  { country: "luxembourg", countryCode: "lu", population: 6.261 },
   { country: "malta", countryCode: "mt", population: 5.146 },
   { country: "netherlands", countryCode: "nl", population: 174.076 },
   { country: "poland", countryCode: "pl", population: 379.581 },
@@ -39,53 +39,57 @@ let eu = euDataSet.map((e) => e.country);
 
 const countryCodes = euDataSet.map((e) => e.countryCode);
 
-const svg = d3.select('svg')
-const width = +svg.attr('width')
-const height = +svg.attr('height')
 
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-const render = (data,metric, countryID) => {
+const render = (data, metric, countryID) => {
+  data = data.sort((a, b) => b[metric] - a[metric]);
 
+  const svg = d3.select("svg");
+const width = +svg.attr("width");
+const height = +svg.attr("height");
 
-    data = data.sort((a, b) => b[metric] - a[metric])
+  const xValue = (d) => d[metric];
+  const yValue = (d) => d[countryID];
+  const margin = { top: 20, right: 20, bottom: 20, left: 25 };
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
 
-    const xValue = d => d[metric]
-    const yValue = d => d[countryID]
-    const margin = {top: 20, right: 20, bottom: 20, left: 25}
-    const innerWidth = width - margin.left - margin.right
-    const innerHeight = height - margin.top - margin.bottom
-
-    const xScale = d3.scaleLinear( )
+  const xScale = d3
+    .scaleLinear()
     .domain([0, d3.max(data, xValue)])
-    .range([0, innerWidth])
+    .range([0, innerWidth]);
 
-  
-
-    const yScale = d3.scaleBand( )
+  const yScale = d3
+    .scaleBand()
     .domain(data.map(yValue))
     .range([0, innerHeight])
-    .padding(0.15)
+    .padding(0.15);
 
-    const g = svg.append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
+  const g = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    g.append('g').call(d3.axisLeft(yScale) )
-    g.append('g').call(d3.axisBottom(xScale) )
-    .attr('transform', `translate(0, ${innerHeight})`)
+  g.append("g").call(d3.axisLeft(yScale))
+  .selectAll('.domain, .tick line')
+  .remove()
 
-  g
-    .selectAll("rect")
+
+  g.append("g")
+    .call(d3.axisBottom(xScale))
+    .attr("transform", `translate(0, ${innerHeight})`);
+
+  g.selectAll("rect")
     .data(data)
     .enter()
     .append("rect")
-    .attr('y', d => yScale(yValue(d)))
-    .attr("width", d => xScale(xValue(d)))
+    .attr("y", (d) => yScale(yValue(d)))
+    .attr("width", (d) => xScale(xValue(d)))
     .attr("height", yScale.bandwidth());
 };
 
-// dataForGraphs();
+dataForGraphs();
 
 function dataForGraphs() {
   let allData = euDataSet
@@ -96,52 +100,33 @@ function dataForGraphs() {
 
   let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
 
-          let totalEuCases = latestDay.map(e => e.casesToDate).reduce((a,b) => a+b)
-  let euPopulation = euDataSet.map(e=>e.population).reduce((a,b) => a+b)
+  let totalEuCases = latestDay
+    .map((e) => e.casesToDate)
+    .reduce((a, b) => a + b);
+  let euPopulation = euDataSet.map((e) => e.population).reduce((a, b) => a + b);
 
-  console.log('totalEU', totalEuCases)
-  console.log('euPopulation', euPopulation)
+  console.log("totalEU", totalEuCases);
+  console.log("euPopulation", euPopulation);
 
   let casesPerCapita = latestDay.map((e, i) => {
     return (e.casesPerCapita = e.casesToDate / euDataSet[i].population);
   });
 
+  let testArray = euDataSet.map((e, i) => {
+    return {
+      ["countryCode"]: e.countryCode,
+      ["casesPerCapita"]: Math.round(casesPerCapita[i]),
+    };
+  });
 
+  testArray.push({
+    countrycode: "eu",
+    casesPerCapita: Math.round(totalEuCases / euPopulation),
+  });
 
+  let clonedArray = [...testArray];
 
-  
-
-//   euDataSet.forEach((e, i) => {
-
-//     testArray.push({ ['countryCode']: e.countryCode,
-//                     ['casesPerCapita'] : Math.round(casesPerCapita[i]) 
-//      });
-
-
-
-//     // testArray.push({ [e.countryCode]: Math.round(casesPerCapita[i]) });
-
-let colmEu = {['countrycode']: 'eu', ['casesPerCapita']: Math.round(totalEuCases/euPopulation)}
-//   })
-
-  let testArray =      euDataSet.map((e,i)=>{return{['countryCode']: e.countryCode,
-                                ['casesPerCapita']: Math.round(casesPerCapita[i]) 
-                                }})
-
-
-
-    
-   
-                                
-    testArray.push({countrycode: 'eu', casesPerCapita: Math.round(totalEuCases/euPopulation)})
-
-    let clonedArray = [...testArray]
-
-    console.log('clonedArray', clonedArray)
-
- 
-
-  render(clonedArray, 'casesPerCapita', 'countryCode');
+  render(clonedArray, "casesPerCapita", "countryCode");
 }
 
 const cleanData = (jsonData) => {
@@ -272,4 +257,4 @@ const makeAPICalls = (countries, firstCall, failedCalls) => {
   });
 };
 
-getData([...eu], true, []);
+// getData([...eu], true, []);
