@@ -78,7 +78,9 @@ const height = +svg.attr("height");
 
   g.append("g")
     .call(d3.axisBottom(xScale))
-    .attr("transform", `translate(0, ${innerHeight})`);
+    .attr("transform", `translate(0, ${innerHeight})`)
+      .select('.domain')
+  .remove()
 
   g.selectAll("rect")
     .data(data)
@@ -89,8 +91,8 @@ const height = +svg.attr("height");
     .attr("height", yScale.bandwidth());
 
     g.append('text')
-    .attr('y', -10)
-    .text('Cases Per 100,000 People')
+    .attr('y', -8)
+    .text('Covid Cases Per 100,000 People by Country')
 };
 
 dataForGraphs();
