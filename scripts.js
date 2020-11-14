@@ -44,6 +44,7 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
 const render = (data, metric, countryID) => {
+
   data = data.sort((a, b) => b[metric] - a[metric]);
 
   const svg = d3.select("svg");
@@ -66,7 +67,6 @@ const height = +svg.attr("height");
     .domain(data.map(yValue))
     .range([0, innerHeight])
     .padding(0.15);
-
   const g = svg
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -112,21 +112,21 @@ function dataForGraphs() {
     return (e.casesPerCapita = e.casesToDate / euDataSet[i].population);
   });
 
-  let testArray = euDataSet.map((e, i) => {
+  let casesPerCapitaObjects = euDataSet.map((e, i) => {
     return {
       ["countryCode"]: e.countryCode,
       ["casesPerCapita"]: Math.round(casesPerCapita[i]),
     };
   });
 
-  testArray.push({
-    countrycode: "eu",
+  casesPerCapitaObjects.push({
+    countryCode: "eu",
     casesPerCapita: Math.round(totalEuCases / euPopulation),
   });
 
-  let clonedArray = [...testArray];
 
-  render(clonedArray, "casesPerCapita", "countryCode");
+
+  render(casesPerCapitaObjects, "casesPerCapita", "countryCode");
 }
 
 const cleanData = (jsonData) => {
