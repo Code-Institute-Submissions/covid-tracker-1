@@ -42,7 +42,7 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-const colmRender = (data, metric, countryID) => {
+const colmRender = (data, metric, countryID, calls) => {
 
     const xValue = d => d[metric]
     const yValue = d => d[countryID]
@@ -50,7 +50,6 @@ const colmRender = (data, metric, countryID) => {
   const width = +svg.attr("width");
   const height = +svg.attr("height");
   const margin = {top: 20, right: 20, bottom: 20, left: 20}
-  //the margin that impacts the ui is from css. Code to import this
   const innerHeight = height -margin.top - margin.bottom
   const innerWidth = width -margin.left - margin.right
 
@@ -62,7 +61,18 @@ const colmRender = (data, metric, countryID) => {
   .domain(data.map(d => d[countryID]))
   .range([0, innerHeight])
 
-    const g = svg.append("g")
+  const yAxis = d3.axisLeft(yScale)
+
+  console.log('yAxis', yAxis)
+
+    
+  const firstCall = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+  const subsequentCall = svg
+  let callStatus
+
+  calls===0 ? callStatus = firstCall : callStatus = subsequentCall
+
+  calls++
 
 
 
@@ -81,7 +91,10 @@ const colmRender = (data, metric, countryID) => {
   .attr('height', yScale.bandwidth())
 
   
+  
 }
+
+
 
 
 
@@ -144,6 +157,8 @@ const render = (data, metric, countryID) => {
     .text("Covid Cases Per 100,000 People by Country");
 };
 
+let calls = 0
+
 
 
 function dataForGraphs(countriesDownloaded) {
@@ -183,7 +198,9 @@ function dataForGraphs(countriesDownloaded) {
 
 //   render(casesPerCapitaObjects, "casesPerCapita", "countryCode");
 
-colmRender(casesPerCapitaObjects, "casesPerCapita", "countryCode", true);
+
+
+colmRender(casesPerCapitaObjects, "casesPerCapita", "countryCode", calls);
 }
 
 const cleanData = (jsonData) => {
@@ -281,8 +298,10 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
       "eu"
     );
 
-    
-      dataForGraphs(countriesDownloaded + countryData.length);
+    if(countriesDownloaded + countryData.length > 0){
+        dataForGraphs(countriesDownloaded + countryData.length);
+    }
+      
   
 
     if (countries.length > 0) {
