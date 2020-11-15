@@ -26,6 +26,10 @@ FAILED API CALLS
 
 GETTING CHART TO UPDATE AS COUNTRY DATA IS DOWNLOADED
 
+APPEND AXIS ONCE AND THEN UPDATE THEM. AXIS WERE BEING CREATED IN EVERY LOAD.
+
+BAR CHARTS WERE PASTING OVER DATA ALREADY ON UI ON EVERY LOAD
+
 
 PROMISE ALL AND FETCHES
 
@@ -55,3 +59,11 @@ https://stackoverflow.com/questions/9422974/createelement-with-id
     https://stackoverflow.com/questions/11301438/return-index-of-greatest-value-in-an-array
 
     https://ec.europa.eu/eurostat/documents/2995521/11081093/3-10072020-AP-EN.pdf/d2f799bf-4412-05cc-a357-7b49b93615f1
+
+https://www.youtube.com/watch?v=_8V5o2UHG0E&t=13053s
+
+https://stackoverflow.com/questions/16919280/how-to-update-axis-using-d3-js
+
+https://observablehq.com/@d3/lets-make-a-bar-chart?collection=@d3/lets-make-a-bar-chart
+
+https://www.freecodecamp.org/learn/data-visualization/data-visualization-with-d3/
