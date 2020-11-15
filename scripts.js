@@ -44,17 +44,25 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 const colmRender = (data, metric, countryID) => {
 
-const svg = d3.select("svg");
+    const xValue = d => d[metric]
+    const yValue = d => d[countryID]
+    const svg = d3.select("svg");
   const width = +svg.attr("width");
   const height = +svg.attr("height");
+  const margin = {top: 20, right: 20, bottom: 20, left: 20}
+  //the margin that impacts the ui is from css. Code to import this
+  const innerHeight = height -margin.top - margin.bottom
+  const innerWidth = width -margin.left - margin.right
 
   const xScale = d3.scaleLinear()
   .domain([0, d3.max(data, d => d[metric])])
-  .range([0,width])
+  .range([0,innerWidth])
 
   const yScale = d3.scaleBand()
   .domain(data.map(d => d[countryID]))
-  .range([0, height])
+  .range([0, innerHeight])
+
+    const g = svg.append("g")
 
 
 
