@@ -42,13 +42,16 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-const initChart = () => {
-    d3.select("svg")
-}
 
 const colmRender = (data, metric, countryID, callNumber) => {
 
-    console.log('data', data)
+ 
+//   https://www.w3schools.com/jsref/jsref_isnan.asp
+
+    
+
+    data = data.filter(e => !isNaN(e[metric])).sort((a,b) => b[metric] - a[metric])
+
 
     const xValue = d => d[metric]
     const yValue = d => d[countryID]
@@ -57,7 +60,7 @@ const colmRender = (data, metric, countryID, callNumber) => {
     const svg = d3.select("svg");
   const width = +svg.attr("width");
   const height = +svg.attr("height");
-  const margin = {top: 20, right: 20, bottom: 20, left: 20}
+  const margin = {top: 20, right: 10, bottom: 20, left: 30}
   const innerHeight = height -margin.top - margin.bottom
   const innerWidth = width -margin.left - margin.right
 
@@ -68,10 +71,12 @@ const colmRender = (data, metric, countryID, callNumber) => {
   const yScale = d3.scaleBand()
   .domain(data.map(d => d[countryID]))
   .range([0, innerHeight])
+  .padding(0.2)
 
 
 
   const yAxis = d3.axisLeft(yScale)
+  const xAxis = d3.axisBottom(xScale)
 
 
   const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`)
@@ -80,22 +85,25 @@ const colmRender = (data, metric, countryID, callNumber) => {
   const subsequentCall = svg
   let callStatus
 
-//   console.log('callNumber', callNumber)
-
-
-
   if(callNumber === 0){
+      // append axis
     callStatus = firstCall 
     g.append('g')
     .attr("class", "y axis")
     .call(yAxis)
+
+    g.append('g')
+    .attr("class", "x axis")
+    .attr("transform", `translate(0, ${innerHeight})`)
+    .call(xAxis)
   }else{
     callStatus = subsequentCall
     //update yAxis
     svg.selectAll("g.y.axis")
         .call(yAxis);
 
-    //     console.log('updatedYAxis', updatedYAxis)
+    svg.selectAll("g.x.axis")
+        .call(xAxis);
   }
 
   calls++
