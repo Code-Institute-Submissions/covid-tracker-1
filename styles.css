@@ -16,3 +16,7 @@ text {
     stroke: #C0C0BB;
 }
 
+svg {
+    margin: 20px;
+    border: 2px solid pink
+}
