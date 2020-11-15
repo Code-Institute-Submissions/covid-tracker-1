@@ -42,10 +42,18 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-const colmRender = (data, metric, countryID, calls) => {
+const initChart = () => {
+    d3.select("svg")
+}
+
+const colmRender = (data, metric, countryID, callNumber) => {
+
+    console.log('data', data)
 
     const xValue = d => d[metric]
     const yValue = d => d[countryID]
+
+
     const svg = d3.select("svg");
   const width = +svg.attr("width");
   const height = +svg.attr("height");
@@ -61,27 +69,44 @@ const colmRender = (data, metric, countryID, calls) => {
   .domain(data.map(d => d[countryID]))
   .range([0, innerHeight])
 
+
+
   const yAxis = d3.axisLeft(yScale)
 
-  console.log('yAxis', yAxis)
 
-    
-  const firstCall = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+  const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`)
+
+  const firstCall = g
   const subsequentCall = svg
   let callStatus
 
-  calls===0 ? callStatus = firstCall : callStatus = subsequentCall
+//   console.log('callNumber', callNumber)
+
+
+
+  if(callNumber === 0){
+    callStatus = firstCall 
+    g.append('g')
+    .attr("class", "y axis")
+    .call(yAxis)
+  }else{
+    callStatus = subsequentCall
+    //update yAxis
+    svg.selectAll("g.y.axis")
+        .call(yAxis);
+
+    //     console.log('updatedYAxis', updatedYAxis)
+  }
 
   calls++
 
-
-
-  svg.selectAll('rect').data(data)
+  d3.select("svg").selectAll('rect').data(data)
   .enter()
   .append('rect')
   .attr('y', d => yScale(d[countryID]))
   .attr('width', d => xScale(d[metric]))
   .attr('height', yScale.bandwidth())
+  .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
     svg.selectAll('rect').data(data)
 //   .enter()
@@ -89,6 +114,7 @@ const colmRender = (data, metric, countryID, calls) => {
   .attr('y', d => yScale(d[countryID]))
   .attr('width', d => xScale(d[metric]))
   .attr('height', yScale.bandwidth())
+  .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
   
   
