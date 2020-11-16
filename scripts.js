@@ -37,6 +37,7 @@ const euDataSet = [
 
 let eu = euDataSet.map((e) => e.country);
 
+
 const countryCodes = euDataSet.map((e) => e.countryCode);
 
 
@@ -48,6 +49,7 @@ const colmRender = (data, metric, countryID, callNumber) => {
  
 //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
+
     
 
     data = data.filter(e => !isNaN(e[metric])).sort((a,b) => b[metric] - a[metric])
@@ -57,10 +59,29 @@ const colmRender = (data, metric, countryID, callNumber) => {
     const yValue = d => d[countryID]
 
 
-    const svg = d3.select("svg");
-  const width = +svg.attr("width");
-  const height = +svg.attr("height");
-  const margin = {top: 20, right: 10, bottom: 20, left: 30}
+    
+
+
+
+
+// https://www.w3schools.com/jsref/prop_screen_height.asp
+
+// https://www.w3schools.com/jsref/prop_screen_width.asp
+
+  const width = screen.width
+  const height = screen.height
+
+  const svg = d3.select("svg").attr('width', width).attr('height', height)
+
+//     const width = +svg.attr("width");
+//   const height = +svg.attr("height");
+
+//   console.log('width', width)
+//   console.log('height', height)
+  
+//   
+
+  const margin = {top: 20, right: 5, bottom: 20, left: 30}
   const innerHeight = height -margin.top - margin.bottom
   const innerWidth = width -margin.left - margin.right
 
@@ -79,7 +100,8 @@ const colmRender = (data, metric, countryID, callNumber) => {
   const xAxis = d3.axisBottom(xScale)
 
 
-  const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`)
+  const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`)   
+
 
   const firstCall = g
   const subsequentCall = svg
@@ -89,6 +111,7 @@ const colmRender = (data, metric, countryID, callNumber) => {
       // append axis
     callStatus = firstCall 
     g.append('g')
+
     .attr("class", "y axis")
     .call(yAxis)
 
@@ -99,6 +122,7 @@ const colmRender = (data, metric, countryID, callNumber) => {
   }else{
     callStatus = subsequentCall
     //update yAxis
+    // https://stackoverflow.com/questions/16919280/how-to-update-axis-using-d3-js
     svg.selectAll("g.y.axis")
         .call(yAxis);
 
