@@ -148,8 +148,8 @@ const colmRender = (data, metric, countryID, callNumber) => {
 
 const render = (data, metric, countryID) => {
   const svg = d3.select("svg");
-  const width = +svg.attr("width");
-  const height = +svg.attr("height");
+  const width = screen.width;
+  const height = screen.height;
 
   const xValue = (d) => d[metric];
   const yValue = (d) => d[countryID];
@@ -171,8 +171,8 @@ const render = (data, metric, countryID) => {
   const g = svg
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`)
-    .attr("height", screen.height)
-    .attr("width", screen.width)
+    .attr("height", height)
+    .attr("width", width)
 
   const xAxis = d3.axisBottom(xScale).tickSize(-innerWidth);
 
