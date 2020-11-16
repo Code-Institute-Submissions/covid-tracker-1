@@ -148,8 +148,8 @@ const colmRender = (data, metric, countryID, callNumber) => {
 
 const render = (data, metric, countryID) => {
   const svg = d3.select("svg");
-  const width = .9*screen.width;
-  const height = .9*screen.height;
+  const width = .7*screen.width;
+  const height = .7*screen.height;
 
   const xValue = (d) => d[metric];
   const yValue = (d) => d[countryID];
