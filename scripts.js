@@ -37,132 +37,116 @@ const euDataSet = [
 
 let eu = euDataSet.map((e) => e.country);
 
-
 const countryCodes = euDataSet.map((e) => e.countryCode);
-
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-
 const colmRender = (data, metric, countryID, callNumber) => {
+  //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
- 
-//   https://www.w3schools.com/jsref/jsref_isnan.asp
+  data = data
+    .filter((e) => !isNaN(e[metric]))
+    .sort((a, b) => b[metric] - a[metric]);
 
+  console.log("data", data);
 
-    
+  const xValue = (d) => d[metric];
+  const yValue = (d) => d[countryID];
 
-    data = data.filter(e => !isNaN(e[metric])).sort((a,b) => b[metric] - a[metric])
+  // https://www.w3schools.com/jsref/prop_screen_height.asp
 
+  // https://www.w3schools.com/jsref/prop_screen_width.asp
 
-    const xValue = d => d[metric]
-    const yValue = d => d[countryID]
+  const width = screen.width;
+  const height = screen.height;
 
+  const svg = d3.select("svg").attr("width", width).attr("height", height);
 
-    
+  //     const width = +svg.attr("width");
+  //   const height = +svg.attr("height");
 
+  //   console.log('width', width)
+  //   console.log('height', height)
 
+  //
 
+  const margin = { top: 20, right: 20, bottom: 20, left: 30 };
+  const innerHeight = height - margin.top - margin.bottom;
+  const innerWidth = width - margin.left - margin.right;
 
-// https://www.w3schools.com/jsref/prop_screen_height.asp
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, d3.max(data, (d) => d[metric])])
+    .range([0, innerWidth]);
 
-// https://www.w3schools.com/jsref/prop_screen_width.asp
+  console.log("domain", xScale.domain());
 
-  const width = screen.width
-  const height = screen.height
+  console.log("range", xScale.range());
 
-  const svg = d3.select("svg").attr('width', width).attr('height', height)
+  const yScale = d3
+    .scaleBand()
+    .domain(data.map((d) => d[countryID]))
+    .range([0, innerHeight])
+    .padding(0.2);
 
-//     const width = +svg.attr("width");
-//   const height = +svg.attr("height");
+  const yAxis = d3.axisLeft(yScale);
+  const xAxis = d3.axisBottom(xScale).ticks(5);
 
-//   console.log('width', width)
-//   console.log('height', height)
-  
-//   
+  const g = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  const margin = {top: 20, right: 5, bottom: 20, left: 30}
-  const innerHeight = height -margin.top - margin.bottom
-  const innerWidth = width -margin.left - margin.right
+  const firstCall = g;
+  const subsequentCall = svg;
+  let callStatus;
 
-  const xScale = d3.scaleLinear()
-  .domain([0, d3.max(data, d => d[metric])])
-  .range([0,innerWidth])
+  if (callNumber === 0) {
+    // append axis
+    callStatus = firstCall;
+    g.append("g")
 
-  const yScale = d3.scaleBand()
-  .domain(data.map(d => d[countryID]))
-  .range([0, innerHeight])
-  .padding(0.2)
+      .attr("class", "y axis")
+      .call(yAxis);
 
-
-
-  const yAxis = d3.axisLeft(yScale)
-  const xAxis = d3.axisBottom(xScale)
-
-
-  const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`)   
-
-
-  const firstCall = g
-  const subsequentCall = svg
-  let callStatus
-
-  if(callNumber === 0){
-      // append axis
-    callStatus = firstCall 
-    g.append('g')
-
-    .attr("class", "y axis")
-    .call(yAxis)
-
-    g.append('g')
-    .attr("class", "x axis")
-    .attr("transform", `translate(0, ${innerHeight})`)
-    .call(xAxis)
-  }else{
-    callStatus = subsequentCall
+    g.append("g")
+      .attr("class", "x axis")
+      .attr("transform", `translate(0, ${innerHeight})`)
+      .call(xAxis);
+  } else {
+    callStatus = subsequentCall;
     //update yAxis
     // https://stackoverflow.com/questions/16919280/how-to-update-axis-using-d3-js
-    svg.selectAll("g.y.axis")
-        .call(yAxis);
+    svg.selectAll("g.y.axis").call(yAxis);
 
-    svg.selectAll("g.x.axis")
-        .call(xAxis);
+    svg.selectAll("g.x.axis").call(xAxis);
   }
 
-  calls++
+  calls++;
 
-  d3.select("svg").selectAll('rect').data(data)
-  .enter()
-  .append('rect')
-  .attr('y', d => yScale(d[countryID]))
-  .attr('width', d => xScale(d[metric]))
-  .attr('height', yScale.bandwidth())
-  .attr("transform", `translate(${margin.left}, ${margin.top})`)
+  d3.select("svg")
+    .selectAll("rect")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("y", (d) => yScale(d[countryID]))
+    .attr("width", (d) => xScale(d[metric]))
+    .attr("height", yScale.bandwidth())
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    svg.selectAll('rect').data(data)
-//   .enter()
-//   .append('rect')
-  .attr('y', d => yScale(d[countryID]))
-  .attr('width', d => xScale(d[metric]))
-  .attr('height', yScale.bandwidth())
-  .attr("transform", `translate(${margin.left}, ${margin.top})`)
-
-  
-  
-}
-
-
-
-
-
-
-
+  svg
+    .selectAll("rect")
+    .data(data)
+    //   .enter()
+    //   .append('rect')
+    .attr("y", (d) => yScale(d[countryID]))
+    .attr("width", (d) => xScale(d[metric]))
+    .attr("height", yScale.bandwidth())
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+};
 
 // dataForGraphs();
 
 const render = (data, metric, countryID) => {
-
   const svg = d3.select("svg");
   const width = +svg.attr("width");
   const height = +svg.attr("height");
@@ -186,7 +170,9 @@ const render = (data, metric, countryID) => {
 
   const g = svg
     .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    .attr("height", screen.height)
+    .attr("width", screen.width)
 
   const xAxis = d3.axisBottom(xScale).tickSize(-innerWidth);
 
@@ -215,50 +201,47 @@ const render = (data, metric, countryID) => {
     .text("Covid Cases Per 100,000 People by Country");
 };
 
-let calls = 0
-
-
+let calls = 0;
 
 function dataForGraphs(countriesDownloaded) {
-  let allData = euDataSet
-    .map((e) => e.countryCode)
-    .map((e) => JSON.parse(localStorage.getItem(e))).filter(e=>e!==null)
+  console.log("countriesDownloaded", countriesDownloaded);
 
-  //code to make sure data is available for all countries for this day
+  let allData = euDataSet.map((e) =>
+    JSON.parse(localStorage.getItem(e.countryCode))
+  );
+  let totalCases = [];
 
-  let latestDay = Object.values(allData).map((e) => e[e.length - 1]);
+  allData = allData
+    .map((e, i) => {
+      if (e !== null) {
+        let latestDay = e[e.length - 1];
+        if (euDataSet[i].countryCode !== "gb") {
+          totalCases.push(latestDay.casesToDate);
+        }
 
-  let casesPerCapita = latestDay.map((e, i) => {
-    return (e.casesPerCapita = e.casesToDate / euDataSet[i].population);
-  });
+        return {
+          ["countryCode"]: euDataSet[i].countryCode,
+          ["casesPerCapita"]: Math.round(
+            latestDay.casesToDate / euDataSet[i].population
+          ),
+        };
+      }
+    })
+    .filter((e) => e !== undefined);
 
-  let casesPerCapitaObjects = euDataSet.map((e, i) => {
-    return {
-      ["countryCode"]: e.countryCode,
-      ["casesPerCapita"]: Math.round(casesPerCapita[i]),
-    };
-  });
+  if (countriesDownloaded === 28) {
+    let totalEuCases = totalCases.reduce((a, b) => a + b);
 
-  if(countriesDownloaded === 28){
-      let totalEuCases = latestDay
-    .map((e) => e.casesToDate)
-    .reduce((a, b) => a + b);
+    let euPopulation =
+      euDataSet.map((e) => e.population).reduce((a, b) => a + b) - 670.255;
 
-  let euPopulation = euDataSet.map((e) => e.population).reduce((a, b) => a + b);
-
-  casesPerCapitaObjects.push({
-    countryCode: "eu",
-    casesPerCapita: Math.round(totalEuCases / euPopulation),
-  });
+    allData.push({
+      countryCode: "eu",
+      casesPerCapita: Math.round(totalEuCases / euPopulation),
+    });
   }
 
-
-
-//   render(casesPerCapitaObjects, "casesPerCapita", "countryCode");
-
-
-
-colmRender(casesPerCapitaObjects, "casesPerCapita", "countryCode", calls);
+  colmRender(allData, "casesPerCapita", "countryCode", calls);
 }
 
 const cleanData = (jsonData) => {
@@ -356,11 +339,9 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
       "eu"
     );
 
-    if(countriesDownloaded + countryData.length > 0){
-        dataForGraphs(countriesDownloaded + countryData.length);
+    if (countriesDownloaded + countryData.length > 0) {
+      dataForGraphs(countriesDownloaded + countryData.length);
     }
-      
-  
 
     if (countries.length > 0) {
       getData(countries, false, failedCalls);
@@ -373,7 +354,7 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
 
 const getData = (countries, firstCall, failedCalls) => {
   if (firstCall) {
-      localStorage.clear()
+    localStorage.clear();
     makeAPICalls(countries, firstCall, failedCalls);
   } else {
     setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
