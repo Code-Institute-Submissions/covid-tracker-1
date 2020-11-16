@@ -33,6 +33,9 @@ BAR CHARTS WERE PASTING OVER DATA ALREADY ON UI ON EVERY LOAD
 
 PROMISE ALL AND FETCHES
 
+
+When I get a 429 on initally loading data, the x axis goes mad and has a range of 10,000 even though the data doesn't contain such numbers. Fixes itself when more data loads: filter was removing values with null. I was then using population from [i] but this mapping was out because nulls had been removed
+
 ## Credits
 
 https://stackoverflow.com/questions/313893/how-to-measure-time-taken-by-a-function-to-execute
@@ -67,3 +70,7 @@ https://stackoverflow.com/questions/16919280/how-to-update-axis-using-d3-js
 https://observablehq.com/@d3/lets-make-a-bar-chart?collection=@d3/lets-make-a-bar-chart
 
 https://www.freecodecamp.org/learn/data-visualization/data-visualization-with-d3/
+
+ https://www.w3schools.com/jsref/prop_screen_height.asp
+
+ https://www.w3schools.com/jsref/prop_screen_width.asp
