@@ -358,7 +358,7 @@ const dealWithData = (data, firstCall, countries, failedCalls) => {
   });
 };
 
-const getData = (countries, firstCall, failedCalls) => {
+function getData(countries, firstCall, failedCalls){
   if (firstCall) {
     localStorage.clear();
     makeAPICalls(countries, firstCall, failedCalls);
@@ -367,7 +367,7 @@ const getData = (countries, firstCall, failedCalls) => {
   }
 };
 
-const makeAPICalls = (countries, firstCall, failedCalls) => {
+function makeAPICalls(countries, firstCall, failedCalls){
   Promise.all(
     countries
       .splice(0, 10)
