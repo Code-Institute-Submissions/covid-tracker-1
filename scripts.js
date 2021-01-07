@@ -276,21 +276,29 @@ const cleanData = (jsonData) => {
 };
 
 
-function processRawData(data, firstCall, countries, failedCalls){
-  //Record failed calls so that I can re-call them later
-
-  data
-    .filter((e) => e.status !== 200)
-    .forEach((e) => {
+function recordFailedAPICalls(rawData, failedCalls){
+      rawData
+    .filter((apiCall) => apiCall.status !== 200)
+    .forEach((apiCall) => {
       // I based this on similar code that I found here: https://stackoverflow.com/questions/3568921/how-to-remove-part-of-a-string
 
-      failedCalls.push(e.url.split("country/").pop());
-    });
+      countryName = apiCall.url.split("country/").pop() 
+
+      failedCalls.push(countryName);
+    })
+
+    return failedCalls
+}
+
+
+function processRawData(rawData, firstCall, countries, failedCalls){
+    
+    recordFailedAPICalls(rawData, failedCalls)
 
   // Manipulate data on successful calls
 
   Promise.all(
-    data.filter((e) => e.status === 200).map((res) => res.json())
+    rawData.filter((e) => e.status === 200).map((res) => res.json())
   ).then((jsonData) => {
     let countryData = cleanData(jsonData);
 
