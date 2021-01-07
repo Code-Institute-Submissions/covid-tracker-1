@@ -322,52 +322,48 @@ function clearStorage(firstCall){
     }
 }
 
-function validateSuccessfulCalls(rawData){
-    try{
-        rawData.filter((apiCall) => apiCall.status === 200).map((res) => res.json())
-    }
-    catch{
-
-    }
-    
-}
-
-
-function processRawData(rawData, firstCall, countries, failedCalls){
-
-    recordFailedAPICalls(rawData, failedCalls)
-
-
-
-  // Manipulate data on successful calls
-
-  Promise.all(
-    rawData.filter((apiCall) => apiCall.status === 200).map((res) => res.json())
-  ).then((jsonData) => {
-    let countryData = cleanData(jsonData)
-
-    console.log('countryData', countryData)
-
-    clearStorage(firstCall)
-
-    let currentTotal = Number(localStorage.getItem("eu"));
-
-    countryData.forEach((e, i) => {
-      localStorage.setItem(e.countryCode, JSON.stringify(e.data));
+function saveDataToLocalStorage(countryData){
+      countryData.forEach((country) => {
+      localStorage.setItem(country.countryCode, JSON.stringify(country.data));
 
       // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
       //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
 
       let node = document.createElement("LI");
       let textnode = document.createTextNode(
-        `${e.country}: ${e.data[e.data.length - 1].casesToDate}`
+        `${country.country}: ${country.data[country.data.length - 1].casesToDate}`
       );
       node.appendChild(textnode);
       document
         .getElementById("countries")
         .appendChild(node)
-        .setAttribute("id", e.countryCode);
+        .setAttribute("id", country.countryCode);
     });
+    
+}
+
+
+
+
+function processRawData(rawData, firstCall, countries, failedCalls){
+
+    recordFailedAPICalls(rawData, failedCalls)
+
+    let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
+
+
+
+  Promise.all(
+    successfulCalls.map((res) => res.json())
+  ).then((jsonData) => {
+
+    clearStorage(firstCall)
+
+    let countryData = cleanData(jsonData)
+
+    let currentTotal = Number(localStorage.getItem("eu"));
+
+    saveDataToLocalStorage(countryData)
 
     let countriesDownloaded = Number(
       localStorage.getItem("countriesDownloaded")
