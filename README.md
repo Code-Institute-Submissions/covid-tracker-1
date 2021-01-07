@@ -38,6 +38,8 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 ## Credits
 
+https://www.udemy.com/course/writing-clean-code/
+
 https://stackoverflow.com/questions/313893/how-to-measure-time-taken-by-a-function-to-execute
 
 https://documenter.getpostman.com/view/10808728/SzS8rjbc#4b88f773-be9b-484f-b521-bb58dda0315c
