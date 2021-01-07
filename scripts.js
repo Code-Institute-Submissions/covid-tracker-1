@@ -314,6 +314,14 @@ function recordFailedAPICalls(rawData, failedCalls){
     return failedCalls
 }
 
+function clearStorage(firstCall){
+
+        if (firstCall) {
+      localStorage.setItem("eu", 0);
+      localStorage.setItem("countriesDownloaded", 0);
+    }
+}
+
 
 function processRawData(rawData, firstCall, countries, failedCalls){
 
@@ -324,12 +332,11 @@ function processRawData(rawData, firstCall, countries, failedCalls){
   Promise.all(
     rawData.filter((apiCall) => apiCall.status === 200).map((res) => res.json())
   ).then((jsonData) => {
-    let countryData = cleanData(jsonData);
+    let countryData = cleanData(jsonData)
 
-    if (firstCall) {
-      localStorage.setItem("eu", 0);
-      localStorage.setItem("countriesDownloaded", 0);
-    }
+    clearStorage(firstCall)
+
+
 
     let currentTotal = Number(localStorage.getItem("eu"));
 
