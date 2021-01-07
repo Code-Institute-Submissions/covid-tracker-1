@@ -370,6 +370,7 @@ function getData(countries, firstCall, failedCalls){
 function makeAPICalls(countries, firstCall, failedCalls){
   Promise.all(
     countries
+        //the api won't allow more than 10 calls from my ip
       .splice(0, 10)
       .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
   ).then((rawData) => {
