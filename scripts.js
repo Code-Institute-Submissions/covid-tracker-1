@@ -144,7 +144,6 @@ const colmRender = (data, metric, countryID, callNumber) => {
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 };
 
-// dataForGraphs();
 
 const render = (data, metric, countryID) => {
   const svg = d3.select("svg");
@@ -210,6 +209,8 @@ const render = (data, metric, countryID) => {
 let calls = 0;
 
 function dataForGraphs(countriesDownloaded) {
+
+    if (countriesDownloaded + countryData.length === 0) {return}
 
   let allData = euDataSet.map((e) =>
     JSON.parse(localStorage.getItem(e.countryCode))
@@ -382,7 +383,6 @@ function processRawData(rawData, firstCall, countries, failedCalls){
     let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
 
 
-
   Promise.all(
     successfulCalls.map((res) => res.json())
   ).then((jsonData) => {
@@ -400,6 +400,8 @@ function processRawData(rawData, firstCall, countries, failedCalls){
     );
 
     let totalCasesNewData = calculateTotalCases(countryData)
+
+    //To Do: Remove UK?
 
     saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData)
 
