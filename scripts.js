@@ -269,9 +269,9 @@ function formatAPIData(countriesOnly){
 
         let dailySummaries = country.map(dailyData => {
         return {
-          casesToDate: country.Confirmed,
-          deathsToDate: country.Deaths,
-          date: country.Date,
+          casesToDate: dailyData.Confirmed,
+          deathsToDate: dailyData.Deaths,
+          date: dailyData.Date,
         };
         })
 
@@ -322,10 +322,22 @@ function clearStorage(firstCall){
     }
 }
 
+function validateSuccessfulCalls(rawData){
+    try{
+        rawData.filter((apiCall) => apiCall.status === 200).map((res) => res.json())
+    }
+    catch{
+
+    }
+    
+}
+
 
 function processRawData(rawData, firstCall, countries, failedCalls){
 
     recordFailedAPICalls(rawData, failedCalls)
+
+
 
   // Manipulate data on successful calls
 
@@ -334,9 +346,9 @@ function processRawData(rawData, firstCall, countries, failedCalls){
   ).then((jsonData) => {
     let countryData = cleanData(jsonData)
 
+    console.log('countryData', countryData)
+
     clearStorage(firstCall)
-
-
 
     let currentTotal = Number(localStorage.getItem("eu"));
 
