@@ -365,6 +365,15 @@ function saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData){
     );
 }
 
+function saveAndDisplayTotalEUCases(currentTotal, totalCasesNewData){
+
+
+    localStorage.setItem("eu", currentTotal + totalCasesNewData);
+    document.getElementById("euTotalCases").innerHTML = localStorage.getItem(
+      "eu"
+    );
+}
+
 
 function processRawData(rawData, firstCall, countries, failedCalls){
 
@@ -394,15 +403,10 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData)
 
+    saveAndDisplayTotalEUCases(currentTotal, totalCasesNewData)
+
   
 
-    localStorage.setItem("eu", currentTotal + totalCasesNewData);
-
- 
-
-    document.getElementById("euTotalCases").innerHTML = localStorage.getItem(
-      "eu"
-    );
 
     if (countriesDownloaded + countryData.length > 0) {
       dataForGraphs(countriesDownloaded + countryData.length);
