@@ -276,7 +276,7 @@ const cleanData = (jsonData) => {
 };
 
 
-const dealWithData = (data, firstCall, countries, failedCalls) => {
+function processRawData(data, firstCall, countries, failedCalls){
   //Record failed calls so that I can re-call them later
 
   data
@@ -371,9 +371,9 @@ function makeAPICalls(countries, firstCall, failedCalls){
   Promise.all(
     countries
       .splice(0, 10)
-      .map((e) => fetch(`https://api.covid19api.com/dayone/country/${e}`))
-  ).then((response) => {
-    dealWithData(response, firstCall, countries, failedCalls);
+      .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
+  ).then((rawData) => {
+    processRawData(rawData, firstCall, countries, failedCalls);
   });
 };
 
