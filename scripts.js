@@ -249,30 +249,54 @@ function dataForGraphs(countriesDownloaded) {
   colmRender(allData, "casesPerCapita", "countryCode", calls);
 }
 
-const cleanData = (jsonData) => {
-  let cleanedData = jsonData.map((e) => {
-    // remove British, French, Dutch and Danish colonies from data
+function removeColonies(jsonData){
+    return jsonData.map(country=> country.filter(dailyData => dailyData.Province===""))
+}
 
-    let changeDataFormat = e
-      .filter((f) => f.Province === "")
-      .map((e) => {
+function formatAPIData(countriesOnly){
+
+    //countriesOnly is an array of arrays.
+    //each internal array is a country's data.
+    //it is an array of objects
+    //each object is the data for a specific day
+
+    //this function cleans the data so that it returns an array of objects
+    //each object contains 3 elements - country name (string), country code (string) and summarised daily data (array of objects - each object is a day's data)
+
+     let cleanedData = countriesOnly.map((country) => {
+
+        //map each internal array so that only the data we are interested in is kept (as an object)
+
+        let dailySummaries = country.map(dailyData => {
         return {
-          casesToDate: e.Confirmed,
-          deathsToDate: e.Deaths,
-          date: e.Date,
+          casesToDate: country.Confirmed,
+          deathsToDate: country.Deaths,
+          date: country.Date,
         };
+        })
+
+
+        //return an array of objects
+
+        return {
+            country: country[0].Country.toLowerCase(),
+            countryCode: country[0].CountryCode.toLowerCase(),
+            data: dailySummaries
+            }
+
       });
 
-    //   return array for each country in the format I want
+      return cleanedData
+}
 
-    return {
-      country: e[0].Country.toLowerCase(),
-      countryCode: e[0].CountryCode.toLowerCase(),
-      data: changeDataFormat,
-    };
-  });
 
-  return cleanedData;
+function cleanData (jsonData) {
+
+    let countriesOnly = removeColonies(jsonData)
+
+    let cleanedData = formatAPIData(countriesOnly)
+
+    return cleanedData;
 };
 
 
@@ -292,13 +316,13 @@ function recordFailedAPICalls(rawData, failedCalls){
 
 
 function processRawData(rawData, firstCall, countries, failedCalls){
-    
+
     recordFailedAPICalls(rawData, failedCalls)
 
   // Manipulate data on successful calls
 
   Promise.all(
-    rawData.filter((e) => e.status === 200).map((res) => res.json())
+    rawData.filter((apiCall) => apiCall.status === 200).map((res) => res.json())
   ).then((jsonData) => {
     let countryData = cleanData(jsonData);
 
