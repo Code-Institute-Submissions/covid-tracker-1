@@ -353,7 +353,7 @@ function calculateTotalCases(countryData){
   
 }
 
-function updateCountriesDownloaded(countriesDownloaded, countryData){
+function saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData){
         localStorage.setItem(
       "countriesDownloaded",
       countriesDownloaded + countryData.length
@@ -392,7 +392,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     let totalCasesNewData = calculateTotalCases(countryData)
 
-    updateCountriesDownloaded(countriesDownloaded, countryData)
+    saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData)
 
   
 
