@@ -151,6 +151,12 @@ const render = (data, metric, countryID) => {
   const width = .7*screen.width;
   const height = .7*screen.height;
 
+  console.log('screen.width', screen.width)
+  console.log('screen.height', screen.height)
+
+  console.log('width', width)
+  console.log('height', height)
+
   const xValue = (d) => d[metric];
   const yValue = (d) => d[countryID];
   const margin = { top: 40, right: 20, bottom: 20, left: 25 };
@@ -204,7 +210,6 @@ const render = (data, metric, countryID) => {
 let calls = 0;
 
 function dataForGraphs(countriesDownloaded) {
-  console.log("countriesDownloaded", countriesDownloaded);
 
   let allData = euDataSet.map((e) =>
     JSON.parse(localStorage.getItem(e.countryCode))
@@ -269,6 +274,7 @@ const cleanData = (jsonData) => {
 
   return cleanedData;
 };
+
 
 const dealWithData = (data, firstCall, countries, failedCalls) => {
   //Record failed calls so that I can re-call them later
