@@ -365,10 +365,10 @@ function saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData){
     );
 }
 
-function saveAndDisplayTotalEUCases(currentTotal, totalCasesNewData){
+function saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData){
 
 
-    localStorage.setItem("eu", currentTotal + totalCasesNewData);
+    localStorage.setItem("eu", currentEUTotal + totalCasesNewData);
     document.getElementById("euTotalCases").innerHTML = localStorage.getItem(
       "eu"
     );
@@ -391,7 +391,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     let countryData = cleanData(jsonData)
 
-    let currentTotal = Number(localStorage.getItem("eu"));
+    let currentEUTotal = Number(localStorage.getItem("eu"));
 
     saveDataToLocalStorage(countryData)
 
@@ -403,7 +403,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData)
 
-    saveAndDisplayTotalEUCases(currentTotal, totalCasesNewData)
+    saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData)
 
   
 
