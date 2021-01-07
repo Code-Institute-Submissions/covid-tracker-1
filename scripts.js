@@ -353,6 +353,18 @@ function calculateTotalCases(countryData){
   
 }
 
+function updateCountriesDownloaded(countriesDownloaded, countryData){
+        localStorage.setItem(
+      "countriesDownloaded",
+      countriesDownloaded + countryData.length
+    );
+
+
+    document.getElementById("downloads").innerHTML = localStorage.getItem(
+      "countriesDownloaded"
+    );
+}
+
 
 function processRawData(rawData, firstCall, countries, failedCalls){
 
@@ -380,18 +392,13 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     let totalCasesNewData = calculateTotalCases(countryData)
 
+    updateCountriesDownloaded(countriesDownloaded, countryData)
 
-
-    localStorage.setItem(
-      "countriesDownloaded",
-      countriesDownloaded + countryData.length
-    );
+  
 
     localStorage.setItem("eu", currentTotal + totalCasesNewData);
 
-    document.getElementById("downloads").innerHTML = localStorage.getItem(
-      "countriesDownloaded"
-    );
+ 
 
     document.getElementById("euTotalCases").innerHTML = localStorage.getItem(
       "eu"
