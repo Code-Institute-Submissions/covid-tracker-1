@@ -390,17 +390,17 @@ function compileDataForSaving(countryData){
         displayNumberCountriesDownloaded()
 
         dataForGraphs(countriesDownloaded + countryData.length);
-      
-        if (countries.length > 0) {
-            getData(countries, false, failedCalls);
-        } else if (failedCalls.length > 0) {
-            countries = failedCalls.splice(0, 10);
-            getData(countries, false, failedCalls);
-        }
+       
+        getData(countries, false, failedCalls);
+
     });
 };
 
+
 function getData(countries, firstCall, failedCalls) {
+    if(countries.length === 0 && failedCalls.length===0){return}
+    if(countries.length === 0 && failedCalls.length >0){countries = failedCalls.splice(0, 10);}
+    
     if (firstCall) {
         //To Do: make this an object {countries, firstCall, failedCalls)}
         makeAPICalls(countries, firstCall, failedCalls);
