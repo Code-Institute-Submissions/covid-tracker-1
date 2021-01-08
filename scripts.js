@@ -370,9 +370,9 @@ function compileSuccessfulCalls(successfulCalls){
 
 
 
- async function processRawData(rawData, firstCall, countries, failedCalls) {
+ async function processRawData(rawData, countries, failedCalls) {
 
-    recordFailedAPICalls(rawData, failedCalls)
+    failedCalls = recordFailedAPICalls(rawData, failedCalls)
 
         let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
 
@@ -414,7 +414,7 @@ function makeAPICalls(countries, firstCall, failedCalls) {
             .splice(0, 10)
             .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
     ).then((rawData) => {
-        processRawData(rawData, firstCall, countries, failedCalls);
+        processRawData(rawData, countries, failedCalls);
     });
 };
 
