@@ -315,7 +315,7 @@ function recordFailedAPICalls(rawData, failedCalls){
     return failedCalls
 }
 
-function clearStorage(firstCall){
+function clearStorageOnFirstCall(firstCall){
 
         if (firstCall) {
       localStorage.setItem("eu", 0);
@@ -387,7 +387,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
     successfulCalls.map((res) => res.json())
   ).then((jsonData) => {
 
-    clearStorage(firstCall)
+    clearStorageOnFirstCall(firstCall)
 
     let countryData = cleanData(jsonData)
 
@@ -425,6 +425,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
 function getData(countries, firstCall, failedCalls){
   if (firstCall) {
+      //To Do: make this an object {countries, firstCall, failedCalls)}
     makeAPICalls(countries, firstCall, failedCalls);
   } else {
     setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
