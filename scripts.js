@@ -359,35 +359,36 @@ function compileDataForSaving(countryData){
 
 }
 
-function compileSuccessfulCalls(rawData){
-
-    let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
-
-
+function compileSuccessfulCalls(successfulCalls){
 
     return   Promise.all(
         successfulCalls.map((res) => res.json())
-    ).then()
+    )
 
 }
+
+
 
 
  async function processRawData(rawData, firstCall, countries, failedCalls) {
 
     recordFailedAPICalls(rawData, failedCalls)
 
-        let jsonData = await compileSuccessfulCalls(rawData)
+        let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
 
-        
+        let jsonData = await compileSuccessfulCalls(successfulCalls)
 
-        let countryData = cleanData(jsonData)
+        if(successfulCalls.length > 0){
 
-        await compileDataForSaving(countryData)
+            let countryData = cleanData(jsonData)
 
-        displayNumberCountriesDownloaded()
+            await compileDataForSaving(countryData)
 
-        dataForGraphs();
-       
+            displayNumberCountriesDownloaded()
+
+            dataForGraphs();
+
+        }      
         getData(countries, false, failedCalls);
 };
 
