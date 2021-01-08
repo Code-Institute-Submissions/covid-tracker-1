@@ -369,17 +369,31 @@ function compileDataForSaving(countryData){
 
 }
 
-
- function processRawData(rawData, firstCall, countries, failedCalls) {
-
-    recordFailedAPICalls(rawData, failedCalls)
+function compileSuccessfulCalls(rawData){
 
     let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
 
-
-    Promise.all(
+    return   Promise.all(
         successfulCalls.map((res) => res.json())
-    ).then(async (jsonData) => {
+    ).then()
+
+}
+
+
+ async function processRawData(rawData, firstCall, countries, failedCalls) {
+
+    recordFailedAPICalls(rawData, failedCalls)
+
+    // let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
+
+
+    // Promise.all(
+    //     successfulCalls.map((res) => res.json())
+    // ).then(async (jsonData) => {
+
+    //TO DO: Code for when there aren't successful calls
+
+        let jsonData = await compileSuccessfulCalls(rawData)
 
         clearStorageOnFirstCall(firstCall)
 
@@ -389,11 +403,11 @@ function compileDataForSaving(countryData){
 
         displayNumberCountriesDownloaded()
 
-        dataForGraphs(countriesDownloaded + countryData.length);
+        dataForGraphs();
        
         getData(countries, false, failedCalls);
 
-    });
+    // });
 };
 
 
@@ -405,6 +419,7 @@ function getData(countries, firstCall, failedCalls) {
         //To Do: make this an object {countries, firstCall, failedCalls)}
         makeAPICalls(countries, firstCall, failedCalls);
     } else {
+        //the api won't allow more than 10 calls from my ip within 5 seconds
         setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
     }
 };
@@ -412,7 +427,7 @@ function getData(countries, firstCall, failedCalls) {
 function makeAPICalls(countries, firstCall, failedCalls) {
     Promise.all(
         countries
-            //the api won't allow more than 10 calls from my ip
+            //the api won't allow more than 10 calls from my ip within 5 seconds
             .splice(0, 10)
             .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
     ).then((rawData) => {
