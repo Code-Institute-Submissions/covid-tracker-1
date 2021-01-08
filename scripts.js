@@ -317,9 +317,12 @@ function recordFailedAPICalls(rawData, failedCalls){
 
 function clearStorageOnFirstCall(firstCall){
 
-        if (firstCall) {
-      localStorage.setItem("eu", 0);
-      localStorage.setItem("countriesDownloaded", 0);
+    console.log('in clearStorageOnFirstCall')
+
+    if (firstCall) {
+
+        localStorage.clear()
+
     }
 }
 
@@ -376,6 +379,23 @@ function saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData){
 }
 
 
+
+async function getcurrentEUTotal(){
+    let promise = new Promise((res, rej) => {
+        Number(localStorage.getItem("eu"))
+    });
+
+    let currentEUTotal = await promise
+
+    console.log('xxxxxxxx')
+
+    return currentEUTotal
+    
+}
+
+
+
+
 function processRawData(rawData, firstCall, countries, failedCalls){
 
     recordFailedAPICalls(rawData, failedCalls)
@@ -385,27 +405,33 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
   Promise.all(
     successfulCalls.map((res) => res.json())
-  ).then((jsonData) => {
+  ).then(async (jsonData) => {
 
     clearStorageOnFirstCall(firstCall)
 
     let countryData = cleanData(jsonData)
 
-    let currentEUTotal = Number(localStorage.getItem("eu"));
-
     saveDataToLocalStorage(countryData)
-
-    let countriesDownloaded = Number(
-      localStorage.getItem("countriesDownloaded")
-    );
 
     let totalCasesNewData = calculateTotalCases(countryData)
 
-    //To Do: Remove UK?
+    let countriesDownloaded = await Number(
+      localStorage.getItem("countriesDownloaded")
+    );
+
+    let currentEUTotal = getcurrentEUTotal()
+
+  
 
     saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData)
 
+      //To Do: Remove UK?
+
     saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData)
+
+    console.log('countriesDownloaded ', countriesDownloaded )
+
+    console.log('countryData.length', countryData.length)
 
   
         //does this make sense?
