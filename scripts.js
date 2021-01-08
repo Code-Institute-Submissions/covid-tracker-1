@@ -230,7 +230,7 @@ async function dataForGraphs(countryData) {
 
 
     let countriesDownloaded = await getNumberOfCountriesDownloaded()
-    
+
     if (countriesDownloaded === 0){return}
 
     let allData = euDataSet.map((e) =>
@@ -349,17 +349,9 @@ function clearStorageOnFirstCall(firstCall) {
 
 function displayNumberCountriesDownloaded() {
 
-    let countryCodes = euDataSet.map(countryEntry => countryEntry.countryCode)
+   let countriesDownloaded = await getNumberOfCountriesDownloaded()
 
-    let CountriesDownloaded = countryCodes.map(countryCode => { return localStorage.getItem(countryCode) })
-
-    Promise.allSettled(CountriesDownloaded).then(countries => {
-
-        let countriesDownloaded = countries.filter(country => country.value !== null).length
-
-        document.getElementById("downloads").innerHTML = countriesDownloaded
-
-    })
+   document.getElementById("downloads").innerHTML = countriesDownloaded
 
 }
 
