@@ -144,7 +144,6 @@ const colmRender = (data, metric, countryID, callNumber) => {
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 };
 
-
 const render = (data, metric, countryID) => {
     const svg = d3.select("svg");
     const width = .7 * screen.width;
@@ -226,16 +225,19 @@ function getNumberOfCountriesDownloaded() {
 
 }
 
-async function dataForGraphs(countryData) {
+function getDataFromStorage(){
+    return euDataSet.map((country) =>
+        JSON.parse(localStorage.getItem(country.countryCode))
+    );
+}
 
+async function dataForGraphs(countryData) {
 
     let countriesDownloaded = await getNumberOfCountriesDownloaded()
 
     if (countriesDownloaded === 0){return}
 
-    let allData = euDataSet.map((e) =>
-        JSON.parse(localStorage.getItem(e.countryCode))
-    );
+    let allData = getDataFromStorage()
     let totalCases = [];
 
     allData = allData
