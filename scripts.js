@@ -225,7 +225,7 @@ function getNumberOfCountriesDownloaded() {
 
 }
 
-function getDataFromStorage(){
+function getDataFromStorage() {
     let data = euDataSet.map((country) =>
         JSON.parse(localStorage.getItem(country.countryCode))
     );
@@ -233,46 +233,61 @@ function getDataFromStorage(){
     return data.filter(country => country !== null)
 }
 
+function calculateCasesPerCapita(){
+
+    let allData = getDataFromStorage()
+
+    return allData
+        .map((country, index) => {
+
+            let latestDay = country[country.length - 1];
+         
+            return {
+                ["countryCode"]: euDataSet[index].countryCode,
+                ["casesPerCapita"]: Math.round(
+                    latestDay.casesToDate / euDataSet[index].population
+                ),
+            };
+
+        })
+}
+
+function calculateTotalEUCases(){
+
+    let allData = getDataFromStorage()
+
+    let totalCases = [];
+
+      allData
+        .forEach((country) => {
+            let latestDay = country[country.length - 1];
+            totalCases.push(latestDay.casesToDate);
+        })
+        
+        return totalCases.reduce((a, b) => a + b);
+}
+
 async function dataForGraphs(countryData) {
 
     let countriesDownloaded = await getNumberOfCountriesDownloaded()
 
-    if (countriesDownloaded === 0){return}
+    if (countriesDownloaded === 0) { return }
 
-    let allData = getDataFromStorage()
-    let totalCases = [];
+    casesPerCapita = calculateCasesPerCapita()
 
-    allData = allData
-        .map((e, i) => {
-           
-                let latestDay = e[e.length - 1];
-                if (euDataSet[i].countryCode !== "gb") {
-                    totalCases.push(latestDay.casesToDate);
-                }
-
-                return {
-                    ["countryCode"]: euDataSet[i].countryCode,
-                    ["casesPerCapita"]: Math.round(
-                        latestDay.casesToDate / euDataSet[i].population
-                    ),
-                };
-         
-        })
-        .filter((e) => e !== undefined);
-
-    if (countriesDownloaded === 28) {
-        let totalEuCases = totalCases.reduce((a, b) => a + b);
+    if (countriesDownloaded === 27) {
+        let totalEuCases = calculateTotalEUCases()
 
         let euPopulation =
             euDataSet.map((e) => e.population).reduce((a, b) => a + b) - 670.255;
 
-        allData.push({
+        casesPerCapita.push({
             countryCode: "eu",
             casesPerCapita: Math.round(totalEuCases / euPopulation),
         });
     }
 
-    colmRender(allData, "casesPerCapita", "countryCode", calls);
+    colmRender(casesPerCapita, "casesPerCapita", "countryCode", calls);
 }
 
 function removeColonies(jsonData) {
@@ -343,25 +358,25 @@ function recordFailedAPICalls(rawData, failedCalls) {
 
 async function displayNumberCountriesDownloaded() {
 
-   let countriesDownloaded = await getNumberOfCountriesDownloaded()
+    let countriesDownloaded = await getNumberOfCountriesDownloaded()
 
-   document.getElementById("downloads").innerHTML = countriesDownloaded
+    document.getElementById("downloads").innerHTML = countriesDownloaded
 
 }
 
-function compileDataForSaving(countryData){
+function compileDataForSaving(countryData) {
 
-        let SaveData = countryData.map((country) => {
+    let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
 
-     return   Promise.allSettled(SaveData).then()
+    return Promise.allSettled(SaveData).then()
 
 }
 
-function compileSuccessfulCalls(successfulCalls){
+function compileSuccessfulCalls(successfulCalls) {
 
-    return   Promise.all(
+    return Promise.all(
         successfulCalls.map((res) => res.json())
     )
 
@@ -370,33 +385,33 @@ function compileSuccessfulCalls(successfulCalls){
 
 
 
- async function processRawData(rawData, countries, failedCalls) {
+async function processRawData(rawData, countries, failedCalls) {
 
     failedCalls = recordFailedAPICalls(rawData, failedCalls)
 
-        let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
+    let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
 
-        let jsonData = await compileSuccessfulCalls(successfulCalls)
+    let jsonData = await compileSuccessfulCalls(successfulCalls)
 
-        if(successfulCalls.length > 0){
+    if (successfulCalls.length > 0) {
 
-            let countryData = cleanData(jsonData)
+        let countryData = cleanData(jsonData)
 
-            await compileDataForSaving(countryData)
+        await compileDataForSaving(countryData)
 
-            displayNumberCountriesDownloaded()
+        displayNumberCountriesDownloaded()
 
-            dataForGraphs();
+        dataForGraphs();
 
-        }      
-        getData(countries, false, failedCalls);
+    }
+    getData(countries, false, failedCalls);
 };
 
 
 function getData(countries, firstCall, failedCalls) {
-    if(countries.length === 0 && failedCalls.length===0){return}
-    if(countries.length === 0 && failedCalls.length >0){countries = failedCalls.splice(0, 10);}
-    
+    if (countries.length === 0 && failedCalls.length === 0) { return }
+    if (countries.length === 0 && failedCalls.length > 0) { countries = failedCalls.splice(0, 10); }
+
     if (firstCall) {
         localStorage.clear()
 
