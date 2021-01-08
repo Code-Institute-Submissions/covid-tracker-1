@@ -210,7 +210,7 @@ let calls = 0;
 
 function dataForGraphs(countriesDownloaded) {
 
-    if (countriesDownloaded + countryData.length === 0) {return}
+    if (countriesDownloaded === 0) {return}
 
   let allData = euDataSet.map((e) =>
     JSON.parse(localStorage.getItem(e.countryCode))
@@ -408,7 +408,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
     saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData)
 
   
-
+        //does this make sense?
 
     if (countriesDownloaded + countryData.length > 0) {
       dataForGraphs(countriesDownloaded + countryData.length);
@@ -425,7 +425,6 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
 function getData(countries, firstCall, failedCalls){
   if (firstCall) {
-    localStorage.clear();
     makeAPICalls(countries, firstCall, failedCalls);
   } else {
     setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
