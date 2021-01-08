@@ -340,16 +340,6 @@ function recordFailedAPICalls(rawData, failedCalls) {
     return failedCalls
 }
 
-function clearStorageOnFirstCall(firstCall) {
-
-
-
-    if (firstCall) {
-
-        localStorage.clear()
-
-    }
-}
 
 async function displayNumberCountriesDownloaded() {
 
@@ -373,6 +363,8 @@ function compileSuccessfulCalls(rawData){
 
     let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
 
+
+
     return   Promise.all(
         successfulCalls.map((res) => res.json())
     ).then()
@@ -384,18 +376,9 @@ function compileSuccessfulCalls(rawData){
 
     recordFailedAPICalls(rawData, failedCalls)
 
-    // let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200)
-
-
-    // Promise.all(
-    //     successfulCalls.map((res) => res.json())
-    // ).then(async (jsonData) => {
-
-    //TO DO: Code for when there aren't successful calls
-
         let jsonData = await compileSuccessfulCalls(rawData)
 
-        clearStorageOnFirstCall(firstCall)
+        
 
         let countryData = cleanData(jsonData)
 
@@ -406,8 +389,6 @@ function compileSuccessfulCalls(rawData){
         dataForGraphs();
        
         getData(countries, false, failedCalls);
-
-    // });
 };
 
 
@@ -416,6 +397,7 @@ function getData(countries, firstCall, failedCalls) {
     if(countries.length === 0 && failedCalls.length >0){countries = failedCalls.splice(0, 10);}
     
     if (firstCall) {
+        localStorage.clear()
         //To Do: make this an object {countries, firstCall, failedCalls)}
         makeAPICalls(countries, firstCall, failedCalls);
     } else {
