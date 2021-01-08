@@ -226,9 +226,11 @@ function getNumberOfCountriesDownloaded() {
 }
 
 function getDataFromStorage(){
-    return euDataSet.map((country) =>
+    let data = euDataSet.map((country) =>
         JSON.parse(localStorage.getItem(country.countryCode))
     );
+
+    return data.filter(country => country !== null)
 }
 
 async function dataForGraphs(countryData) {
@@ -242,7 +244,7 @@ async function dataForGraphs(countryData) {
 
     allData = allData
         .map((e, i) => {
-            if (e !== null) {
+           
                 let latestDay = e[e.length - 1];
                 if (euDataSet[i].countryCode !== "gb") {
                     totalCases.push(latestDay.casesToDate);
@@ -254,7 +256,7 @@ async function dataForGraphs(countryData) {
                         latestDay.casesToDate / euDataSet[i].population
                     ),
                 };
-            }
+         
         })
         .filter((e) => e !== undefined);
 
@@ -349,7 +351,7 @@ function clearStorageOnFirstCall(firstCall) {
     }
 }
 
-function displayNumberCountriesDownloaded() {
+async function displayNumberCountriesDownloaded() {
 
    let countriesDownloaded = await getNumberOfCountriesDownloaded()
 
