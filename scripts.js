@@ -399,15 +399,15 @@ function getData(countries, firstCall, failedCalls) {
     
     if (firstCall) {
         localStorage.clear()
-        //To Do: make this an object {countries, firstCall, failedCalls)}
-        makeAPICalls(countries, firstCall, failedCalls);
+
+        makeAPICalls(countries, failedCalls);
     } else {
         //the api won't allow more than 10 calls from my ip within 5 seconds
-        setTimeout(() => makeAPICalls(countries, firstCall, failedCalls), 5000);
+        setTimeout(() => makeAPICalls(countries, failedCalls), 5000);
     }
 };
 
-function makeAPICalls(countries, firstCall, failedCalls) {
+function makeAPICalls(countries, failedCalls) {
     Promise.all(
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
