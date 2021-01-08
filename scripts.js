@@ -359,39 +359,18 @@ async function displayNumberCountriesDownloaded() {
 
 }
 
-function saveDataAndDisplayNumberCountriesDownloaded(countryData) {
+function compileDataForSaving(countryData){
 
-    countryData.forEach(country => {
-        //TO DO: if this code isn't temporary, put this code into different function
-
-        // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
-        //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
-
-        let node = document.createElement("LI");
-        let textnode = document.createTextNode(
-            `${country.country}: ${country.data[country.data.length - 1].casesToDate}`
-        );
-        node.appendChild(textnode);
-        document
-            .getElementById("countries")
-            .appendChild(node)
-            .setAttribute("id", country.countryCode);
-    })
-
-    let SaveData = countryData.map((country) => {
+        let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
 
-    Promise.allSettled(SaveData).then(savedData => {
-
-        displayNumberCountriesDownloaded()
-
-    })
+     return   Promise.allSettled(SaveData).then()
 
 }
 
 
-function processRawData(rawData, firstCall, countries, failedCalls) {
+ function processRawData(rawData, firstCall, countries, failedCalls) {
 
     recordFailedAPICalls(rawData, failedCalls)
 
@@ -400,13 +379,15 @@ function processRawData(rawData, firstCall, countries, failedCalls) {
 
     Promise.all(
         successfulCalls.map((res) => res.json())
-    ).then((jsonData) => {
+    ).then(async (jsonData) => {
 
         clearStorageOnFirstCall(firstCall)
 
         let countryData = cleanData(jsonData)
 
-        saveDataAndDisplayNumberCountriesDownloaded(countryData)
+        await compileDataForSaving(countryData)
+
+        displayNumberCountriesDownloaded()
 
         let countriesDownloaded = 0
 
