@@ -389,12 +389,8 @@ function compileDataForSaving(countryData){
 
         displayNumberCountriesDownloaded()
 
-        let countriesDownloaded = 0
-
-        if (countriesDownloaded + countryData.length > 0) {
-            dataForGraphs(countriesDownloaded + countryData.length);
-        }
-
+        dataForGraphs(countriesDownloaded + countryData.length);
+      
         if (countries.length > 0) {
             getData(countries, false, failedCalls);
         } else if (failedCalls.length > 0) {
