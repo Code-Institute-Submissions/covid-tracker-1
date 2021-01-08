@@ -32,7 +32,7 @@ const euDataSet = [
   { country: "slovenia", countryCode: "si", population: 20.959 },
   { country: "spain", countryCode: "es", population: 473.3 },
   { country: "sweden", countryCode: "se", population: 103.276 },
-  { country: "united-kingdom", countryCode: "gb", population: 670.255 },
+//   { country: "united-kingdom", countryCode: "gb", population: 670.255 },
 ];
 
 let eu = euDataSet.map((e) => e.country);
@@ -327,8 +327,9 @@ function clearStorageOnFirstCall(firstCall){
 }
 
 function saveDataToLocalStorage(countryData){
-      countryData.forEach((country) => {
-      localStorage.setItem(country.countryCode, JSON.stringify(country.data));
+
+    countryData.forEach(country => {
+                //TO DO: if this code isn't temporary, put this code into different function
 
       // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
       //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
@@ -342,7 +343,13 @@ function saveDataToLocalStorage(countryData){
         .getElementById("countries")
         .appendChild(node)
         .setAttribute("id", country.countryCode);
+    })
+
+      let SaveData = countryData.map((country) => {
+        return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
+
+    Promise.allSettled(SaveData).then(savedData => displayNumberCountriesDownloaded())
     
 }
 
@@ -357,16 +364,32 @@ function calculateTotalCases(countryData){
   
 }
 
-function saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData){
-        localStorage.setItem(
-      "countriesDownloaded",
-      countriesDownloaded + countryData.length
-    );
+// function saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData){
+//         localStorage.setItem(
+//       "countriesDownloaded",
+//       countriesDownloaded + countryData.length
+//     );
 
 
-    document.getElementById("downloads").innerHTML = localStorage.getItem(
-      "countriesDownloaded"
-    );
+//     document.getElementById("downloads").innerHTML = localStorage.getItem(
+//       "countriesDownloaded"
+//     );
+// }
+
+function displayNumberCountriesDownloaded(){
+
+    let countryCodes = euDataSet.map(countryEntry=>countryEntry.countryCode)
+
+    let CountriesDownloaded = countryCodes.map(countryCode=>{return localStorage.getItem(countryCode) })
+
+    Promise.allSettled(CountriesDownloaded).then(countries => {
+      
+        countriesDownloaded = countries.filter(country=>country.value!==null).length
+
+        document.getElementById("downloads").innerHTML = countriesDownloaded
+     
+    })
+
 }
 
 function saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData){
@@ -387,7 +410,7 @@ async function getcurrentEUTotal(){
 
     let currentEUTotal = await promise
 
-    console.log('xxxxxxxx')
+
 
     return currentEUTotal
     
@@ -415,7 +438,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     let totalCasesNewData = calculateTotalCases(countryData)
 
-    let countriesDownloaded = await Number(
+    let countriesDownloaded = Number(
       localStorage.getItem("countriesDownloaded")
     );
 
@@ -423,17 +446,13 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
   
 
-    saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData)
+    // displayNumberCountriesDownloaded()
 
-      //To Do: Remove UK?
+      
 
     saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData)
 
-    console.log('countriesDownloaded ', countriesDownloaded )
 
-    console.log('countryData.length', countryData.length)
-
-  
         //does this make sense?
 
     if (countriesDownloaded + countryData.length > 0) {
