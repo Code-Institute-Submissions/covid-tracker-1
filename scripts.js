@@ -326,10 +326,26 @@ function clearStorageOnFirstCall(firstCall){
     }
 }
 
-function saveDataToLocalStorage(countryData){
+function displayNumberCountriesDownloaded(){
+
+    let countryCodes = euDataSet.map(countryEntry=>countryEntry.countryCode)
+
+    let CountriesDownloaded = countryCodes.map(countryCode=>{return localStorage.getItem(countryCode) })
+
+    Promise.allSettled(CountriesDownloaded).then(countries => {
+      
+        countriesDownloaded = countries.filter(country=>country.value!==null).length
+
+        document.getElementById("downloads").innerHTML = countriesDownloaded
+     
+    })
+
+}
+
+function saveAndDisplayData(countryData){
 
     countryData.forEach(country => {
-                //TO DO: if this code isn't temporary, put this code into different function
+    //TO DO: if this code isn't temporary, put this code into different function
 
       // set attribute from Here; https://stackoverflow.com/questions/9422974/createelement-with-id
       //rest from: https://www.w3schools.com/jsref/met_node_appendchild.asp
@@ -364,33 +380,9 @@ function calculateTotalCases(countryData){
   
 }
 
-// function saveAndDisplayCountriesDownloaded(countriesDownloaded, countryData){
-//         localStorage.setItem(
-//       "countriesDownloaded",
-//       countriesDownloaded + countryData.length
-//     );
 
 
-//     document.getElementById("downloads").innerHTML = localStorage.getItem(
-//       "countriesDownloaded"
-//     );
-// }
 
-function displayNumberCountriesDownloaded(){
-
-    let countryCodes = euDataSet.map(countryEntry=>countryEntry.countryCode)
-
-    let CountriesDownloaded = countryCodes.map(countryCode=>{return localStorage.getItem(countryCode) })
-
-    Promise.allSettled(CountriesDownloaded).then(countries => {
-      
-        countriesDownloaded = countries.filter(country=>country.value!==null).length
-
-        document.getElementById("downloads").innerHTML = countriesDownloaded
-     
-    })
-
-}
 
 function saveAndDisplayTotalEUCases(currentEUTotal, totalCasesNewData){
 
@@ -434,7 +426,7 @@ function processRawData(rawData, firstCall, countries, failedCalls){
 
     let countryData = cleanData(jsonData)
 
-    saveDataToLocalStorage(countryData)
+    saveAndDisplayData(countryData)
 
     let totalCasesNewData = calculateTotalCases(countryData)
 
