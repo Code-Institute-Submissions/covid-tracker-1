@@ -232,9 +232,9 @@ function getDataFromStorage() {
         JSON.parse(localStorage.getItem(country.countryCode))
     );
 
-    let downloadedCountryData = countryData.filter(country => country !== null)
+    //don't filter out nulls here. You use the index in next function to assign the correct data to the correct country
 
-    return Promise.all(downloadedCountryData)
+    return Promise.all(countryData)
 }
 
 function calculateTotalEUCases(allData){
@@ -254,14 +254,23 @@ function calculateEUPopulation(){
     return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
 }
 
-async function calculateCasesPerCapita(countriesDownloaded){
+function calculateCasesPerCapita(allData){
 
-    let allData = await getDataFromStorage() 
+    console.log('allData', allData)
 
-    let casesPerCapita = allData
+        let casesPerCapita = allData
         .map((country, index) => {
 
+            //prevent countries that haven't been downloaded yet from causing errors
+
+            if(country === null){return}
+
             let latestDay = country[country.length - 1];
+
+            if(euDataSet[index].countryCode==='ie'){
+                console.log('ie latest day', latestDay)
+                console.log('ie pop', euDataSet[index].population)
+            }
          
             return  {
                 ["countryCode"]: euDataSet[index].countryCode,
@@ -271,6 +280,20 @@ async function calculateCasesPerCapita(countriesDownloaded){
             };
 
         })
+        //remove countries that haven't been downloaded yet
+        .filter(country => country !== undefined)
+
+        return casesPerCapita
+
+}
+
+async function getCasesPerCapita(countriesDownloaded){
+
+    let allData = await getDataFromStorage() 
+
+    let casesPerCapita = calculateCasesPerCapita(allData)
+
+
 
         let promiseToReturn 
 
@@ -307,7 +330,7 @@ async function dataForGraphs() {
 
     if (countriesDownloaded === 0) { return }
 
-    casesPerCapita = await calculateCasesPerCapita(countriesDownloaded)
+    casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
     colmRender(casesPerCapita, "casesPerCapita", "countryCode", calls);
 }
