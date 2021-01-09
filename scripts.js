@@ -47,6 +47,16 @@ function sortByHighestValues(data, metric){
     return data.sort((a, b) => b[metric] - a[metric])
 }
 
+function setBarColor(data){
+  
+            if(data.countryCode==='eu'){
+                return "orange"
+            }else{
+                return "steelBlue"
+            }
+        }
+        
+
 const renderBarChart = (data, metric, countryID, callNumber) => {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
@@ -83,13 +93,9 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    const firstCall = g;
-    const subsequentCall = svg;
-    let callStatus;
+
 
     if (callNumber === 0) {
-        // append axis
-        callStatus = firstCall;
         g.append("g")
 
             .attr("class", "y axis")
@@ -100,9 +106,6 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
             .attr("transform", `translate(0, ${innerHeight})`)
             .call(xAxis);
     } else {
-        callStatus = subsequentCall;
-        //update yAxis
-        // https://stackoverflow.com/questions/16919280/how-to-update-axis-using-d3-js
         svg.selectAll("g.y.axis").call(yAxis);
 
         svg.selectAll("g.x.axis").call(xAxis);
@@ -115,18 +118,23 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
         .data(data)
         .enter()
         .append("rect")
+
         .attr("y", (d) => yScale(d[countryID]))
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
-    svg
+
+
+    d3.select("svg")
         .selectAll("rect")
+        .attr("fill", d => setBarColor(d))
         .data(data)
         .attr("y", (d) => yScale(d[countryID]))
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+        
 };
 
 const render = (data, metric, countryID) => {
