@@ -35,7 +35,7 @@ const euDataSet = [
     //   { country: "united-kingdom", countryCode: "gb", population: 670.255 },
 ];
 
-let calls = 0
+let barChartAxisRendered = false
 
 let eu = euDataSet.map((e) => e.country);
 
@@ -97,7 +97,7 @@ const renderBarChart = (data, metric, countryID) => {
 
 
 
-    if (calls === 0) {
+    if (!barChartAxisRendered) {
         g.append("g")
 
             .attr("class", "y axis")
@@ -113,7 +113,7 @@ const renderBarChart = (data, metric, countryID) => {
         svg.selectAll("g.x.axis").call(xAxis);
     }
 
-    calls++;
+    barChartAxisRendered = true
 
     d3.select("svg")
         .selectAll("rect")
@@ -135,11 +135,7 @@ const renderBarChart = (data, metric, countryID) => {
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-      
-
-
-
-        
+              
 };
 
 const render = (data, metric, countryID) => {
