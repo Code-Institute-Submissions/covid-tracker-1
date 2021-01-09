@@ -43,7 +43,7 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-const colmRender = (data, metric, countryID, callNumber) => {
+const renderBarChart = (data, metric, countryID, callNumber) => {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
     console.log('data', data)
@@ -332,7 +332,7 @@ async function dataForGraphs() {
 
     casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
-    colmRender(casesPerCapita, "casesPerCapita", "countryCode", calls);
+    renderBarChart (casesPerCapita, "casesPerCapita", "countryCode", calls);
 }
 
 function removeColonies(jsonData) {
