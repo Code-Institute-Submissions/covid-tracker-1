@@ -46,13 +46,15 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 const renderBarChart = (data, metric, countryID, callNumber) => {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
-    console.log('data', data)
+    console.log('data1', data)
 
     data = data
         .filter((e) => !isNaN(e[metric]))
         .sort((a, b) => b[metric] - a[metric]);
 
-    console.log("data", data);
+    console.log("data2", data);
+
+    debugger
 
     const xValue = (d) => d[metric];
     const yValue = (d) => d[countryID];
