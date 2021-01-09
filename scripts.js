@@ -43,40 +43,25 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
+function sortByHighestValues(data, metric){
+    return data.sort((a, b) => b[metric] - a[metric])
+}
+
 const renderBarChart = (data, metric, countryID, callNumber) => {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
-    console.log('data1', data)
 
-    data = data
-        .filter((e) => !isNaN(e[metric]))
-        .sort((a, b) => b[metric] - a[metric]);
-
-    console.log("data2", data);
-
-    debugger
-
-    const xValue = (d) => d[metric];
-    const yValue = (d) => d[countryID];
+    data = sortByHighestValues(data, metric)
 
     // https://www.w3schools.com/jsref/prop_screen_height.asp
 
     // https://www.w3schools.com/jsref/prop_screen_width.asp
 
-    const width = screen.width;
-    const height = screen.height;
+    const width = 0.9* screen.width;
+    const height = 0.9* screen.height;
 
     const svg = d3.select("svg").attr("width", width).attr("height", height);
-
-    //     const width = +svg.attr("width");
-    //   const height = +svg.attr("height");
-
-    //   console.log('width', width)
-    //   console.log('height', height)
-
-    //
-
-    const margin = { top: 20, right: 20, bottom: 20, left: 30 };
+    const margin = { top: 0, right: 0, bottom: 20, left: 30 };
     const innerHeight = height - margin.top - margin.bottom;
     const innerWidth = width - margin.left - margin.right;
 
@@ -84,10 +69,6 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
         .range([0, innerWidth]);
-
-    console.log("domain", xScale.domain());
-
-    console.log("range", xScale.range());
 
     const yScale = d3
         .scaleBand()
@@ -142,8 +123,6 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
     svg
         .selectAll("rect")
         .data(data)
-        //   .enter()
-        //   .append('rect')
         .attr("y", (d) => yScale(d[countryID]))
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
@@ -258,8 +237,6 @@ function calculateEUPopulation(){
 
 function calculateCasesPerCapita(allData){
 
-    console.log('allData', allData)
-
         let casesPerCapita = allData
         .map((country, index) => {
 
@@ -268,11 +245,6 @@ function calculateCasesPerCapita(allData){
             if(country === null){return}
 
             let latestDay = country[country.length - 1];
-
-            if(euDataSet[index].countryCode==='ie'){
-                console.log('ie latest day', latestDay)
-                console.log('ie pop', euDataSet[index].population)
-            }
          
             return  {
                 ["countryCode"]: euDataSet[index].countryCode,
