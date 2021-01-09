@@ -48,16 +48,18 @@ function sortByHighestValues(data, metric){
 }
 
 function setBarColor(data){
+
+    console.log('data', data)
   
             if(data.countryCode==='eu'){
                 return "orange"
             }else{
                 return "steelBlue"
             }
-        }
+}
         
 
-const renderBarChart = (data, metric, countryID, callNumber) => {
+const renderBarChart = (data, metric, countryID) => {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
 
@@ -87,7 +89,7 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
         .padding(0.2);
 
     const yAxis = d3.axisLeft(yScale);
-    const xAxis = d3.axisBottom(xScale).ticks(5);
+    const xAxis = d3.axisBottom(xScale).ticks(10);
 
     const g = svg
         .append("g")
@@ -95,7 +97,7 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
 
 
 
-    if (callNumber === 0) {
+    if (calls === 0) {
         g.append("g")
 
             .attr("class", "y axis")
@@ -124,8 +126,7 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
-
-
+        
     d3.select("svg")
         .selectAll("rect")
         .attr("fill", d => setBarColor(d))
@@ -134,6 +135,10 @@ const renderBarChart = (data, metric, countryID, callNumber) => {
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
+      
+
+
+
         
 };
 
@@ -314,7 +319,7 @@ async function dataForGraphs() {
 
     casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
-    renderBarChart (casesPerCapita, "casesPerCapita", "countryCode", calls);
+    renderBarChart (casesPerCapita, "casesPerCapita", "countryCode");
 }
 
 function removeColonies(jsonData) {
