@@ -59,7 +59,7 @@ function setBarColor(data){
 }
         
 
-const renderBarChart = (data, metric, countryID) => {
+ function renderBarChart(data, metric, countryID) {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
 
 
@@ -91,22 +91,24 @@ const renderBarChart = (data, metric, countryID) => {
     const yAxis = d3.axisLeft(yScale);
     const xAxis = d3.axisBottom(xScale).ticks(10);
 
-    const g = svg
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-
 
     if (!barChartAxisRendered) {
-        g.append("g")
+
+                    svg
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    
 
             .attr("class", "y axis")
             .call(yAxis);
 
-        g.append("g")
+        svg
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
             .attr("class", "x axis")
             .attr("transform", `translate(0, ${innerHeight})`)
             .call(xAxis);
+
     } else {
         svg.selectAll("g.y.axis").call(yAxis);
 
