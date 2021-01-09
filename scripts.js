@@ -35,6 +35,8 @@ const euDataSet = [
     //   { country: "united-kingdom", countryCode: "gb", population: 670.255 },
 ];
 
+let calls = 0
+
 let eu = euDataSet.map((e) => e.country);
 
 const countryCodes = euDataSet.map((e) => e.countryCode);
@@ -43,6 +45,8 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 const colmRender = (data, metric, countryID, callNumber) => {
     //   https://www.w3schools.com/jsref/jsref_isnan.asp
+
+    console.log('data', data)
 
     data = data
         .filter((e) => !isNaN(e[metric]))
@@ -205,8 +209,6 @@ const render = (data, metric, countryID) => {
         .text("Covid Cases Per 100,000 People by Country");
 };
 
-let calls = 0;
-
 function getNumberOfCountriesDownloaded() {
 
     let countryCodes = euDataSet.map(countryEntry => countryEntry.countryCode)
@@ -226,35 +228,16 @@ function getNumberOfCountriesDownloaded() {
 }
 
 function getDataFromStorage() {
-    let data = euDataSet.map((country) =>
+    let countryData = euDataSet.map((country) =>
         JSON.parse(localStorage.getItem(country.countryCode))
     );
 
-    return data.filter(country => country !== null)
+    let downloadedCountryData = countryData.filter(country => country !== null)
+
+    return Promise.all(downloadedCountryData)
 }
 
-function calculateCasesPerCapita(){
-
-    let allData = getDataFromStorage()
-
-    return allData
-        .map((country, index) => {
-
-            let latestDay = country[country.length - 1];
-         
-            return {
-                ["countryCode"]: euDataSet[index].countryCode,
-                ["casesPerCapita"]: Math.round(
-                    latestDay.casesToDate / euDataSet[index].population
-                ),
-            };
-
-        })
-}
-
-function calculateTotalEUCases(){
-
-    let allData = getDataFromStorage()
+function calculateTotalEUCases(allData){
 
     let totalCases = [];
 
@@ -267,25 +250,64 @@ function calculateTotalEUCases(){
         return totalCases.reduce((a, b) => a + b);
 }
 
-async function dataForGraphs(countryData) {
+function calculateEUPopulation(){
+    return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
+}
+
+async function calculateCasesPerCapita(countriesDownloaded){
+
+    let allData = await getDataFromStorage() 
+
+    let casesPerCapita = allData
+        .map((country, index) => {
+
+            let latestDay = country[country.length - 1];
+         
+            return  {
+                ["countryCode"]: euDataSet[index].countryCode,
+                ["casesPerCapita"]: Math.round(
+                    latestDay.casesToDate / euDataSet[index].population
+                ),
+            };
+
+        })
+
+        let promiseToReturn 
+
+           if(countriesDownloaded < 27){promiseToReturn = new Promise((resolve,reject) => {
+                resolve(casesPerCapita)
+           }) }else{
+               promiseToReturn = new Promise((resolve,reject)=>{
+                   resolve(includeEUInCasesPerCapita(allData, casesPerCapita))
+               })
+           }
+ 
+        return promiseToReturn
+
+
+}
+
+function includeEUInCasesPerCapita(allData, casesPerCapita){
+    
+        let totalEuCases = calculateTotalEUCases(allData)
+
+        let euPopulation = calculateEUPopulation()
+            
+        casesPerCapita.push({
+            countryCode: "eu",
+            casesPerCapita: Math.round(totalEuCases / euPopulation),
+        });
+
+        return casesPerCapita
+}
+
+async function dataForGraphs() {
 
     let countriesDownloaded = await getNumberOfCountriesDownloaded()
 
     if (countriesDownloaded === 0) { return }
 
-    casesPerCapita = calculateCasesPerCapita()
-
-    if (countriesDownloaded === 27) {
-        let totalEuCases = calculateTotalEUCases()
-
-        let euPopulation =
-            euDataSet.map((e) => e.population).reduce((a, b) => a + b) - 670.255;
-
-        casesPerCapita.push({
-            countryCode: "eu",
-            casesPerCapita: Math.round(totalEuCases / euPopulation),
-        });
-    }
+    casesPerCapita = await calculateCasesPerCapita(countriesDownloaded)
 
     colmRender(casesPerCapita, "casesPerCapita", "countryCode", calls);
 }
@@ -381,8 +403,6 @@ function compileSuccessfulCalls(successfulCalls) {
     )
 
 }
-
-
 
 
 async function processRawData(rawData, countries, failedCalls) {
