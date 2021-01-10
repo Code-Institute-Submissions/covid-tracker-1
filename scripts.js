@@ -79,24 +79,24 @@ function renderXAxis(width, height, margin, xAxis, innerHeight) {
 
 }
 
-function updateXAxis(width, height, xAxis){
+function updateXAxis(width, height, xAxis) {
 
     d3.select("svg").attr("width", width).attr("height", height).selectAll("g.x.axis").call(xAxis)
 
 }
 
-function updateYAxis(width, height, yAxis){
+function updateYAxis(width, height, yAxis) {
     d3.select("svg").attr("width", width).attr("height", height).selectAll("g.y.axis").call(yAxis);
 }
 
-function renderBars(data, yScale, xScale, margin, metric, countryID){
+function renderBars(data, yScale, xScale, margin, metric, countryID) {
 
     let selectDataForBarCharts = d3.select("svg")
-    .selectAll("rect")
-    .data(data)
+        .selectAll("rect")
+        .data(data)
 
 
-   selectDataForBarCharts
+    selectDataForBarCharts
         .enter()
         .append("rect")
         .merge(selectDataForBarCharts)
@@ -105,14 +105,26 @@ function renderBars(data, yScale, xScale, margin, metric, countryID){
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
+        .on('mouseover', function (d, i) {
+            d3.select(this).transition()
+                .duration('50')
+                .attr('opacity', '.85')
+        })
+        .on('mouseout', function (d, i) {
+            d3.select(this).transition()
+                .duration('50')
+                .attr('opacity', '1')
+        })
+
+
+
+
 
 }
 
 
 
 function renderBarChart(data, metric, countryID) {
-
-    console.log('countryID', countryID)
 
     data = sortByHighestValues(data, metric)
 
@@ -121,7 +133,7 @@ function renderBarChart(data, metric, countryID) {
     // https://www.w3schools.com/jsref/prop_screen_width.asp
 
     const width = 0.9 * screen.width
-    const height = 0.9 * screen.height
+    const height = 0.8 * screen.height
     const margin = { top: 0, right: 0, bottom: 20, left: 30 }
     const innerHeight = height - margin.top - margin.bottom
 
@@ -145,13 +157,13 @@ function renderBarChart(data, metric, countryID) {
         renderYAxis(width, height, margin, yAxis)
         renderXAxis(width, height, margin, xAxis, innerHeight)
 
-   
+
 
     } else {
-       
+
         updateXAxis(width, height, xAxis)
         updateYAxis(width, height, yAxis)
-        
+
     }
 
     barChartAxisRendered = true
