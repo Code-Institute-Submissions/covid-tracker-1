@@ -99,22 +99,48 @@ function renderBars(data, yScale, xScale, margin, metric, countryID) {
     selectDataForBarCharts
         .enter()
         .append("rect")
+   
         .merge(selectDataForBarCharts)
         .attr("fill", d => setBarColor(d))
         .attr("y", (d) => yScale(d[countryID]))
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-        .on('mouseover', function (d, i) {
+
+        
+
+
+
+
+
+
+
+
+        //          .on("mouseover", onMouseOver) //Add listener for the mouseover event
+        //  .on("mouseout", onMouseOut)
+  
+        .on('mouseover', function () {
             d3.select(this).transition()
                 .duration('50')
                 .attr('opacity', '.85')
         })
-        .on('mouseout', function (d, i) {
+        .on('mouseout', function () {
             d3.select(this).transition()
                 .duration('50')
                 .attr('opacity', '1')
         })
+
+    //     var div = d3.select("svg").seleactAll("rect").append("div").attr("class", "tooltip-donut").style("opacity", 0)
+
+    //              div.transition()
+    //            .duration('50')
+    //            .style("opacity", 1);
+
+              
+        
+    //     div.html(d.value)
+    //  .style("left", (d3.event.pageX + 10) + "px")
+    //  .style("top", (d3.event.pageY - 15) + "px");
 
 
 
