@@ -80,7 +80,7 @@ function setBarColor(data){
     const xScale = d3
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
-        .range([30, innerWidth]);
+        .range([30, width]);
 
     const yScale = d3
         .scaleBand()
