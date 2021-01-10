@@ -77,6 +77,17 @@ function renderXAxis(width, height, margin, xAxis, innerHeight) {
 
 }
 
+function updateXAxis(width, height, xAxis){
+
+    d3.select("svg").attr("width", width).attr("height", height).selectAll("g.x.axis").call(xAxis)
+
+}
+
+function updateYAxis(width, height, yAxis){
+    d3.select("svg").attr("width", width).attr("height", height).selectAll("g.y.axis").call(yAxis);
+}
+
+
 
 function renderBarChart(data, metric, countryID) {
 
@@ -86,18 +97,15 @@ function renderBarChart(data, metric, countryID) {
 
     // https://www.w3schools.com/jsref/prop_screen_width.asp
 
-    const width = 0.9 * screen.width;
-    const height = 0.9 * screen.height;
-
-    const svg = d3.select("svg").attr("width", width).attr("height", height);
-    const margin = { top: 0, right: 0, bottom: 20, left: 30 };
-    const innerHeight = height - margin.top - margin.bottom;
-    const innerWidth = width - margin.left - margin.right;
+    const width = 0.9 * screen.width
+    const height = 0.9 * screen.height
+    const margin = { top: 0, right: 0, bottom: 20, left: 30 }
+    const innerHeight = height - margin.top - margin.bottom
 
     const xScale = d3
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
-        .range([30, width]);
+        .range([margin.left, width]);
 
     const yScale = d3
         .scaleBand()
@@ -112,13 +120,13 @@ function renderBarChart(data, metric, countryID) {
     if (!barChartAxisRendered) {
 
         renderYAxis(width, height, margin, yAxis)
-
         renderXAxis(width, height, margin, xAxis, innerHeight)
 
     } else {
-        svg.selectAll("g.y.axis").call(yAxis);
-
-        svg.selectAll("g.x.axis").call(xAxis);
+       
+        updateXAxis(width, height, xAxis)
+        updateYAxis(width, height, yAxis)
+        
     }
 
     barChartAxisRendered = true
@@ -128,7 +136,6 @@ function renderBarChart(data, metric, countryID) {
         .data(data)
         .enter()
         .append("rect")
-
         .attr("y", (d) => yScale(d[countryID]))
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
@@ -146,66 +153,6 @@ function renderBarChart(data, metric, countryID) {
 
 };
 
-const render = (data, metric, countryID) => {
-    const svg = d3.select("svg");
-    const width = .7 * screen.width;
-    const height = .7 * screen.height;
-
-    console.log('screen.width', screen.width)
-    console.log('screen.height', screen.height)
-
-    console.log('width', width)
-    console.log('height', height)
-
-    const xValue = (d) => d[metric];
-    const yValue = (d) => d[countryID];
-    const margin = { top: 40, right: 20, bottom: 20, left: 25 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
-
-    const xScale = d3
-        .scaleLinear()
-        .domain([0, d3.max(data, xValue)])
-        .range([0, innerWidth]);
-
-    const yScale = d3
-        .scaleBand()
-        .domain(data.map(yValue))
-        .range([0, innerHeight])
-        .padding(0.15);
-
-    const g = svg
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
-        .attr("height", height)
-        .attr("width", width)
-
-    const xAxis = d3.axisBottom(xScale).tickSize(-innerWidth);
-
-    g.append("g")
-        .call(d3.axisLeft(yScale))
-        .selectAll(".domain, .tick line")
-        .remove();
-
-    const xAxisG = g
-        .append("g")
-        .call(xAxis)
-        .attr("transform", `translate(0, ${innerHeight})`);
-
-    xAxisG.select(".domain").remove();
-
-    g.selectAll("rect")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("y", (d) => yScale(yValue(d)))
-        .attr("width", (d) => xScale(xValue(d)))
-        .attr("height", yScale.bandwidth());
-
-    g.append("text")
-        .attr("y", -8)
-        .text("Covid Cases Per 100,000 People by Country");
-};
 
 function getNumberOfCountriesDownloaded() {
 
