@@ -43,25 +43,42 @@ const countryCodes = euDataSet.map((e) => e.countryCode);
 
 // This function is from https://www.youtube.com/watch?v=_8V5o2UHG0E&t=26788s
 
-function sortByHighestValues(data, metric){
+function sortByHighestValues(data, metric) {
     return data.sort((a, b) => b[metric] - a[metric])
 }
 
-function setBarColor(data){
+function setBarColor(data) {
 
-    console.log('data', data)
-  
-            if(data.countryCode==='eu'){
-                return "orange"
-            }else{
-                return "steelBlue"
-            }
+    if (data.countryCode === 'eu') {
+        return "orange"
+    } else {
+        return "steelBlue"
+    }
 }
-        
 
- function renderBarChart(data, metric, countryID) {
-    //   https://www.w3schools.com/jsref/jsref_isnan.asp
+function renderYAxis(width, height, margin, yAxis) {
 
+    d3.select("svg").attr("width", width).attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+        .attr("class", "y axis")
+        .call(yAxis)
+
+}
+
+function renderXAxis(width, height, margin, xAxis, innerHeight) {
+
+    d3.select("svg").attr("width", width).attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+        .attr("class", "x axis")
+        .attr("transform", `translate(0, ${innerHeight})`)
+        .call(xAxis)
+
+}
+
+
+function renderBarChart(data, metric, countryID) {
 
     data = sortByHighestValues(data, metric)
 
@@ -69,8 +86,8 @@ function setBarColor(data){
 
     // https://www.w3schools.com/jsref/prop_screen_width.asp
 
-    const width = 0.9* screen.width;
-    const height = 0.9* screen.height;
+    const width = 0.9 * screen.width;
+    const height = 0.9 * screen.height;
 
     const svg = d3.select("svg").attr("width", width).attr("height", height);
     const margin = { top: 0, right: 0, bottom: 20, left: 30 };
@@ -94,20 +111,9 @@ function setBarColor(data){
 
     if (!barChartAxisRendered) {
 
-                    svg
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
-    
+        renderYAxis(width, height, margin, yAxis)
 
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        svg
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
-            .attr("class", "x axis")
-            .attr("transform", `translate(0, ${innerHeight})`)
-            .call(xAxis);
+        renderXAxis(width, height, margin, xAxis, innerHeight)
 
     } else {
         svg.selectAll("g.y.axis").call(yAxis);
@@ -128,7 +134,7 @@ function setBarColor(data){
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
-        
+
     d3.select("svg")
         .selectAll("rect")
         .attr("fill", d => setBarColor(d))
@@ -137,7 +143,7 @@ function setBarColor(data){
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-              
+
 };
 
 const render = (data, metric, countryID) => {
@@ -229,35 +235,35 @@ function getDataFromStorage() {
     return Promise.all(countryData)
 }
 
-function calculateTotalEUCases(allData){
+function calculateTotalEUCases(allData) {
 
     let totalCases = [];
 
-      allData
+    allData
         .forEach((country) => {
             let latestDay = country[country.length - 1];
             totalCases.push(latestDay.casesToDate);
         })
-        
-        return totalCases.reduce((a, b) => a + b);
+
+    return totalCases.reduce((a, b) => a + b);
 }
 
-function calculateEUPopulation(){
+function calculateEUPopulation() {
     return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
 }
 
-function calculateCasesPerCapita(allData){
+function calculateCasesPerCapita(allData) {
 
-        let casesPerCapita = allData
+    let casesPerCapita = allData
         .map((country, index) => {
 
             //prevent countries that haven't been downloaded yet from causing errors
 
-            if(country === null){return}
+            if (country === null) { return }
 
             let latestDay = country[country.length - 1];
-         
-            return  {
+
+            return {
                 ["countryCode"]: euDataSet[index].countryCode,
                 ["casesPerCapita"]: Math.round(
                     latestDay.casesToDate / euDataSet[index].population
@@ -268,45 +274,47 @@ function calculateCasesPerCapita(allData){
         //remove countries that haven't been downloaded yet
         .filter(country => country !== undefined)
 
-        return casesPerCapita
+    return casesPerCapita
 
 }
 
-async function getCasesPerCapita(countriesDownloaded){
+async function getCasesPerCapita(countriesDownloaded) {
 
-    let allData = await getDataFromStorage() 
+    let allData = await getDataFromStorage()
 
     let casesPerCapita = calculateCasesPerCapita(allData)
 
 
 
-        let promiseToReturn 
+    let promiseToReturn
 
-           if(countriesDownloaded < 27){promiseToReturn = new Promise((resolve,reject) => {
-                resolve(casesPerCapita)
-           }) }else{
-               promiseToReturn = new Promise((resolve,reject)=>{
-                   resolve(includeEUInCasesPerCapita(allData, casesPerCapita))
-               })
-           }
- 
-        return promiseToReturn
+    if (countriesDownloaded < 27) {
+        promiseToReturn = new Promise((resolve, reject) => {
+            resolve(casesPerCapita)
+        })
+    } else {
+        promiseToReturn = new Promise((resolve, reject) => {
+            resolve(includeEUInCasesPerCapita(allData, casesPerCapita))
+        })
+    }
+
+    return promiseToReturn
 
 
 }
 
-function includeEUInCasesPerCapita(allData, casesPerCapita){
-    
-        let totalEuCases = calculateTotalEUCases(allData)
+function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
-        let euPopulation = calculateEUPopulation()
-            
-        casesPerCapita.push({
-            countryCode: "eu",
-            casesPerCapita: Math.round(totalEuCases / euPopulation),
-        });
+    let totalEuCases = calculateTotalEUCases(allData)
 
-        return casesPerCapita
+    let euPopulation = calculateEUPopulation()
+
+    casesPerCapita.push({
+        countryCode: "eu",
+        casesPerCapita: Math.round(totalEuCases / euPopulation),
+    });
+
+    return casesPerCapita
 }
 
 async function dataForGraphs() {
@@ -317,7 +325,7 @@ async function dataForGraphs() {
 
     casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
-    renderBarChart (casesPerCapita, "casesPerCapita", "countryCode");
+    renderBarChart(casesPerCapita, "casesPerCapita", "countryCode");
 }
 
 function removeColonies(jsonData) {
