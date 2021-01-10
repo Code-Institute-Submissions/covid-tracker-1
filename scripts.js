@@ -64,6 +64,8 @@ function renderYAxis(width, height, margin, yAxis) {
         .attr("class", "y axis")
         .call(yAxis)
 
+
+
 }
 
 function renderXAxis(width, height, margin, xAxis, innerHeight) {
@@ -87,9 +89,30 @@ function updateYAxis(width, height, yAxis){
     d3.select("svg").attr("width", width).attr("height", height).selectAll("g.y.axis").call(yAxis);
 }
 
+function renderBars(data, yScale, xScale, margin, metric, countryID){
+
+    let selectDataForBarCharts = d3.select("svg")
+    .selectAll("rect")
+    .data(data)
+
+
+   selectDataForBarCharts
+        .enter()
+        .append("rect")
+        .merge(selectDataForBarCharts)
+        .attr("fill", d => setBarColor(d))
+        .attr("y", (d) => yScale(d[countryID]))
+        .attr("width", (d) => xScale(d[metric]))
+        .attr("height", yScale.bandwidth())
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+
+}
+
 
 
 function renderBarChart(data, metric, countryID) {
+
+    console.log('countryID', countryID)
 
     data = sortByHighestValues(data, metric)
 
@@ -122,6 +145,8 @@ function renderBarChart(data, metric, countryID) {
         renderYAxis(width, height, margin, yAxis)
         renderXAxis(width, height, margin, xAxis, innerHeight)
 
+   
+
     } else {
        
         updateXAxis(width, height, xAxis)
@@ -131,25 +156,16 @@ function renderBarChart(data, metric, countryID) {
 
     barChartAxisRendered = true
 
-    d3.select("svg")
-        .selectAll("rect")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("y", (d) => yScale(d[countryID]))
-        .attr("width", (d) => xScale(d[metric]))
-        .attr("height", yScale.bandwidth())
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    renderBars(data, yScale, xScale, margin, metric, countryID)
 
 
-    d3.select("svg")
-        .selectAll("rect")
-        .attr("fill", d => setBarColor(d))
-        .data(data)
-        .attr("y", (d) => yScale(d[countryID]))
-        .attr("width", (d) => xScale(d[metric]))
-        .attr("height", yScale.bandwidth())
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    //To Do: Get display title rendering in correct position
+
+    // d3.select("svg").attr("width", width).attr("height", height)
+    //     .append("text")
+    //     .attr("fill", "black")
+    //     .attr("y", 60)
+    //     .text('Cases per 100,000')
 
 };
 
