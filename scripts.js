@@ -190,20 +190,16 @@ function renderBarChart(data, metric, countryID) {
 
 
     const yAxis = d3.axisLeft(yScale);
-    const xAxis = d3.axisBottom(xScale).ticks(10);
+    const xAxis = d3.axisBottom(xScale).ticks(0);
 
 
     if (!barChartAxisRendered) {
-
         renderYAxis(width, height, margin, yAxis)
-        renderXAxis(width, height, margin, xAxis, innerHeight)
-
-
+        // renderXAxis(width, height, margin, xAxis, innerHeight)
 
     } else {
-
-        updateXAxis(width, height, xAxis)
         updateYAxis(width, height, yAxis)
+        // updateXAxis(width, height, xAxis, innerHeight)
 
     }
 
