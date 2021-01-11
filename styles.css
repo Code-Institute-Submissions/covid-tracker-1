@@ -25,6 +25,8 @@ svg {
     fill: white;
 }
 
+
+
 rect:hover {
     opacity: 0.5;
 }

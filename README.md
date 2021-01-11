@@ -40,6 +40,8 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 Check this out: https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/
 
+//https://www.w3schools.com/jsref/jsref_round.asp
+
 https://stackoverflow.com/questions/65657686/d3-cant-get-values-to-display-when-more-data-is-added-to-a-bar-chart/65669651#65669651
 
 https://www.youtube.com/watch?v=IyIAR65G-GQ&t=2273s

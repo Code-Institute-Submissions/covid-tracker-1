@@ -107,34 +107,75 @@ function renderBars(data, yScale, xScale, margin, metric, countryID) {
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
- 
-  
 
         //TO DO: Move code in new functions - how do I pass this?
 
-        //code from https://medium.com/@kj_schmidt/show-data-on-mouse-over-with-d3-js-3bf598ff8fc2
-        // .on('mouseover', function () {
-        //     d3.select(this).transition()
-        //         .duration('50')
-        //         .attr('opacity', '.85')
-        // })
-        // .on('mouseout', function () {
-        //     d3.select(this).transition()
-        //         .duration('50')
-        //         .attr('opacity', '1')
-        // })
+        //code based on  https://jsfiddle.net/matehu/w7h81xz2/
+        .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, xScale, yScale)})
 
+        .on('mouseout', ()=>{renderValuesInBars(data, metric, countryID, xScale, yScale)})
 
+}
 
+function displayComparisons(event, barData, data, metric, countryID, xScale, yScale){
+               
+            let comparisons = calculateComparisons(data, barData)
+
+            renderComparisonInBars(comparisons, metric, countryID, xScale, yScale)
+}
+
+function calculateComparisons(data, barData){
+            const selectedCountry = barData.countryCode
+
+              let comparisons =  data.map(country => {
+               
+              let difference = (country.casesPerCapita - barData.casesPerCapita)
+                if(country.countryCode === selectedCountry){
+                    country.comparison = barData.casesPerCapita
+                }
+                else if (difference === 0 || Math.round(100*difference/barData.casesPerCapita) === 0){
+                    country.comparison = '='
+                }
+                
+                else if (difference > 0){
+                    //https://www.w3schools.com/jsref/jsref_round.asp
+                    country.comparison = `+${Math.round(100*difference/barData.casesPerCapita)}%`
+                }else{
+                    difference = barData.casesPerCapita - country.casesPerCapita 
+                    country.comparison = `-${Math.round(100*difference/barData.casesPerCapita)}%`
+                    if(Math.round(100*difference/barData.casesPerCapita) === 0){country.comparison = '='}
+
+                }
+                return country
+            })
+
+            return comparisons
+
+}
+
+function renderComparisonInBars (comparisons, metric, countryID, xScale, yScale){
+
+        let values = d3.select("svg")
+        .selectAll(".casesPerCapita")
+        .data(comparisons)
+
+        values
+        .enter()
+        .append("text")
+        .merge(values)
+        .attr("class", "casesPerCapita")
+        // .attr('text-anchor', 'middle')
+        .attr('alignment-baseline', 'central')
+        .attr("x", d => xScale(d[metric])-5)
+        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 )
+        .text(d => d.comparison)   
 
 }
 
 function renderValuesInBars(data, metric, countryID, xScale, yScale){
-
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
         .data(data)
-
         values
         .enter()
         .append("text")
@@ -175,15 +216,6 @@ function renderBarChart(data, metric, countryID) {
         .domain(data.map((d) => d[countryID]))
         .range([0, innerHeight])
         .padding(0.2);
-
-  
-        data.forEach(e => {
-            console.log('e', e)
-            console.log('e.metric', e[metric])
-            console.log('e.metric xscale', xScale(e[metric]))
-        })
-
-   
 
 
     const yAxis = d3.axisLeft(yScale);
