@@ -107,22 +107,22 @@ function renderBars(data, yScale, xScale, margin, metric, countryID) {
         .attr("width", (d) => xScale(d[metric]))
         .attr("height", yScale.bandwidth())
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-  
+ 
   
 
         //TO DO: Move code in new functions - how do I pass this?
 
         //code from https://medium.com/@kj_schmidt/show-data-on-mouse-over-with-d3-js-3bf598ff8fc2
-        .on('mouseover', function () {
-            d3.select(this).transition()
-                .duration('50')
-                .attr('opacity', '.85')
-        })
-        .on('mouseout', function () {
-            d3.select(this).transition()
-                .duration('50')
-                .attr('opacity', '1')
-        })
+        // .on('mouseover', function () {
+        //     d3.select(this).transition()
+        //         .duration('50')
+        //         .attr('opacity', '.85')
+        // })
+        // .on('mouseout', function () {
+        //     d3.select(this).transition()
+        //         .duration('50')
+        //         .attr('opacity', '1')
+        // })
 
 
 
