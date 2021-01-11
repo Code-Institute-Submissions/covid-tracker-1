@@ -317,9 +317,50 @@ function calculateCasesPerCapita(allData) {
 
 }
 
+function checkLastestDayIsTheSame(allData){
+
+    let dataWithOutNulls = allData.filter(country => country !== null)
+    
+    let latestDays = dataWithOutNulls.map(country => country[country.length -1].date)
+
+    let latestDaysIgnoringTime = latestDays.map(date => new Date(date).setHours(0, 0, 0, 0))
+
+     latestDaysIgnoringTime[3] = new Date (1/1/2020).setHours(0, 0, 0, 0)
+
+    //https://stackoverflow.com/questions/14832603/check-if-all-values-of-array-are-equal
+
+    let  sameLatestDateForAll =  latestDaysIgnoringTime.every( (val, i, arr) => val === arr[0] )
+
+   
+
+    console.log('sameLatestDateForAll', sameLatestDateForAll)
+
+    if(sameLatestDateForAll){return allData}else{
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
+        let leastRecentDate = Math.min(...latestDaysIgnoringTime)
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+        let indexOfLeastRecentDate = latestDaysIgnoringTime.indexOf(leastRecentDate)
+        console.log('indexOfLeastRecentDate', indexOfLeastRecentDate)
+
+
+        //TO DO:
+
+        //take that date....
+
+        //filter allData to remove dates after it
+
+        //return filtered data
+    }
+
+}
+
 async function getCasesPerCapita(countriesDownloaded) {
 
     let allData = await getDataFromStorage()
+
+    checkLastestDayIsTheSame(allData)
+
+
 
     let casesPerCapita = calculateCasesPerCapita(allData)
 
@@ -482,6 +523,17 @@ async function processRawData(rawData, countries, failedCalls) {
     getData(countries, false, failedCalls);
 };
 
+function makeAPICalls(countries, failedCalls) {
+    Promise.all(
+        countries
+            //the api won't allow more than 10 calls from my ip within 5 seconds
+            .splice(0, 10)
+            .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
+    ).then((rawData) => {
+        processRawData(rawData, countries, failedCalls);
+    });
+};
+
 
 function getData(countries, firstCall, failedCalls) {
     if (countries.length === 0 && failedCalls.length === 0) { return }
@@ -497,15 +549,6 @@ function getData(countries, firstCall, failedCalls) {
     }
 };
 
-function makeAPICalls(countries, failedCalls) {
-    Promise.all(
-        countries
-            //the api won't allow more than 10 calls from my ip within 5 seconds
-            .splice(0, 10)
-            .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
-    ).then((rawData) => {
-        processRawData(rawData, countries, failedCalls);
-    });
-};
+
 
 getData([...eu], true, []);

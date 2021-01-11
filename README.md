@@ -40,6 +40,12 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 Check this out: https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/
 
+https://stackoverflow.com/questions/14832603/check-if-all-values-of-array-are-equal
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+
 //https://www.w3schools.com/jsref/jsref_round.asp
 
 https://stackoverflow.com/questions/65657686/d3-cant-get-values-to-display-when-more-data-is-added-to-a-bar-chart/65669651#65669651
