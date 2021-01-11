@@ -89,7 +89,7 @@ function updateYAxis(width, height, yAxis) {
     d3.select("svg").attr("width", width).attr("height", height).selectAll("g.y.axis").call(yAxis);
 }
 
-function renderBars(data, yScale, xScale, margin, metric, countryID) {
+function renderBars(data, measurements, metric, countryID) {
 
     
 
@@ -103,25 +103,20 @@ function renderBars(data, yScale, xScale, margin, metric, countryID) {
         .append("rect")
         .merge(selectDataForBarCharts)
         .attr("fill", d => setBarColor(d))
-        .attr("y", (d) => yScale(d[countryID]))
-        .attr("width", (d) => xScale(d[metric]))
-        .attr("height", yScale.bandwidth())
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
-
-        //TO DO: Move code in new functions - how do I pass this?
-
-        //code based on  https://jsfiddle.net/matehu/w7h81xz2/
-        .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, xScale, yScale)})
-
-        .on('mouseout', ()=>{renderValuesInBars(data, metric, countryID, xScale, yScale)})
+        .attr("y", (d) => measurements.yScale(d[countryID]))
+        .attr("width", (d) => measurements.xScale(d[metric]))
+        .attr("height", measurements.yScale.bandwidth())
+        .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
+        .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
+        .on('mouseout', ()=>{renderValuesInBars(data, metric, countryID, measurements)})
 
 }
 
-function displayComparisons(event, barData, data, metric, countryID, xScale, yScale){
+function displayComparisons(event, barData, data, metric, countryID, measurements){
                
             let comparisons = calculateComparisons(data, barData)
 
-            renderComparisonInBars(comparisons, metric, countryID, xScale, yScale)
+            renderComparisonInBars(comparisons, metric, countryID, measurements)
 }
 
 function calculateComparisons(data, barData){
@@ -153,7 +148,7 @@ function calculateComparisons(data, barData){
 
 }
 
-function renderComparisonInBars (comparisons, metric, countryID, xScale, yScale){
+function renderComparisonInBars (comparisons, metric, countryID, measurements){
 
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
@@ -166,13 +161,13 @@ function renderComparisonInBars (comparisons, metric, countryID, xScale, yScale)
         .attr("class", "casesPerCapita")
         // .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'central')
-        .attr("x", d => xScale(d[metric])-5)
-        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 )
+        .attr("x", d => measurements.xScale(d[metric])-5)
+        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 )
         .text(d => d.comparison)   
 
 }
 
-function renderValuesInBars(data, metric, countryID, xScale, yScale){
+function renderValuesInBars(data, metric, countryID, measurements ){
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
         .data(data)
@@ -183,12 +178,11 @@ function renderValuesInBars(data, metric, countryID, xScale, yScale){
         .attr("class", "casesPerCapita")
         // .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'central')
-        .attr("x", d => xScale(d[metric]))
-        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 )
+        .attr("x", d => measurements.xScale(d[metric]))
+        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 )
         .text(d => d.casesPerCapita)       
 
 }
-
 
 
 function renderBarChart(data, metric, countryID) {
@@ -234,9 +228,11 @@ function renderBarChart(data, metric, countryID) {
 
     barChartAxisRendered = true
 
-    renderBars(data, yScale, xScale, margin, metric, countryID)
+    let measurements = {yScale, xScale, margin}
 
-    renderValuesInBars(data, metric, countryID, xScale, yScale)
+    renderBars(data, measurements, metric, countryID)
+
+    renderValuesInBars(data, metric, countryID, measurements)
 
 
     //To Do: Get display title rendering in correct position
