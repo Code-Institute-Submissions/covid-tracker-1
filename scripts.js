@@ -140,9 +140,10 @@ function renderValuesInBars(data, metric, countryID, xScale, yScale){
         .append("text")
         .merge(values)
         .attr("class", "casesPerCapita")
-        .attr('text-anchor', 'middle')
+        // .attr('text-anchor', 'middle')
+        .attr('alignment-baseline', 'central')
         .attr("x", d => xScale(d[metric]))
-        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 +3 )
+        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 )
         .text(d => d.casesPerCapita)       
 
 }
@@ -161,13 +162,12 @@ function renderBarChart(data, metric, countryID) {
     const height = 0.8 * screen.height
     const margin = { top: 0, right: 0, bottom: 20, left: 30 }
     const innerHeight = height - margin.top - margin.bottom
+    const innerWidth = width -margin.left - margin.right
 
     const xScale = d3
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
-        .range([margin.left, width]);
-
-
+        .range([margin.left, innerWidth]);
 
 
     const yScale = d3
