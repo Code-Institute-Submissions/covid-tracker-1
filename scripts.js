@@ -97,8 +97,6 @@ function renderBars(data, yScale, xScale, margin, metric, countryID) {
         .selectAll("rect")
         .data(data)
 
-  
-
 
     selectDataForBarCharts
         .enter()
@@ -127,29 +125,25 @@ function renderBars(data, yScale, xScale, margin, metric, countryID) {
         })
 
 
-        // d3.select('svg').selectAll('text').remove()
-
-        d3.select('svg').selectAll('text').data(data).exit().remove()
 
 
-     selectDataForBarCharts
+}
+
+function renderValuesInBars(data, metric, countryID, xScale, yScale){
+
+        let values = d3.select("svg")
+        .selectAll(".casesPerCapita")
+        .data(data)
+
+        values
         .enter()
         .append("text")
-        // .merge(selectDataForBarCharts)
-        .attr("class", "casesPerCapitaValues")
+        .merge(values)
+        .attr("class", "casesPerCapita")
         .attr('text-anchor', 'middle')
-        .attr("x", d => xScale(d[metric])-5)
-        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 +3)
-        .attr("fill", "white")
-        .style("font-size", "10px")
-        .text(d => d.casesPerCapita)
-
-    //       .attr('class', 'value')
-    //   .attr('x', (a) => xScale(a.language) + xScale.bandwidth() / 2)
-    //   .attr('y', (a) => yScale(a.value) + 30)
-      
-    //   .text((a) => `${a.value}%`)
-       
+        .attr("x", d => xScale(d[metric]))
+        .attr("y", d => yScale(d[countryID]) + yScale.bandwidth()/2 +3 )
+        .text(d => d.casesPerCapita)       
 
 }
 
@@ -216,6 +210,8 @@ function renderBarChart(data, metric, countryID) {
     barChartAxisRendered = true
 
     renderBars(data, yScale, xScale, margin, metric, countryID)
+
+    renderValuesInBars(data, metric, countryID, xScale, yScale)
 
 
     //To Do: Get display title rendering in correct position

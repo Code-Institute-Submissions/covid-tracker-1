@@ -5,10 +5,7 @@ body {
     box-sizing: border-box;
 }
 
-text {
-    font-size: 1.4em;
-    font-family: sans-serif
-}
+
 
 .tick text {
     fill: #635F5D
@@ -20,4 +17,10 @@ text {
 
 svg {
     border: 1px solid pink
+}
+
+.casesPerCapita {
+    font-size: 10px;
+    font-family: sans-serif;
+    fill: white;
 }
