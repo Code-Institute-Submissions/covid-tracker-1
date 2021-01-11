@@ -176,10 +176,7 @@ function renderBarChart(data, metric, countryID) {
         .range([0, innerHeight])
         .padding(0.2);
 
-        // var bandScaleYScale = d3.scaleBand()
-        //     .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
-        //     .range([0, 200]);
-
+  
         data.forEach(e => {
             console.log('e', e)
             console.log('e.metric', e[metric])
@@ -190,7 +187,7 @@ function renderBarChart(data, metric, countryID) {
 
 
     const yAxis = d3.axisLeft(yScale);
-    const xAxis = d3.axisBottom(xScale).ticks(0);
+    // const xAxis = d3.axisBottom(xScale).ticks(0);
 
 
     if (!barChartAxisRendered) {
