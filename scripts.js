@@ -95,20 +95,35 @@ function renderBars(data, measurements, metric, countryID) {
 
     let selectDataForBarCharts = d3.select("svg")
         .selectAll("rect")
-        .data(data)
+        .data(data, d => {
+            console.log(d[countryID] )
+            return d[countryID]
+        })
 
 
     selectDataForBarCharts
         .enter()
         .append("rect")
+        .attr("width", 0)
+        .attr("height", measurements.yScale.bandwidth())
+        .attr("y", (d) => measurements.yScale(d[countryID]))
         .merge(selectDataForBarCharts)
         .attr("fill", d => setBarColor(d))
-        .attr("y", (d) => measurements.yScale(d[countryID]))
-        .attr("width", (d) => measurements.xScale(d[metric]))
         .attr("height", measurements.yScale.bandwidth())
         .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
         .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
         .on('mouseout', ()=>{renderValuesInBars(data, metric, countryID, measurements)})
+
+        .transition().duration(1500).attr("y", (d) => measurements.yScale(d[countryID]))
+        
+        
+        .transition().duration(2000).delay(1500)
+            .attr("width", (d) => measurements.xScale(d[metric]))
+
+
+      
+            
+     
 
 }
 
