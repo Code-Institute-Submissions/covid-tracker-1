@@ -40,6 +40,10 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 Check this out: https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/
 
+https://bl.ocks.org/guilhermesimoes/be6b8be8a3e8dc2b70e2
+
+http://jsfiddle.net/maggiehu/e0r2pzc0/5/
+
 https://stackoverflow.com/questions/14832603/check-if-all-values-of-array-are-equal
 
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
