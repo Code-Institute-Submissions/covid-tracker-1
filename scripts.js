@@ -241,13 +241,15 @@ function renderBarChart(data, metric, countryID) {
         renderYAxis(width, height, margin, yAxis)
         // renderXAxis(width, height, margin, xAxis, innerHeight)
 
+    let xScaleMidPoint = (xScale.range()[1]+xScale.range()[0])/2
+
     d3.select("svg")
         .append("text")
         .attr("fill", "black")
         .attr("y", 15)
-        .attr('x', xScale.range()[1]/2)
+        .attr('x', xScaleMidPoint)
         .attr("text-anchor", "middle")
-        .text('Cases per 100,000 people')
+        .text('Cases Per 100,000 People By Country')
 
     } else {
         updateYAxis(width, height, yAxis)

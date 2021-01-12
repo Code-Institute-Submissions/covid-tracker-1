@@ -5,6 +5,11 @@ body {
     box-sizing: border-box;
 }
 
+svg text {
+    font-family: sans-serif;
+    fill: #635F5D
+}
+
 .tick text {
     text-transform: uppercase
 }
