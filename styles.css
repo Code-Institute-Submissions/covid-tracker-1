@@ -5,6 +5,10 @@ body {
     box-sizing: border-box;
 }
 
+.tick text {
+    text-transform: uppercase
+}
+
 
 
 .tick text {
