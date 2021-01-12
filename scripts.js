@@ -103,15 +103,6 @@ function updateYAxis(width, height, yAxis) {
 
 function renderVerticalBars(data, measurements, metric, countryID) {
 
-    // chart.selectAll()
-    // .data(goals)
-    // .enter()
-    // .append('rect')
-    // .attr('x', (s) => xScale(s.language))
-    // .attr('y', (s) => yScale(s.value))
-    // .attr('height', (s) => height - yScale(s.value))
-    
-
     let selectDataForBarCharts = d3.select("svg")
         .selectAll("rect")
         .data(data, d => d[countryID])
@@ -216,6 +207,26 @@ function renderComparisonInBars (comparisons, metric, countryID, measurements){
 
 }
 
+function renderComparisonInVerticalBars (comparisons, metric, countryID, measurements){
+
+        let values = d3.select("svg")
+        .selectAll(".casesPerCapita")
+        .data(comparisons)
+
+        values
+        .enter()
+        .append("text")
+        .merge(values)
+        .attr("class", "casesPerCapita")
+        .attr('alignment-baseline', 'central')
+        .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2 + measurements.margin.top)
+        .attr("y", d => measurements.xScale(d[metric])-5)
+        .text(d => d.comparison)   
+
+        
+
+}
+
 function renderValuesInBars(data, metric, countryID, measurements ){
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
@@ -228,6 +239,25 @@ function renderValuesInBars(data, metric, countryID, measurements ){
         .attr('alignment-baseline', 'central')
         .attr("x", d => measurements.xScale(d[metric])-5)
         .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 + measurements.margin.top)
+        .text(d => d.casesPerCapita)       
+}
+
+function renderValuesInVerticalBars(data, metric, countryID, measurements ){
+
+    console.log('renderValuesInVerticalBars')
+
+        let values = d3.select("svg")
+        .selectAll(".casesPerCapita")
+        .data(data)
+        values
+        .enter()
+        .append("text")
+        .merge(values)
+        .attr("class", "casesPerCapita")
+        .attr('text-anchor', 'middle')
+        .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
+        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top +30)
+        .style("font-size", "4vh")
         .text(d => d.casesPerCapita)       
 }
 
@@ -355,6 +385,7 @@ function renderVerticalBarChart(data, metric, countryID) {
     let measurements = {yScale, xScale, margin, height, innerHeight}
 
     renderVerticalBars(data, measurements, metric, countryID)
+    renderValuesInVerticalBars(data, metric, countryID, measurements )
 
     } else {
         // updateYAxis(width, height, yAxis)
