@@ -109,8 +109,23 @@ function renderBars(data, measurements, metric, countryID) {
         .attr("fill", d => setBarColor(d))
         .attr("height", measurements.yScale.bandwidth())
         .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
-        .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
-        .on('mouseout', ()=>{renderValuesInBars(data, metric, countryID, measurements)})
+        .on('mouseover', (event, barData) => {
+
+            console.log('event', event)
+            console.log('barData', barData)
+
+        // d3.select(this)
+        //   .transition()
+        //   .duration(300)
+        //   .attr('opacity', 0.5)
+            displayComparisons(event, barData, data, metric, countryID, measurements)})
+        .on('mouseout', (event)=>{
+        //             d3.select(this)
+        //   .transition()
+        //   .duration(300)
+        //   .attr('opacity', 1)
+            
+            renderValuesInBars(data, metric, countryID, measurements)})
 
         .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
         

@@ -34,8 +34,14 @@ svg {
     fill: white;
 }
 
+rect {
+    opacity: 1;
+    transition: .3s ease-in
+}
+
 
 
 rect:hover {
     opacity: 0.5;
+    transition: .3s ease-in
 }
