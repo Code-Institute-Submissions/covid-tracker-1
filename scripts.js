@@ -317,7 +317,7 @@ function calculateCasesPerCapita(allData) {
 
 }
 
-function checkLastestDayIsTheSame(allData){
+function isLatestDateTheSame(allData){
 
     let dataWithOutNulls = allData.filter(country => country !== null)
     
@@ -325,31 +325,60 @@ function checkLastestDayIsTheSame(allData){
 
     let latestDaysIgnoringTime = latestDays.map(date => new Date(date).setHours(0, 0, 0, 0))
 
-     latestDaysIgnoringTime[3] = new Date (1/1/2020).setHours(0, 0, 0, 0)
 
     //https://stackoverflow.com/questions/14832603/check-if-all-values-of-array-are-equal
 
     let  sameLatestDateForAll =  latestDaysIgnoringTime.every( (val, i, arr) => val === arr[0] )
 
-   
+    
 
-    console.log('sameLatestDateForAll', sameLatestDateForAll)
+    return sameLatestDateForAll
+
+}
+
+function calculateEarliestDate(allData){
+
+    let dataWithOutNulls = allData.filter(country => country !== null)
+    
+    let latestDays = dataWithOutNulls.map(country => country[country.length -1].date)
+
+    let latestDaysIgnoringTime = latestDays.map(date => new Date(date).setHours(0, 0, 0, 0))
+
+     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
+
+    return (Math.min(...latestDaysIgnoringTime))
+
+}
+
+function filterDataByDates(allData, startDate, endDate){
+
+        return allData.map(country => {
+            if(country === null){return null}
+            let filteredData =  country.filter(dailyData => {
+                let jsDate = new Date (dailyData.date).setHours(0,0,0,0)
+                if(jsDate >= startDate && jsDate<= endDate){return dailyData}
+             } )
+
+             return filteredData
+        })
+}
+
+
+function returnDataWithSameDates(allData){
+
+    const sameLatestDateForAll = isLatestDateTheSame(allData)
 
     if(sameLatestDateForAll){return allData}else{
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
-        let leastRecentDate = Math.min(...latestDaysIgnoringTime)
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
-        let indexOfLeastRecentDate = latestDaysIgnoringTime.indexOf(leastRecentDate)
-        console.log('indexOfLeastRecentDate', indexOfLeastRecentDate)
 
+        const earliestDate = calculateEarliestDate(allData)
 
-        //TO DO:
+        console.log('earliestDate', earliestDate)
 
-        //take that date....
+        let startDate = new Date('January 01, 2020 03:24:00').setHours(0,0,0,0)
 
-        //filter allData to remove dates after it
+        let dataWithSameEndDate = filterDataByDates(allData, startDate, earliestDate)
 
-        //return filtered data
+        return dataWithSameEndDate
     }
 
 }
@@ -358,8 +387,9 @@ async function getCasesPerCapita(countriesDownloaded) {
 
     let allData = await getDataFromStorage()
 
-    checkLastestDayIsTheSame(allData)
+    allData = returnDataWithSameDates(allData)
 
+    console.log('allData', allData)
 
 
     let casesPerCapita = calculateCasesPerCapita(allData)
