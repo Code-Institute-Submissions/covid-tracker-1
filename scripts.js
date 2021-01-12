@@ -120,7 +120,7 @@ function renderVerticalBars(data, measurements, metric, countryID) {
         .attr("fill", d => setBarColor(d))
         .attr("transform", `translate(0, ${measurements.margin.top})`)
         .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
-        .on('mouseout', (event)=>{renderValuesInBars(data, metric, countryID, measurements)})
+        .on('mouseout', (event)=>{renderValuesInVerticalBars(data, metric, countryID, measurements)})
         .transition().duration(500)
          .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
          .attr("y", (d) => measurements.yScale(d[metric]))
@@ -157,7 +157,9 @@ function displayComparisons(event, barData, data, metric, countryID, measurement
                
             let comparisons = calculateComparisons(data, barData)
 
-            renderComparisonInBars(comparisons, metric, countryID, measurements)
+            renderComparisonInVerticalBars(comparisons, metric, countryID, measurements)
+
+            // renderComparisonInBars(comparisons, metric, countryID, measurements)
 }
 
 function calculateComparisons(data, barData){
@@ -207,26 +209,6 @@ function renderComparisonInBars (comparisons, metric, countryID, measurements){
 
 }
 
-function renderComparisonInVerticalBars (comparisons, metric, countryID, measurements){
-
-        let values = d3.select("svg")
-        .selectAll(".casesPerCapita")
-        .data(comparisons)
-
-        values
-        .enter()
-        .append("text")
-        .merge(values)
-        .attr("class", "casesPerCapita")
-        .attr('alignment-baseline', 'central')
-        .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2 + measurements.margin.top)
-        .attr("y", d => measurements.xScale(d[metric])-5)
-        .text(d => d.comparison)   
-
-        
-
-}
-
 function renderValuesInBars(data, metric, countryID, measurements ){
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
@@ -242,13 +224,12 @@ function renderValuesInBars(data, metric, countryID, measurements ){
         .text(d => d.casesPerCapita)       
 }
 
-function renderValuesInVerticalBars(data, metric, countryID, measurements ){
-
-    console.log('renderValuesInVerticalBars')
+function renderComparisonInVerticalBars (comparisons, metric, countryID, measurements){
 
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
-        .data(data)
+        .data(comparisons)
+
         values
         .enter()
         .append("text")
@@ -256,7 +237,29 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements ){
         .attr("class", "casesPerCapita")
         .attr('text-anchor', 'middle')
         .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
-        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top +30)
+        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top +40)
+        .style("font-size", "4vh")
+        .text(d => d.comparison)   
+}
+
+
+
+function renderValuesInVerticalBars(data, metric, countryID, measurements ){
+
+    console.log('renderValuesInVerticalBars')
+
+        let values = d3.select("svg")
+        .selectAll(".casesPerCapita")
+        .data(data)
+
+        values
+        .enter()
+        .append("text")
+        .merge(values)
+        .attr("class", "casesPerCapita")
+        .attr('text-anchor', 'middle')
+        .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
+        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top +40)
         .style("font-size", "4vh")
         .text(d => d.casesPerCapita)       
 }
@@ -279,7 +282,7 @@ function renderBarChart(data, metric, countryID) {
     const xScale = d3
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
-        .range([margin.left, innerWidth]);
+        .range([margin.left, width]);
 
 
     const yScale = d3
