@@ -63,6 +63,7 @@ function renderYAxis(width, height, margin, yAxis) {
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
         .attr("class", "y axis")
         .call(yAxis)
+        .selectAll('.tick line').remove()
 
 
 
@@ -86,7 +87,10 @@ function updateXAxis(width, height, xAxis) {
 }
 
 function updateYAxis(width, height, yAxis) {
-    d3.select("svg").attr("width", width).attr("height", height).selectAll("g.y.axis").call(yAxis);
+    d3.select("svg")
+        .selectAll("g.y.axis")
+        .call(yAxis)
+        .selectAll('.tick line').remove()
 }
 
 function renderBars(data, measurements, metric, countryID) {
@@ -114,10 +118,10 @@ function renderBars(data, measurements, metric, countryID) {
         .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
         .on('mouseout', ()=>{renderValuesInBars(data, metric, countryID, measurements)})
 
-        .transition().duration(1500).attr("y", (d) => measurements.yScale(d[countryID]))
+        .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
         
         
-        .transition().duration(2000).delay(1500)
+        .transition().duration(500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
 
 
@@ -194,9 +198,8 @@ function renderValuesInBars(data, metric, countryID, measurements ){
         // .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'central')
         .attr("x", d => measurements.xScale(d[metric]))
-        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 )
+        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 + measurements.margin.top)
         .text(d => d.casesPerCapita)       
-
 }
 
 
@@ -210,7 +213,7 @@ function renderBarChart(data, metric, countryID) {
 
     const width = 0.9 * screen.width
     const height = 0.8 * screen.height
-    const margin = { top: 0, right: 0, bottom: 20, left: 30 }
+    const margin = { top: 30, right: 0, bottom: 20, left: 30 }
     const innerHeight = height - margin.top - margin.bottom
     const innerWidth = width -margin.left - margin.right
 
@@ -218,6 +221,9 @@ function renderBarChart(data, metric, countryID) {
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
         .range([margin.left, innerWidth]);
+
+
+        console.log('xScale.range()', xScale.range()[1])
 
 
     const yScale = d3
@@ -234,6 +240,14 @@ function renderBarChart(data, metric, countryID) {
     if (!barChartAxisRendered) {
         renderYAxis(width, height, margin, yAxis)
         // renderXAxis(width, height, margin, xAxis, innerHeight)
+
+    // d3.select("svg")
+    //     .append("text")
+    //     .attr("fill", "black")
+    //     .attr("y", 15)
+    //     .attr('x', xScale.range()[1]/2)
+    //     .attr("text-anchor", "middle")
+    //     .text('Cases per 100,000 people')
 
     } else {
         updateYAxis(width, height, yAxis)
@@ -252,11 +266,7 @@ function renderBarChart(data, metric, countryID) {
 
     //To Do: Get display title rendering in correct position
 
-    // d3.select("svg").attr("width", width).attr("height", height)
-    //     .append("text")
-    //     .attr("fill", "black")
-    //     .attr("y", 60)
-    //     .text('Cases per 100,000')
+
 
 };
 
