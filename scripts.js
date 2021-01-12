@@ -241,13 +241,13 @@ function renderBarChart(data, metric, countryID) {
         renderYAxis(width, height, margin, yAxis)
         // renderXAxis(width, height, margin, xAxis, innerHeight)
 
-    // d3.select("svg")
-    //     .append("text")
-    //     .attr("fill", "black")
-    //     .attr("y", 15)
-    //     .attr('x', xScale.range()[1]/2)
-    //     .attr("text-anchor", "middle")
-    //     .text('Cases per 100,000 people')
+    d3.select("svg")
+        .append("text")
+        .attr("fill", "black")
+        .attr("y", 15)
+        .attr('x', xScale.range()[1]/2)
+        .attr("text-anchor", "middle")
+        .text('Cases per 100,000 people')
 
     } else {
         updateYAxis(width, height, yAxis)
