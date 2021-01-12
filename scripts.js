@@ -95,15 +95,9 @@ function updateYAxis(width, height, yAxis) {
 
 function renderBars(data, measurements, metric, countryID) {
 
-    
-
     let selectDataForBarCharts = d3.select("svg")
         .selectAll("rect")
-        .data(data, d => {
-            console.log(d[countryID] )
-            return d[countryID]
-        })
-
+        .data(data, d => d[countryID])
 
     selectDataForBarCharts
         .enter()
@@ -123,11 +117,6 @@ function renderBars(data, measurements, metric, countryID) {
         
         .transition().duration(500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
-
-
-      
-            
-     
 
 }
 
@@ -178,10 +167,9 @@ function renderComparisonInBars (comparisons, metric, countryID, measurements){
         .append("text")
         .merge(values)
         .attr("class", "casesPerCapita")
-        // .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'central')
         .attr("x", d => measurements.xScale(d[metric])-5)
-        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 )
+        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 + measurements.margin.top)
         .text(d => d.comparison)   
 
 }
@@ -195,7 +183,6 @@ function renderValuesInBars(data, metric, countryID, measurements ){
         .append("text")
         .merge(values)
         .attr("class", "casesPerCapita")
-        // .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'central')
         .attr("x", d => measurements.xScale(d[metric]))
         .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth()/2 + measurements.margin.top)
@@ -221,9 +208,6 @@ function renderBarChart(data, metric, countryID) {
         .scaleLinear()
         .domain([0, d3.max(data, (d) => d[metric])])
         .range([margin.left, innerWidth]);
-
-
-        console.log('xScale.range()', xScale.range()[1])
 
 
     const yScale = d3
@@ -399,8 +383,6 @@ function returnDataWithSameDates(allData){
 
         const earliestDate = calculateEarliestDate(allData)
 
-        console.log('earliestDate', earliestDate)
-
         let startDate = new Date('January 01, 2020 03:24:00').setHours(0,0,0,0)
 
         let dataWithSameEndDate = filterDataByDates(allData, startDate, earliestDate)
@@ -415,9 +397,6 @@ async function getCasesPerCapita(countriesDownloaded) {
     let allData = await getDataFromStorage()
 
     allData = returnDataWithSameDates(allData)
-
-    console.log('allData', allData)
-
 
     let casesPerCapita = calculateCasesPerCapita(allData)
 
