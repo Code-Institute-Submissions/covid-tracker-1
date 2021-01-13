@@ -136,6 +136,12 @@ function renderVerticalBars(data, measurements, metric, countryID) {
 
 function renderComparisonInVerticalBars (comparisons, metric, countryID, measurements){
 
+        function calculateVW(data){
+
+        //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
+        return (    (.25/data.length )       * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+    }
+
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
         .data(comparisons)
@@ -147,8 +153,9 @@ function renderComparisonInVerticalBars (comparisons, metric, countryID, measure
         .attr("class", "casesPerCapita")
         .attr('text-anchor', 'middle')
         .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
-        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top +40)
-        .style("font-size", 0.8* measurements.xScale.bandwidth())
+        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top -2)
+        .style("fill", "black")
+        .style("font-size", calculateVW(comparisons))
         .text(d => d.comparison)   
 }
 
