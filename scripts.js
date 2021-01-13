@@ -140,6 +140,13 @@ function renderComparisonInVerticalBars (comparisons, metric, countryID, measure
 
         //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
         return (    (.25/data.length )       * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+        }
+
+    function getColor(countryData){
+        if(typeof(countryData.comparison)==='number'){return "steelblue"}
+        if(countryData.comparison.includes("+")){return "tomato"}
+        return "darkgreen"
+     
     }
 
         let values = d3.select("svg")
@@ -152,11 +159,12 @@ function renderComparisonInVerticalBars (comparisons, metric, countryID, measure
         .merge(values)
         .attr("class", "casesPerCapita")
         .attr('text-anchor', 'middle')
-        .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
-        .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top -2)
-        .style("fill", "black")
+        .attr("x", countryData => measurements.xScale(countryData[countryID]) + measurements.xScale.bandwidth()/2  )    
+        .attr("y", countryData => measurements.yScale(countryData[metric]) + measurements.margin.top -2)
+        .style("fill", (countryData) =>getColor(countryData))
         .style("font-size", calculateVW(comparisons))
-        .text(d => d.comparison)   
+        .style("opacity", "1")
+        .text(countryData => countryData.comparison)   
 }
 
 
@@ -181,7 +189,8 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements ){
         .attr('text-anchor', 'middle')
         .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
         .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top -2)
-        .style("fill", "black")
+        .style("fill", "steelBlue")
+        .style("opacity", "0.6")
         .style("font-size", calculateVW(data))
         .text(d => d.casesPerCapita)       
 }
