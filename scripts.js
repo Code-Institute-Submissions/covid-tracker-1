@@ -114,21 +114,25 @@ function renderVerticalBars(data, measurements, metric, countryID) {
         .append("rect")
         .attr('width', measurements.xScale.bandwidth())
         .attr("height", 0)
-        .attr('y',  d => measurements.yScale(0))        
-        .attr('x', (d) => measurements.xScale(d[countryID]))
+        .attr('y',  d => measurements.yScale(0))         
         .merge(selectDataForBarCharts)
         .attr("fill", d => setBarColor(d))
         .attr("transform", `translate(0, ${measurements.margin.top})`)
+        .attr('width', measurements.xScale.bandwidth())
+        .attr('x', (d) => measurements.xScale(d[countryID]))
         .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
         .on('mouseout', (event)=>{renderValuesInVerticalBars(data, metric, countryID, measurements)})
         .transition().duration(500)
          .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
          .attr("y", (d) => measurements.yScale(d[metric]))
+
+
         
         // To DO: I think move x with delay.
         
         
 }
+
 
 function renderComparisonInVerticalBars (comparisons, metric, countryID, measurements){
 
@@ -152,7 +156,12 @@ function renderComparisonInVerticalBars (comparisons, metric, countryID, measure
 
 function renderValuesInVerticalBars(data, metric, countryID, measurements ){
 
-    console.log('renderValuesInVerticalBars')
+
+    function calculateVW(data){
+
+        //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
+        return (    (.3/data.length )       * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+    }
 
         let values = d3.select("svg")
         .selectAll(".casesPerCapita")
@@ -166,7 +175,7 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements ){
         .attr('text-anchor', 'middle')
         .attr("x", d => measurements.xScale(d[countryID]) + measurements.xScale.bandwidth()/2  )    
         .attr("y", d => measurements.yScale(d[metric]) + measurements.margin.top +40)
-        .style("font-size", "2vw")
+        .style("font-size", calculateVW(data))
         .text(d => d.casesPerCapita)       
 }
 
@@ -222,22 +231,22 @@ function renderVerticalBarChart(data, metric, countryID) {
         .attr("text-anchor", "middle")
         .text('Cases Per 100,000 People By Country')
 
-    let measurements = {yScale, xScale, margin, height, innerHeight}
+    
 
-    renderVerticalBars(data, measurements, metric, countryID)
-    renderValuesInVerticalBars(data, metric, countryID, measurements )
+
 
     } else {
         // updateYAxis(width, height, yAxis)
-        // updateXAxis(width, height, xAxis, innerHeight)
+        updateXAxis(width, height, xAxis, innerHeight)
 
     }
 
     barChartAxisRendered = true
 
+    let measurements = {yScale, xScale, margin, height, innerHeight}
 
-
-    // renderValuesInBars(data, metric, countryID, measurements)
+    renderVerticalBars(data, measurements, metric, countryID)
+    renderValuesInVerticalBars(data, metric, countryID, measurements )
 
 
     //To Do: Get display title rendering in correct position
@@ -319,28 +328,7 @@ function renderValuesInBars(data, metric, countryID, measurements ){
         .text(d => d.casesPerCapita)       
 }
 
-function renderBars(data, measurements, metric, countryID) {
 
-    let selectDataForBarCharts = d3.select("svg")
-        .selectAll("rect")
-        .data(data, d => d[countryID])
-
-    selectDataForBarCharts
-        .enter()
-        .append("rect")
-        .attr("width", 0)
-        .attr("height", measurements.yScale.bandwidth())
-        .attr("y", (d) => measurements.yScale(d[countryID]))
-        .merge(selectDataForBarCharts)
-        .attr("fill", d => setBarColor(d))
-        .attr("height", measurements.yScale.bandwidth())
-        .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
-        .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
-        .on('mouseout', (event)=>{renderValuesInBars(data, metric, countryID, measurements)})
-        .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
-        .transition().duration(500).delay(500)
-            .attr("width", (d) => measurements.xScale(d[metric]))
-}
 
 
 
