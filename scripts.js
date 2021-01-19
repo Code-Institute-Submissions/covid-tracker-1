@@ -63,6 +63,14 @@ function setBarColor(data) {
     }
 }
 
+function setSpeed(){
+    const countriesDownloaded = getNumberOfCountriesDownloaded()
+
+    if(countriesDownloaded !== 27){return 5000}
+    else{return 500}
+
+}
+
 
 
 
@@ -119,6 +127,8 @@ function renderValuesInBars(data, metric, countryID, measurements) {
 
 function renderValuesInVerticalBars(data, metric, countryID, measurements) {
 
+     
+
 
     function calculateVW(data) {
 
@@ -149,6 +159,8 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
 
     }
 
+
+
     let values = d3.select("svg")
         .selectAll(".casesPerCapita")
         .data(data)
@@ -156,6 +168,8 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
     values
         .enter()
         .append("text")
+        .style("opacity", "0")
+        .attr("y", 0)
         .merge(values)
         .attr("class", "casesPerCapita")
         .attr('text-anchor', 'middle')
@@ -163,11 +177,13 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData))
-        .style("opacity", "0.6")
-        .style("font-size", calculateVW(data))
         
-        .transition().duration(500).delay(500)
+        .style("font-size", calculateVW(data))
         .text(countryData => countryData[metric])
+        .style("opacity", "0")
+        .transition().duration(setSpeed())
+        .style("opacity", "0.6")
+                
 }
 
 
