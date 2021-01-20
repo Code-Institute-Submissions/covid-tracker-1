@@ -86,16 +86,14 @@ function renderValuesInBars(data, metric, countryID, measurements) {
 
 function renderValuesInVerticalBars(data, metric, countryID, measurements, barData) {
 
-   
-  
-    
+    console.log('renderValuesInVerticalBars triggered')
 
-    if(countriesDownloaded<27){return}
+    console.log('data', data)
 
-      console.log('data', data)
+    console.log('metric', metric)
 
 
-
+    // if(countriesDownloaded<27){return}
     
     function calculateVW(data) {
 
@@ -147,6 +145,7 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements, barDa
         else{return countryData[metric]}
     }
 
+
  
 
     let values = d3.select("svg")
@@ -168,10 +167,10 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements, barDa
         
         .style("font-size", calculateVW(data))
         .text(countryData => decideTextToReturn(countryData))
-        // .style("opacity", "0")
+        .style("opacity", "0")
         // .transition()
         // .delay(setSpeed())
-        .style("opacity", "0.6")                
+        .style("opacity", "1")                
 }
 
 
@@ -303,6 +302,8 @@ function renderVerticalBarChart(data, metric, countryID) {
     }
 
     function renderVerticalBars(data, measurements, metric, countryID) {
+
+
         
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
@@ -321,7 +322,7 @@ function renderVerticalBarChart(data, metric, countryID) {
             .attr('width', measurements.xScale.bandwidth())
             .attr('x', (d) => measurements.xScale(d[countryID]))
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
-            .on('mouseout', (event) => { renderValuesInVerticalBars(data, metric, countryID, measurements) })
+            .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
             .transition()
             .ease(d3.easeLinear) 
             .duration(setSpeed()/2)
@@ -337,7 +338,15 @@ function renderVerticalBarChart(data, metric, countryID) {
     } else {
         return "steelBlue"
     }
-}
+    }
+
+    function removeComparisons(data, metric, countryID, measurements){
+        let dataWithOutComparisons = data.map(countryData => {
+            delete countryData.comparison
+            return countryData
+        })
+        renderValuesInVerticalBars(data, metric, countryID, measurements)
+    }
 
     data = sortByHighestValues(data, metric)
 
