@@ -35,6 +35,8 @@ const euDataSet = [
     //   { country: "united-kingdom", countryCode: "gb", population: 670.255 },
 ];
 
+let countriesDownloaded = 0
+
 let barChartAxisRendered = false
 
 let eu = euDataSet.map((e) => e.country);
@@ -54,59 +56,16 @@ function sortByHighestValues(data, metric) {
     return data.sort((a, b) => b[metric] - a[metric])
 }
 
-function setBarColor(data) {
 
-    if (data.countryCode === 'eu') {
-        return "orange"
-    } else {
-        return "steelBlue"
-    }
-}
 
 function setSpeed(){
-    const countriesDownloaded = getNumberOfCountriesDownloaded()
 
-    if(countriesDownloaded !== 27){return 4000}
-    else{return 500}
+    if(countriesDownloaded !== 27){return 4500}
+    else{return 0}
 
 }
 
 
-
-
-function renderComparisonInVerticalBars(comparisons, metric, countryID, measurements, barData) {
-
-    function calculateVW(data) {
-
-        //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
-        return ((.25 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
-    }
-
-    function getColor(countryData, barData) {
-        if(barData.countryCode === 'eu' && countryData.countryCode === 'eu'){return 'orange'}
-        if (typeof (countryData.comparison) === 'number') { return "steelblue" }
-        if (countryData.comparison.includes("+")) { return "tomato" }
-        return "darkgreen"
-
-    }
-
-    let values = d3.select("svg")
-        .selectAll(".casesPerCapita")
-        .data(comparisons)
-
-    values
-        .enter()
-        .append("text")
-        .merge(values)
-        .attr("class", "casesPerCapita")
-        .attr('text-anchor', 'middle')
-        .attr("x", countryData => measurements.xScale(countryData[countryID]) + measurements.xScale.bandwidth() / 2)
-        .attr("y", countryData => measurements.yScale(countryData[metric]) + measurements.margin.top - 2)
-        .style("fill", countryData => getColor(countryData, barData))
-        .style("font-size", calculateVW(comparisons))
-        .style("opacity", "1")
-        .text(countryData => countryData.comparison)
-}
 
 function renderValuesInBars(data, metric, countryID, measurements) {
     let values = d3.select("svg")
@@ -125,11 +84,19 @@ function renderValuesInBars(data, metric, countryID, measurements) {
 
 
 
-function renderValuesInVerticalBars(data, metric, countryID, measurements) {
+function renderValuesInVerticalBars(data, metric, countryID, measurements, barData) {
 
-     
+   
+  
+    
+
+    if(countriesDownloaded<27){return}
+
+      console.log('data', data)
 
 
+
+    
     function calculateVW(data) {
 
         //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
@@ -147,16 +114,37 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
 
     function setYValue(countryData, measurements, metric){
         if(verticalBarChart){
+            
             return measurements.yScale(countryData[metric]) + measurements.margin.top -2
         }else {
             return (measurements.yScale(countryData[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
         }
     }
 
-    function setColor(countryData){
-        if(countryData.countryCode === 'eu'){return 'orange'}
-        else{return 'steelBlue'}
+    // function setColor(countryData){
+    //     if(countryData.countryCode === 'eu'){return 'orange'}
+    //     else{return 'steelBlue'}
 
+    // }
+
+    function setColor(countryData, barData) {
+
+        let valueToReturn
+
+        countryData.countryCode === 'eu' ? valueToReturn = 'orange' : valueToReturn = 'steelBlue'
+
+        if (barData===undefined){return valueToReturn}
+        if(barData.countryCode === 'eu' && countryData.countryCode === 'eu'){return 'orange'}
+        if (typeof (countryData.comparison) === 'number') { return "steelblue" }
+        if (countryData.comparison.includes("+")) { return "tomato" }
+        return "darkgreen"
+ 
+        
+    }
+
+    function decideTextToReturn(countryData){
+        if(countryData.comparison!==undefined){return countryData.comparison}
+        else{return countryData[metric]}
     }
 
  
@@ -168,7 +156,7 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
     values
         .enter()
         .append("text")
-        .style("opacity", "0")
+        // .style("opacity", "0")
         .attr("y", 0)
         .merge(values)
         .attr("class", "casesPerCapita")
@@ -176,18 +164,14 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
         // .attr('alignment-baseline', 'central')
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
         .attr("y", countryData => setYValue(countryData, measurements, metric))
-        .style("fill", countryData => setColor(countryData))
+        .style("fill", countryData => setColor(countryData, barData))
         
         .style("font-size", calculateVW(data))
-        .text(countryData => countryData[metric])
-        .style("opacity", "0")
-        .transition().delay(setSpeed())
-        .style("opacity", "0.6")
-
-
-
-
-                
+        .text(countryData => decideTextToReturn(countryData))
+        // .style("opacity", "0")
+        // .transition()
+        // .delay(setSpeed())
+        .style("opacity", "0.6")                
 }
 
 
@@ -346,6 +330,15 @@ function renderVerticalBarChart(data, metric, countryID) {
             
     }
 
+    function setBarColor(data) {
+
+    if (data.countryCode === 'eu') {
+        return "orange"
+    } else {
+        return "steelBlue"
+    }
+}
+
     data = sortByHighestValues(data, metric)
 
     // https://www.w3schools.com/jsref/prop_screen_height.asp
@@ -381,6 +374,7 @@ function renderVerticalBarChart(data, metric, countryID) {
     let measurements = { yScale, xScale, margin, height, innerHeight }
 
     verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)
+
     
     renderValuesInVerticalBars(data, metric, countryID, measurements)
     // renderValuesInBars(data, metric, countryID, measurements)
@@ -457,12 +451,14 @@ function renderBarChart(data, metric, countryID) {
 
 function displayComparisons(event, barData, data, metric, countryID, measurements) {
 
-    console.log('event', event)
-    console.log('barData', barData)
 
     let comparisons = calculateComparisons(data, barData)
 
-    renderComparisonInVerticalBars(comparisons, metric, countryID, measurements, barData)
+   
+
+    renderValuesInVerticalBars(comparisons, metric, countryID, measurements, barData)
+
+    // renderComparisonInVerticalBars(comparisons, metric, countryID, measurements, barData)
 
     // renderComparisonInBars(comparisons, metric, countryID, measurements)
 }
@@ -694,7 +690,7 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
 async function dataForGraphs() {
 
-    let countriesDownloaded = await getNumberOfCountriesDownloaded()
+    countriesDownloaded = await getNumberOfCountriesDownloaded()
 
     if (countriesDownloaded === 0) { return }
 
