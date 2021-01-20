@@ -66,7 +66,7 @@ function setBarColor(data) {
 function setSpeed(){
     const countriesDownloaded = getNumberOfCountriesDownloaded()
 
-    if(countriesDownloaded !== 27){return 5000}
+    if(countriesDownloaded !== 27){return 4000}
     else{return 500}
 
 }
@@ -159,7 +159,7 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
 
     }
 
-
+ 
 
     let values = d3.select("svg")
         .selectAll(".casesPerCapita")
@@ -181,8 +181,12 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements) {
         .style("font-size", calculateVW(data))
         .text(countryData => countryData[metric])
         .style("opacity", "0")
-        .transition().duration(setSpeed())
+        .transition().delay(setSpeed())
         .style("opacity", "0.6")
+
+
+
+
                 
 }
 
@@ -334,9 +338,12 @@ function renderVerticalBarChart(data, metric, countryID) {
             .attr('x', (d) => measurements.xScale(d[countryID]))
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
             .on('mouseout', (event) => { renderValuesInVerticalBars(data, metric, countryID, measurements) })
-            .transition().duration(500)
+            .transition()
+            .ease(d3.easeLinear) 
+            .duration(setSpeed()/2)
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
+            
     }
 
     data = sortByHighestValues(data, metric)
