@@ -143,10 +143,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
     values
         .enter()
         .append("text")
+        // .attr("class", d => {return `${d[countryID]} ${metric}`})
         .attr("y", 0)
         .style("opacity", "1") 
         .merge(values)
-        .attr("class", "casesPerCapita")
+
         .attr('text-anchor', setTextAnchor())
         .attr('alignment-baseline', setAlignmentBaseline())
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
@@ -277,6 +278,7 @@ function renderBarChart(data, metric, countryID) {
     selectDataForBarCharts
         .enter()
         .append("rect")
+        // .attr("class", d => {return `${d[countryID]} ${metric}`})
         .attr("width", 0)
         .attr("height", measurements.yScale.bandwidth())
         .attr("y", (d) => measurements.yScale(d[countryID]))
@@ -289,7 +291,7 @@ function renderBarChart(data, metric, countryID) {
         .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
         .transition().duration(setSpeed()-500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
-            .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))
+            // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))
 
     }
 
@@ -307,6 +309,7 @@ function renderBarChart(data, metric, countryID) {
             .append("rect")
             .attr('width', measurements.xScale.bandwidth())
             .attr("height", 0)
+            // .attr("class", d => {return `${d[countryID]} ${metric}`})
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
             .attr("fill", d => setBarColor(d))
@@ -320,7 +323,7 @@ function renderBarChart(data, metric, countryID) {
             .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
-            .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
+            // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
     }
 
     function setBarColor(data) {
@@ -376,13 +379,9 @@ function renderBarChart(data, metric, countryID) {
 
     let measurements = { yScale, xScale, margin, height, innerHeight }
 
-    verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)
+    verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)  
 
-    
-    //   setTimeout(renderValuesInBars, 3000, data, metric, countryID, measurements);         
-      
-    //   renderValuesInBars(data, metric, countryID, measurements)
-  
+    setTimeout(renderValuesInBars, 1000, data, metric, countryID, measurements);
 
 };
 
