@@ -37,6 +37,8 @@ let countriesDownloaded = 0
 
 let barChartAxisRendered = false
 
+let latestCommonDate
+
 let eu = euDataSet.map((e) => e.country);
 
 const countryCodes = euDataSet.map((e) => e.countryCode)
@@ -49,11 +51,37 @@ function displayNav(){
     document.getElementById('nav').classList.add("show-element")
 }
 
+function setDefaultDates(){
 
+    if(countriesDownloaded <27){return}
 
-function setEndDate(){
-    document.getElementById("start-date").value = "Johnny Bravo"
+    console.log('convertDateFormat(latestCommonDate)', convertDateFormat(latestCommonDate))
+
+    document.getElementById("end-date").value = convertDateFormat(latestCommonDate).toString()
+    document.getElementById("end-date").max = convertDateFormat(latestCommonDate).toString()
+    document.getElementById("start-date").max = convertDateFormat(latestCommonDate).toString()
+
 }
+
+function convertDateFormat(date){
+
+    //https://dzone.com/articles/javascript-convert-date
+
+    let month = new Date(date).getMonth() + 1
+
+    if(month <10){
+        month=`0${month.toString()}`
+    }
+    let day = new Date(date).getDate()
+    let year = new Date(date) .getFullYear()
+
+
+    return `${year}-${month}-${day}`
+
+}
+
+
+
 
 function setBarChartType() {
     if (screen.width > screen.height) { verticalBarChart = true }
@@ -549,9 +577,9 @@ function calculateEarliestDate(allData) {
 
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
 
-    console.log('latestCommonDate', Math.min(...latestDaysIgnoringTime))
+    latestCommonDate = Math.min(...latestDaysIgnoringTime)
 
-    return (Math.min(...latestDaysIgnoringTime))
+    return latestCommonDate
 
 }
 
@@ -634,6 +662,7 @@ async function dataForGraphs() {
     if (countriesDownloaded === 0) { return }
 
     displayNav()
+    setDefaultDates()
 
     casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
