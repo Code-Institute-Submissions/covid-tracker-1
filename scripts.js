@@ -203,13 +203,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 
 
-
-
-
-
-
-
-
 function renderBarChart(data, metric, countryID) {
 
     function setMargins() {
@@ -427,21 +420,13 @@ function renderBarChart(data, metric, countryID) {
 };
 
 
-
-
-
 function displayComparisons(event, barData, data, metric, countryID, measurements) {
 
 
     let comparisons = calculateComparisons(data, barData)
 
-   
-
     renderValuesInBars(comparisons, metric, countryID, measurements, barData)
 
-    // renderComparisonInVerticalBars(comparisons, metric, countryID, measurements, barData)
-
-    // renderComparisonInBars(comparisons, metric, countryID, measurements)
 }
 
 function calculateComparisons(data, barData) {
@@ -472,8 +457,6 @@ function calculateComparisons(data, barData) {
     return comparisons
 
 }
-
-
 
 
 
@@ -567,7 +550,7 @@ function isLatestDateTheSame(allData) {
 
 }
 
-function calculateEarliestDate(allData) {
+function calculateCommonLatestDate(allData) {
 
     let dataWithOutNulls = allData.filter(country => country !== null)
 
@@ -603,7 +586,7 @@ function returnDataWithSameDates(allData) {
 
     if (sameLatestDateForAll) { return allData } else {
 
-        const earliestDate = calculateEarliestDate(allData)
+        const earliestDate = calculateCommonLatestDate(allData)
 
         let startDate = new Date('January 01, 2020 03:24:00').setHours(0, 0, 0, 0)
 
