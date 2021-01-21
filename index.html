@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Covid Tracker</title>
 </head>
-<body>
-    <h1 id="test">Covid 19</h1>
 
-  
+<body>
+    <nav>
+        <label for="start-date">Start date:</label>
+
+        <input type="date" id="start-date" name="start-date" value="2018-07-22" min="2018-01-01" max="2018-12-31">
+
+        <label for="end-date">End date:</label>
+
+        <input type="date" id="end-date" name="end-date" value="2018-07-22" min="2018-01-01" max="2018-12-31">
+    </nav>
+
+    <h1>Covid 19</h1>
+
+
 
 
     <div>
@@ -18,7 +30,7 @@
 
     <hr>
 
-  
+
 
 
 
@@ -26,16 +38,19 @@
     <svg id="casesPerCapita"></svg>
 
     <div>
-        <p>Downloaded Data for</p> <p id="downloads">0</p> <p>of 27 countries</p>
+        <p>Downloaded Data for</p>
+        <p id="downloads">0</p>
+        <p>of 27 countries</p>
     </div>
 
     <hr>
 
     <ul id="countries">
- 
-          
+
+
     </ul>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="./scripts.js"></script>
 </body>
+
 </html>
