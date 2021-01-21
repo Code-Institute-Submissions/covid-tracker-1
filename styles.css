@@ -44,3 +44,11 @@ rect:hover {
     opacity: 0.5;
     transition: .3s ease-in
 }
+
+.hide-element{
+    display: none
+}
+
+.show-element{
+    display: block
+}

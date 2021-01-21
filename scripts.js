@@ -43,6 +43,18 @@ const countryCodes = euDataSet.map((e) => e.countryCode)
 
 let verticalBarChart = false
 
+function displayNav(){
+    if(countriesDownloaded <27){return}
+    document.getElementById('nav').classList.remove("hide-element")
+    document.getElementById('nav').classList.add("show-element")
+}
+
+
+
+function setEndDate(){
+    document.getElementById("start-date").value = "Johnny Bravo"
+}
+
 function setBarChartType() {
     if (screen.width > screen.height) { verticalBarChart = true }
 }
@@ -65,6 +77,8 @@ function setSpeed(){
 
 
 function renderValuesInBars(data, metric, countryID, measurements, barData) {
+
+  
 
 
     if(countriesDownloaded<27){return}
@@ -143,11 +157,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
     values
         .enter()
         .append("text")
-        // .attr("class", d => {return `${d[countryID]} ${metric}`})
+        
         .attr("y", 0)
         .style("opacity", "1") 
         .merge(values)
-
+        // .attr("class", d => {return `${metric} ${d[countryID]}`})
         .attr('text-anchor', setTextAnchor())
         .attr('alignment-baseline', setAlignmentBaseline())
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
@@ -278,11 +292,11 @@ function renderBarChart(data, metric, countryID) {
     selectDataForBarCharts
         .enter()
         .append("rect")
-        // .attr("class", d => {return `${d[countryID]} ${metric}`})
         .attr("width", 0)
         .attr("height", measurements.yScale.bandwidth())
         .attr("y", (d) => measurements.yScale(d[countryID]))
         .merge(selectDataForBarCharts)
+        // .attr("class", d => {return `${d[countryID]} ${metric}`})
         .attr("fill", d => setBarColor(d))
         .attr("height", measurements.yScale.bandwidth())
         .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
@@ -291,7 +305,6 @@ function renderBarChart(data, metric, countryID) {
         .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
         .transition().duration(setSpeed()-500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
-            // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))
 
     }
 
@@ -309,9 +322,9 @@ function renderBarChart(data, metric, countryID) {
             .append("rect")
             .attr('width', measurements.xScale.bandwidth())
             .attr("height", 0)
-            // .attr("class", d => {return `${d[countryID]} ${metric}`})
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
+            // .attr("class", d => {return `${d[countryID]} ${metric}`})
             .attr("fill", d => setBarColor(d))
             .attr("transform", `translate(0, ${measurements.margin.top})`)
             .attr('width', measurements.xScale.bandwidth())
@@ -536,6 +549,8 @@ function calculateEarliestDate(allData) {
 
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
 
+    console.log('latestCommonDate', Math.min(...latestDaysIgnoringTime))
+
     return (Math.min(...latestDaysIgnoringTime))
 
 }
@@ -617,6 +632,8 @@ async function dataForGraphs() {
     countriesDownloaded = await getNumberOfCountriesDownloaded()
 
     if (countriesDownloaded === 0) { return }
+
+    displayNav()
 
     casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
