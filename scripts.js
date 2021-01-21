@@ -1,8 +1,6 @@
-//find users country from their IP
+//TO DO: find users country from their IP
 
-//if EU make sure their country is called by the second call
-
-//pull their country data and display while the rest is loading
+//TO DO: Fix Bug. If screen size changes values/comparisons will change size even though bar size has not
 
 const euDataSet = [
     { country: "austria", countryCode: "at", population: 88.588 },
@@ -62,51 +60,34 @@ function setSpeed(){
 
     if(countriesDownloaded !== 27){return 4500}
     else{return 0}
-
 }
 
 
 
-function renderValuesInBars(data, metric, countryID, measurements) {
-    let values = d3.select("svg")
-        .selectAll(".casesPerCapita")
-        .data(data)
-    values
-        .enter()
-        .append("text")
-        .merge(values)
-        .attr("class", "casesPerCapita")
-        .attr('alignment-baseline', 'central')
-        .attr("x", d => measurements.xScale(d[metric]) - 5)
-        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
-        .text(d => d.casesPerCapita)
-}
+function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 
-
-function renderValuesInVerticalBars(data, metric, countryID, measurements, barData) {
-
-    console.log('renderValuesInVerticalBars triggered')
-
-    console.log('data', data)
-
-    console.log('metric', metric)
-
-
-    // if(countriesDownloaded<27){return}
+    if(countriesDownloaded<27){return}
     
-    function calculateVW(data) {
+    function calculateFontSize(data) {
 
-        //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
-        return ((.2 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+        
+        if(verticalBarChart){
+            //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
+            return ((.2 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+        }else{
+            return 12
+  
+        }
+        
     }
 
     function setXValue(countryData, measurements, countryID){
         if(verticalBarChart){
             return measurements.xScale(countryData[countryID]) + measurements.xScale.bandwidth() / 2
         }else{
-            console.log('not vertical chart')
-            return (measurements.xScale(countryData[metric]) - 5)
+        
+            return (measurements.xScale(countryData[metric]) - 8)
         }
     }
 
@@ -119,13 +100,11 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements, barDa
         }
     }
 
-    // function setColor(countryData){
-    //     if(countryData.countryCode === 'eu'){return 'orange'}
-    //     else{return 'steelBlue'}
-
-    // }
 
     function setColor(countryData, barData) {
+
+        if(!verticalBarChart){return "white"}
+       
 
         let valueToReturn
 
@@ -145,6 +124,15 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements, barDa
         else{return countryData[metric]}
     }
 
+    function setTextAnchor(){
+        if(verticalBarChart){return 'middle'}
+        else{return 'start'}
+    }
+
+    function setAlignmentBaseline(){
+        if(verticalBarChart){return 'auto'}
+        else{return 'central'}
+    }
 
  
 
@@ -155,22 +143,19 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements, barDa
     values
         .enter()
         .append("text")
-        // .style("opacity", "0")
         .attr("y", 0)
+        .style("opacity", "1") 
         .merge(values)
         .attr("class", "casesPerCapita")
-        .attr('text-anchor', 'middle')
-        // .attr('alignment-baseline', 'central')
+        .attr('text-anchor', setTextAnchor())
+        .attr('alignment-baseline', setAlignmentBaseline())
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData, barData))
-        
-        .style("font-size", calculateVW(data))
+        .style("font-size", calculateFontSize(data))
         .text(countryData => decideTextToReturn(countryData))
-        .style("opacity", "0")
-        // .transition()
-        // .delay(setSpeed())
-        .style("opacity", "1")                
+        
+              
 }
 
 
@@ -178,12 +163,17 @@ function renderValuesInVerticalBars(data, metric, countryID, measurements, barDa
 
 
 
-function renderVerticalBarChart(data, metric, countryID) {
+
+
+
+
+function renderBarChart(data, metric, countryID) {
 
     function setMargins() {
 
         let margin = { top: 30, right: 0, bottom: 20, left: 30 }
-        if (verticalBarChart) { margin.left = 0 }
+        if (verticalBarChart) { margin.left = 0}
+
         return margin
     }
 
@@ -297,8 +287,10 @@ function renderVerticalBarChart(data, metric, countryID) {
         .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
         .on('mouseout', (event)=>{renderValuesInBars(data, metric, countryID, measurements)})
         .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
-        .transition().duration(500).delay(500)
+        .transition().duration(setSpeed()-500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
+            .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))
+
     }
 
     function renderVerticalBars(data, measurements, metric, countryID) {
@@ -325,10 +317,10 @@ function renderVerticalBarChart(data, metric, countryID) {
             .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
             .transition()
             .ease(d3.easeLinear) 
-            .duration(setSpeed()/2)
+            .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
-            
+            .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
     }
 
     function setBarColor(data) {
@@ -345,8 +337,10 @@ function renderVerticalBarChart(data, metric, countryID) {
             delete countryData.comparison
             return countryData
         })
-        renderValuesInVerticalBars(data, metric, countryID, measurements)
+        renderValuesInBars(data, metric, countryID, measurements)
     }
+
+
 
     data = sortByHighestValues(data, metric)
 
@@ -361,7 +355,7 @@ function renderVerticalBarChart(data, metric, countryID) {
     const innerWidth = width - margin.left - margin.right
 
     const yScale = setYScale(metric, innerHeight, data, countryID)
-    const xScale = setXScale(data, countryID, margin, width, metric)
+    const xScale = setXScale(data, countryID, margin, innerWidth, metric)
 
     const yAxis = d3.axisLeft(yScale);
     const xAxis = d3.axisBottom(xScale).ticks(0);
@@ -385,76 +379,14 @@ function renderVerticalBarChart(data, metric, countryID) {
     verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)
 
     
-    renderValuesInVerticalBars(data, metric, countryID, measurements)
-    // renderValuesInBars(data, metric, countryID, measurements)
+    //   setTimeout(renderValuesInBars, 3000, data, metric, countryID, measurements);         
+      
+    //   renderValuesInBars(data, metric, countryID, measurements)
+  
 
 };
 
-function renderBarChart(data, metric, countryID) {
 
-    data = sortByHighestValues(data, metric)
-
-    // https://www.w3schools.com/jsref/prop_screen_height.asp
-
-    // https://www.w3schools.com/jsref/prop_screen_width.asp
-
-    const width = 0.9 * screen.width
-    const height = 0.8 * screen.height
-    const margin = { top: 30, right: 0, bottom: 20, left: 30 }
-    const innerHeight = height - margin.top - margin.bottom
-    const innerWidth = width - margin.left - margin.right
-
-    const xScale = d3
-        .scaleLinear()
-        .domain([0, d3.max(data, (d) => d[metric])])
-        .range([margin.left, width]);
-
-
-    const yScale = d3
-        .scaleBand()
-        .domain(data.map((d) => d[countryID]))
-        .range([0, innerHeight])
-        .padding(0.2);
-
-
-    const yAxis = d3.axisLeft(yScale);
-    // const xAxis = d3.axisBottom(xScale).ticks(0);
-
-
-    if (!barChartAxisRendered) {
-        renderYAxis(width, height, margin, yAxis)
-        // renderXAxis(width, height, margin, xAxis, innerHeight)
-
-        let xScaleMidPoint = (xScale.range()[1] + xScale.range()[0]) / 2
-
-        d3.select("svg")
-            .append("text")
-            .attr("fill", "black")
-            .attr("y", 15)
-            .attr('x', xScaleMidPoint)
-            .attr("text-anchor", "middle")
-            .text('Cases Per 100,000 People By Country')
-
-    } else {
-        updateYAxis(width, height, yAxis)
-        // updateXAxis(width, height, xAxis, innerHeight)
-
-    }
-
-    barChartAxisRendered = true
-
-    let measurements = { yScale, xScale, margin }
-
-    renderBars(data, measurements, metric, countryID)
-
-    renderValuesInBars(data, metric, countryID, measurements)
-
-
-    //To Do: Get display title rendering in correct position
-
-
-
-};
 
 
 
@@ -465,7 +397,7 @@ function displayComparisons(event, barData, data, metric, countryID, measurement
 
    
 
-    renderValuesInVerticalBars(comparisons, metric, countryID, measurements, barData)
+    renderValuesInBars(comparisons, metric, countryID, measurements, barData)
 
     // renderComparisonInVerticalBars(comparisons, metric, countryID, measurements, barData)
 
@@ -501,23 +433,7 @@ function calculateComparisons(data, barData) {
 
 }
 
-function renderComparisonInBars(comparisons, metric, countryID, measurements) {
 
-    let values = d3.select("svg")
-        .selectAll(".casesPerCapita")
-        .data(comparisons)
-
-    values
-        .enter()
-        .append("text")
-        .merge(values)
-        .attr("class", "casesPerCapita")
-        .attr('alignment-baseline', 'central')
-        .attr("x", d => measurements.xScale(d[metric]) - 5)
-        .attr("y", d => measurements.yScale(d[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
-        .text(d => d.comparison)
-
-}
 
 
 
@@ -705,7 +621,7 @@ async function dataForGraphs() {
 
     casesPerCapita = await getCasesPerCapita(countriesDownloaded)
 
-    renderVerticalBarChart(casesPerCapita, "casesPerCapita", "countryCode");
+    renderBarChart(casesPerCapita, "casesPerCapita", "countryCode");
 }
 
 function removeColonies(jsonData) {
