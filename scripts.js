@@ -207,7 +207,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
     let values = d3.select("svg")
         .selectAll(".casesPerCapita")
-        .data(data)
+        .data(data, d => d[countryID])
 
     values
         .enter()
@@ -225,12 +225,16 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
         .style("font-size", calculateFontSize(data))
         .text(countryData => decideTextToReturn(countryData))
 
+        values.exit().remove()
+
 
 }
 
 
 
 function renderBarChart(data, metric, countryID) {
+
+    console.log('data', data)
 
 
     function setMargins() {
@@ -267,7 +271,7 @@ function renderBarChart(data, metric, countryID) {
             return d3
                 .scaleLinear()
                 .domain([0, d3.max(data, (d) => d[metric])])
-                .range([margin.left, width]);
+                .range([margin.left, innerWidth]);
         }
     }
 
@@ -355,6 +359,8 @@ function renderBarChart(data, metric, countryID) {
             .transition().duration(setSpeed() - 500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
 
+            selectDataForBarCharts.exit().remove()
+
     }
 
     function renderVerticalBars(data, measurements, metric, countryID) {
@@ -386,6 +392,8 @@ function renderBarChart(data, metric, countryID) {
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
         // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
+
+        selectDataForBarCharts.exit().remove()
     }
 
     function setBarColor(data) {
@@ -571,7 +579,7 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
                 latestDate = country[country.length -1].casesToDate
             }
 
-            let casesPerCapita = (latestDate - firstDate)/ euDataSet[index].population
+            let casesPerCapita = ((latestDate - firstDate)/ euDataSet[index].population).toFixed(3)
 
             if(casesPerCapita > 0.49){casesPerCapita = Math.round(casesPerCapita)}
 
@@ -583,8 +591,8 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
             };
 
         })
-        //remove countries that haven't been downloaded yet
-        .filter(country => country !== undefined)
+        //remove countries that haven't been downloaded yet & countries without data
+        .filter(country => country !== undefined && country.casesPerCapita > 0)
 
     return casesPerCapita
 
@@ -638,8 +646,6 @@ function filterDataByDates(allData, startDate, endDate) {
 
         return filteredData
     })
-
-    console.log('dataToReturn', dataToReturn)
 
     return dataToReturn
 }
@@ -700,11 +706,7 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
     let requestedData = filterDataByDates(allData, startDate, endDate)
 
-    casesPerCapita =  getCasesPerCapita(requestedData, startDate, endDate)
-
-    console.log('casesPerCapita', casesPerCapita)
-
-    
+    casesPerCapita =  getCasesPerCapita(requestedData, startDate, endDate)    
 
     renderBarChart(casesPerCapita, "casesPerCapita", "countryCode");
 }
@@ -814,7 +816,7 @@ async function processRawData(rawData, countries, failedCalls) {
 
         let countryData = cleanData(jsonData)
 
-        console.log('countryData b4 saving', countryData)
+        console.log('countryData', countryData)
 
         await compileDataForSaving(countryData)
 
@@ -828,8 +830,6 @@ async function processRawData(rawData, countries, failedCalls) {
         displayNumberCountriesDownloaded()
 
         let allData = await getDataFromStorage()
-
-        console.log('first all Data', allData)
 
         let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0)
 
