@@ -125,7 +125,7 @@ function sortByHighestValues(data, metric) {
 
 function setSpeed() {
 
-    if (countriesDownloaded !== 27) { return 4500 }
+    if (countriesDownloaded !== 27) { return 3000 }
     else { return 0 }
 }
 
@@ -524,32 +524,7 @@ function getDataFromStorage() {
     return Promise.all(countryData)
 }
 
-function calculateTotalEUCases(allData) {
 
-    let totalCases = [];
-
-    allData
-        .forEach((country) => {
-            let firstDate, latestDate
-
-            if(country.length === 0){
-                firstDate = 0
-                latestDate = 0
-            }else{
-                firstDate = country[0].casesToDate
-                latestDate = country[country.length - 1].casesToDate;
-            }
-
-
-            totalCases.push(latestDate - firstDate);
-        })
-
-    return totalCases.reduce((a, b) => a + b);
-}
-
-function calculateEUPopulation() {
-    return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
-}
 
 function calculateCasesPerCapita(allData, startDate, endDate) {
 
@@ -684,17 +659,56 @@ function getCasesPerCapita(requestedData, startDate, endDate) {
 
 }
 
-function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
+
+function calculateEUPopulation() {
+    return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
+}
+
+function calculateTotalEUCases(allData) {
+
+    let totalCases = [];
+
+    allData
+        .forEach((country) => {
+            let firstDate, latestDate
+
+            if(country.length === 0){
+                firstDate = 0
+                latestDate = 0
+            }else if(country.length ==1)  {
+                firstDate = 0
+                latestDate = country[country.length - 1].casesToDate;
+            }
+                 else{
+                firstDate = country[0].casesToDate
+                latestDate = country[country.length - 1].casesToDate;
+            }
+
+
+            totalCases.push(latestDate - firstDate);
+        })
+
+    return totalCases.reduce((a, b) => a + b);
+}
+
+function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
     let totalEuCases = calculateTotalEUCases(allData)
 
+    if(totalEuCases <5){return casesPerCapita}
+
     let euPopulation = calculateEUPopulation()
+
+    let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3)
+
+    if(euCasesPerCapita > 0.49){euCasesPerCapita = Math.round(euCasesPerCapita)}
+
 
     casesPerCapita.push({
         countryCode: "eu",
-        casesPerCapita: Math.round(totalEuCases / euPopulation),
-    });
+        casesPerCapita: euCasesPerCapita,
+    });        
 
     return casesPerCapita
 }
