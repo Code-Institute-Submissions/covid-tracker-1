@@ -88,11 +88,9 @@ async function changeDates() {
 
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
     
-    startDate = new Date (startDate.setDate(startDate.getDate()-1))
+    startDate = new Date (startDate.setDate(startDate.getDate()-1)).setHours(0, 0, 0, 0)
 
 
-
-    startDate = startDate.setHours(0, 0, 0, 0)
 
     let endDate = new Date (document.getElementById("end-date").value).setHours(0, 0, 0, 0)
 
@@ -529,30 +527,45 @@ function getDataFromStorage() {
 function calculateCasesPerCapita(allData, startDate, endDate) {
 
 
+
+    
+
+
     let casesPerCapita = allData
         .map((country, index) => {
 
             //prevent countries that haven't been downloaded yet from causing errors
 
             if (country === null) { return }
+            
 
          
 
-            let firstDate
+            let firstDateData
 
-            let latestDate 
+            let latestDateData 
 
             if(country.length === 0){
-                firstDate = 0
-                latestDate = 0
+                firstDateData = 0
+                latestDateData = 0
             }else if(country.length === 1){
-                firstDate = 0
-                latestDate = country[country.length - 1].casesToDate;
-            }else
-            {
-                firstDate = country[0].casesToDate
-                latestDate = country[country.length -1].casesToDate
+                firstDateData = 0
+                latestDateData = country[country.length - 1].casesToDate;
             }
+            else if(country[0].firstDayOfData){
+  
+                firstDateData = 0
+                latestDateData = country[country.length -1].casesToDate
+            }
+            else
+            {
+                firstDateData = country[0].casesToDate
+                latestDateData = country[country.length -1].casesToDate
+            }
+            
+    
+
+            if(firstDateData === latestDateData){firstDateData = 0}
 
             let casesPerCapita = ((latestDate - firstDate)/ euDataSet[index].population).toFixed(3)
 
@@ -685,6 +698,8 @@ function calculateTotalEUCases(allData) {
                 latestDate = country[country.length - 1].casesToDate;
             }
 
+            if(firstDate === latestDate){firstDate === 0}
+
 
             totalCases.push(latestDate - firstDate);
         })
@@ -743,12 +758,15 @@ function formatAPIData(countriesOnly) {
 
         //map each internal array so that only the data we are interested in is kept (as an object)
 
-        let dailySummaries = country.map(dailyData => {
-            return {
+        let dailySummaries = country.map((dailyData, index) => {
+
+            let objectToReturn = {
                 casesToDate: dailyData.Confirmed,
                 deathsToDate: dailyData.Deaths,
                 date: dailyData.Date,
             };
+            if(index === 0){objectToReturn.firstDayOfData = true}
+            return objectToReturn
         })
 
 
@@ -800,6 +818,8 @@ async function displayNumberCountriesDownloaded() {
 }
 
 function compileDataForSaving(countryData) {
+
+    console.log('countryData', countryData)
 
     let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
@@ -856,6 +876,7 @@ async function processRawData(rawData, countries, failedCalls) {
 };
 
 function makeAPICalls(countries, failedCalls) {
+    //TO DO: Make this a promise all settled
     Promise.all(
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
