@@ -45,15 +45,15 @@ const countryCodes = euDataSet.map((e) => e.countryCode)
 
 let verticalBarChart = false
 
-function displayNav(){
-    if(countriesDownloaded <27){return}
+function displayNav() {
+    if (countriesDownloaded < 27) { return }
     document.getElementById('nav').classList.remove("hide-element")
     document.getElementById('nav').classList.add("show-element")
 }
 
-function setDefaultDates(){
+function setDefaultDates() {
 
-    if(countriesDownloaded <27){return}
+    if (countriesDownloaded < 27) { return }
 
     console.log('convertDateFormat(latestCommonDate)', convertDateFormat(latestCommonDate))
 
@@ -63,20 +63,36 @@ function setDefaultDates(){
 
 }
 
-function convertDateFormat(date){
+function convertDateFormat(date) {
 
     //https://dzone.com/articles/javascript-convert-date
 
     let month = new Date(date).getMonth() + 1
 
-    if(month <10){
-        month=`0${month.toString()}`
+    if (month < 10) {
+        month = `0${month.toString()}`
     }
     let day = new Date(date).getDate()
-    let year = new Date(date) .getFullYear()
+    let year = new Date(date).getFullYear()
 
 
     return `${year}-${month}-${day}`
+
+}
+
+async function changeDates() {
+
+
+    let startDate = new Date (document.getElementById("start-date").value).setHours(0, 0, 0, 0)
+    let endDate = new Date (document.getElementById("end-date").value).setHours(0, 0, 0, 0)
+
+    console.log('startDate', startDate)
+
+    console.log('endDate', endDate)
+
+    let allData = await getDataFromStorage()
+
+    dataForGraphs(startDate, endDate, allData)
 
 }
 
@@ -96,48 +112,48 @@ function sortByHighestValues(data, metric) {
 
 
 
-function setSpeed(){
+function setSpeed() {
 
-    if(countriesDownloaded !== 27){return 4500}
-    else{return 0}
+    if (countriesDownloaded !== 27) { return 4500 }
+    else { return 0 }
 }
 
 
 
 function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
-  
 
 
-    if(countriesDownloaded<27){return}
-    
+
+    if (countriesDownloaded < 27) { return }
+
     function calculateFontSize(data) {
 
-        
-        if(verticalBarChart){
+
+        if (verticalBarChart) {
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
             return ((.2 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
-        }else{
+        } else {
             return 12
-  
+
         }
-        
+
     }
 
-    function setXValue(countryData, measurements, countryID){
-        if(verticalBarChart){
+    function setXValue(countryData, measurements, countryID) {
+        if (verticalBarChart) {
             return measurements.xScale(countryData[countryID]) + measurements.xScale.bandwidth() / 2
-        }else{
-        
+        } else {
+
             return (measurements.xScale(countryData[metric]) - 8)
         }
     }
 
-    function setYValue(countryData, measurements, metric){
-        if(verticalBarChart){
-            
-            return measurements.yScale(countryData[metric]) + measurements.margin.top -2
-        }else {
+    function setYValue(countryData, measurements, metric) {
+        if (verticalBarChart) {
+
+            return measurements.yScale(countryData[metric]) + measurements.margin.top - 2
+        } else {
             return (measurements.yScale(countryData[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
         }
     }
@@ -145,38 +161,38 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
     function setColor(countryData, barData) {
 
-        if(!verticalBarChart){return "white"}
-       
+        if (!verticalBarChart) { return "white" }
+
 
         let valueToReturn
 
         countryData.countryCode === 'eu' ? valueToReturn = 'orange' : valueToReturn = 'steelBlue'
 
-        if (barData===undefined){return valueToReturn}
-        if(barData.countryCode === 'eu' && countryData.countryCode === 'eu'){return 'orange'}
+        if (barData === undefined) { return valueToReturn }
+        if (barData.countryCode === 'eu' && countryData.countryCode === 'eu') { return 'orange' }
         if (typeof (countryData.comparison) === 'number') { return "steelblue" }
         if (countryData.comparison.includes("+")) { return "tomato" }
         return "darkgreen"
- 
-        
+
+
     }
 
-    function decideTextToReturn(countryData){
-        if(countryData.comparison!==undefined){return countryData.comparison}
-        else{return countryData[metric]}
+    function decideTextToReturn(countryData) {
+        if (countryData.comparison !== undefined) { return countryData.comparison }
+        else { return countryData[metric] }
     }
 
-    function setTextAnchor(){
-        if(verticalBarChart){return 'middle'}
-        else{return 'start'}
+    function setTextAnchor() {
+        if (verticalBarChart) { return 'middle' }
+        else { return 'start' }
     }
 
-    function setAlignmentBaseline(){
-        if(verticalBarChart){return 'auto'}
-        else{return 'central'}
+    function setAlignmentBaseline() {
+        if (verticalBarChart) { return 'auto' }
+        else { return 'central' }
     }
 
- 
+
 
     let values = d3.select("svg")
         .selectAll(".casesPerCapita")
@@ -185,11 +201,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
     values
         .enter()
         .append("text")
-        
+
         .attr("y", 0)
-        .style("opacity", "1") 
+        .style("opacity", "1")
         .merge(values)
-        // .attr("class", d => {return `${metric} ${d[countryID]}`})
+        .attr("class", metric)
         .attr('text-anchor', setTextAnchor())
         .attr('alignment-baseline', setAlignmentBaseline())
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
@@ -197,18 +213,20 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
         .style("fill", countryData => setColor(countryData, barData))
         .style("font-size", calculateFontSize(data))
         .text(countryData => decideTextToReturn(countryData))
-        
-              
+
+
 }
 
 
 
 function renderBarChart(data, metric, countryID) {
 
+    console.log('in render bar chart')
+
     function setMargins() {
 
         let margin = { top: 30, right: 0, bottom: 20, left: 30 }
-        if (verticalBarChart) { margin.left = 0}
+        if (verticalBarChart) { margin.left = 0 }
 
         return margin
     }
@@ -229,36 +247,36 @@ function renderBarChart(data, metric, countryID) {
     }
 
     function setXScale(data, countryID, margin, width, metric) {
-    if (verticalBarChart) {
-        return d3
-            .scaleBand()
-            .domain(data.map((d) => d[countryID]))
-            .range([margin.left, width])
-            .padding(0.2);
-    } else {
-        return d3
-            .scaleLinear()
-            .domain([0, d3.max(data, (d) => d[metric])])
-            .range([margin.left, width]);
-    }
+        if (verticalBarChart) {
+            return d3
+                .scaleBand()
+                .domain(data.map((d) => d[countryID]))
+                .range([margin.left, width])
+                .padding(0.2);
+        } else {
+            return d3
+                .scaleLinear()
+                .domain([0, d3.max(data, (d) => d[metric])])
+                .range([margin.left, width]);
+        }
     }
 
     function renderXAxis(width, height, margin, xAxis, innerHeight) {
 
-    if(!verticalBarChart){return}
+        if (!verticalBarChart) { return }
 
-    d3.select("svg").attr("width", width).attr("height", height)
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
-        .attr("class", "x axis")
-        .attr("transform", `translate(0, ${innerHeight + margin.top})`)
-        .call(xAxis)
+        d3.select("svg").attr("width", width).attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            .attr("class", "x axis")
+            .attr("transform", `translate(0, ${innerHeight + margin.top})`)
+            .call(xAxis)
 
     }
 
     function renderYAxis(width, height, margin, yAxis) {
 
-        if(verticalBarChart){return}
+        if (verticalBarChart) { return }
 
         d3.select("svg").attr("width", width).attr("height", height)
             .append("g")
@@ -271,8 +289,8 @@ function renderBarChart(data, metric, countryID) {
 
     }
 
-    function renderChartTitle(xScale){
-        
+    function renderChartTitle(xScale) {
+
         let xScaleMidPoint = (xScale.range()[1] + xScale.range()[0]) / 2
 
         d3.select("svg")
@@ -287,17 +305,17 @@ function renderBarChart(data, metric, countryID) {
 
     function updateXAxis(width, height, xAxis) {
 
-    if(!verticalBarChart){return}
+        if (!verticalBarChart) { return }
 
-    d3.select("svg").attr("width", width).attr("height", height).selectAll("g.x.axis").call(xAxis)
+        d3.select("svg").attr("width", width).attr("height", height).selectAll("g.x.axis").call(xAxis)
 
 
 
     }
 
     function updateYAxis(width, height, yAxis) {
-        if(verticalBarChart){return}
-        
+        if (verticalBarChart) { return }
+
         d3.select("svg")
             .selectAll("g.y.axis")
             .call(yAxis)
@@ -306,25 +324,25 @@ function renderBarChart(data, metric, countryID) {
 
     function renderHorizontalBars(data, measurements, metric, countryID) {
 
-    let selectDataForBarCharts = d3.select("svg")
-        .selectAll("rect")
-        .data(data, d => d[countryID])
+        let selectDataForBarCharts = d3.select("svg")
+            .selectAll("rect")
+            .data(data, d => d[countryID])
 
-    selectDataForBarCharts
-        .enter()
-        .append("rect")
-        .attr("width", 0)
-        .attr("height", measurements.yScale.bandwidth())
-        .attr("y", (d) => measurements.yScale(d[countryID]))
-        .merge(selectDataForBarCharts)
-        // .attr("class", d => {return `${d[countryID]} ${metric}`})
-        .attr("fill", d => setBarColor(d))
-        .attr("height", measurements.yScale.bandwidth())
-        .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
-        .on('mouseover', (event, barData) => {displayComparisons(event, barData, data, metric, countryID, measurements)})
-        .on('mouseout', (event)=>{renderValuesInBars(data, metric, countryID, measurements)})
-        .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
-        .transition().duration(setSpeed()-500).delay(500)
+        selectDataForBarCharts
+            .enter()
+            .append("rect")
+            .attr("width", 0)
+            .attr("height", measurements.yScale.bandwidth())
+            .attr("y", (d) => measurements.yScale(d[countryID]))
+            .merge(selectDataForBarCharts)
+            // .attr("class", d => {return `${d[countryID]} ${metric}`})
+            .attr("fill", d => setBarColor(d))
+            .attr("height", measurements.yScale.bandwidth())
+            .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
+            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
+            .on('mouseout', (event) => { renderValuesInBars(data, metric, countryID, measurements) })
+            .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
+            .transition().duration(setSpeed() - 500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
 
     }
@@ -332,7 +350,7 @@ function renderBarChart(data, metric, countryID) {
     function renderVerticalBars(data, measurements, metric, countryID) {
 
 
-        
+
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
             .data(data, d => d[countryID])
@@ -353,23 +371,23 @@ function renderBarChart(data, metric, countryID) {
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
             .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
             .transition()
-            .ease(d3.easeLinear) 
+            .ease(d3.easeLinear)
             .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
-            // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
+        // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
     }
 
     function setBarColor(data) {
 
-    if (data.countryCode === 'eu') {
-        return "orange"
-    } else {
-        return "steelBlue"
-    }
+        if (data.countryCode === 'eu') {
+            return "orange"
+        } else {
+            return "steelBlue"
+        }
     }
 
-    function removeComparisons(data, metric, countryID, measurements){
+    function removeComparisons(data, metric, countryID, measurements) {
         let dataWithOutComparisons = data.map(countryData => {
             delete countryData.comparison
             return countryData
@@ -413,7 +431,7 @@ function renderBarChart(data, metric, countryID) {
 
     let measurements = { yScale, xScale, margin, height, innerHeight }
 
-    verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)  
+    verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)
 
     setTimeout(renderValuesInBars, 1000, data, metric, countryID, measurements);
 
@@ -586,45 +604,36 @@ function returnDataWithSameDates(allData) {
 
     if (sameLatestDateForAll) { return allData } else {
 
-        const earliestDate = calculateCommonLatestDate(allData)
+        const commonLatestDate = calculateCommonLatestDate(allData)
 
-        let startDate = new Date('January 01, 2020 03:24:00').setHours(0, 0, 0, 0)
+        let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0)
 
-        let dataWithSameEndDate = filterDataByDates(allData, startDate, earliestDate)
+        let dataWithSameEndDate = filterDataByDates(allData, startDate, commonLatestDate)
 
         return dataWithSameEndDate
     }
 
 }
 
-async function getCasesPerCapita(countriesDownloaded) {
+function getCasesPerCapita(requestedData) {
 
-    let allData = await getDataFromStorage()
-
-    allData = returnDataWithSameDates(allData)
-
-    let casesPerCapita = calculateCasesPerCapita(allData)
-
-
-
-    let promiseToReturn
+    let casesPerCapita = calculateCasesPerCapita(requestedData)
 
     if (countriesDownloaded < 27) {
-        promiseToReturn = new Promise((resolve, reject) => {
-            resolve(casesPerCapita)
-        })
-    } else {
-        promiseToReturn = new Promise((resolve, reject) => {
-            resolve(includeEUInCasesPerCapita(allData, casesPerCapita))
-        })
-    }
 
-    return promiseToReturn
+        return casesPerCapita
+    }
+    else {
+
+        return includeEUInCasesPerCapita(requestedData, casesPerCapita)
+    }
 
 
 }
 
 function includeEUInCasesPerCapita(allData, casesPerCapita) {
+
+    console.log('casesPerCapita in includeEU func', casesPerCapita)
 
     let totalEuCases = calculateTotalEUCases(allData)
 
@@ -638,16 +647,19 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
     return casesPerCapita
 }
 
-async function dataForGraphs() {
+async function dataForGraphs(startDate, endDate, allData) {
 
-    countriesDownloaded = await getNumberOfCountriesDownloaded()
+    console.log('in data for graphs func')
+
+    
 
     if (countriesDownloaded === 0) { return }
 
-    displayNav()
-    setDefaultDates()
+    let requestedData = filterDataByDates(allData, startDate, endDate)
 
-    casesPerCapita = await getCasesPerCapita(countriesDownloaded)
+    casesPerCapita = await getCasesPerCapita(requestedData)
+
+    
 
     renderBarChart(casesPerCapita, "casesPerCapita", "countryCode");
 }
@@ -759,9 +771,22 @@ async function processRawData(rawData, countries, failedCalls) {
 
         await compileDataForSaving(countryData)
 
+        countriesDownloaded = await getNumberOfCountriesDownloaded()
+
+        if (countriesDownloaded === 27){
+            displayNav()
+            setDefaultDates()
+        }
+
         displayNumberCountriesDownloaded()
 
-        dataForGraphs();
+        let allData = await getDataFromStorage()
+
+        let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0)
+
+        let endDate = calculateCommonLatestDate(allData)
+
+        dataForGraphs(startDate, endDate, allData)
 
     }
     getData(countries, false, failedCalls);
