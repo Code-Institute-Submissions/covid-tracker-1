@@ -127,8 +127,6 @@ function setSpeed() {
     else { return 0 }
 }
 
-
-
 function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 
@@ -228,11 +226,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 }
 
-
-
 function renderBarChart(data, metric, countryID) {
-
-    console.log('data', data)
 
 
     function setMargins() {
@@ -352,7 +346,7 @@ function renderBarChart(data, metric, countryID) {
             .attr("height", measurements.yScale.bandwidth())
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
-            .on('mouseout', (event) => { renderValuesInBars(data, metric, countryID, measurements) })
+            .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
             .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
             .transition().duration(setSpeed() - 500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
@@ -453,7 +447,6 @@ function renderBarChart(data, metric, countryID) {
 
 };
 
-
 function displayComparisons(event, barData, data, metric, countryID, measurements) {
 
 
@@ -492,8 +485,6 @@ function calculateComparisons(data, barData) {
 
 }
 
-
-
 function getNumberOfCountriesDownloaded() {
 
     let countryCodes = euDataSet.map(countryEntry => countryEntry.countryCode)
@@ -521,8 +512,6 @@ function getDataFromStorage() {
 
     return Promise.all(countryData)
 }
-
-
 
 function calculateCasesPerCapita(allData, startDate, endDate) {
 
@@ -567,7 +556,7 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
 
             if(firstDateData === latestDateData){firstDateData = 0}
 
-            let casesPerCapita = ((latestDate - firstDate)/ euDataSet[index].population).toFixed(3)
+            let casesPerCapita = ((latestDateData - firstDateData)/ euDataSet[index].population).toFixed(3)
 
             if(casesPerCapita > 0.49){casesPerCapita = Math.round(casesPerCapita)}
 
@@ -671,8 +660,6 @@ function getCasesPerCapita(requestedData, startDate, endDate) {
     }
 
 }
-
-
 
 function calculateEUPopulation() {
     return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
@@ -819,8 +806,6 @@ async function displayNumberCountriesDownloaded() {
 
 function compileDataForSaving(countryData) {
 
-    console.log('countryData', countryData)
-
     let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
@@ -849,8 +834,6 @@ async function processRawData(rawData, countries, failedCalls) {
     if (successfulCalls.length > 0) {
 
         let countryData = cleanData(jsonData)
-
-        console.log('countryData', countryData)
 
         await compileDataForSaving(countryData)
 
