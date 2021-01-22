@@ -46,6 +46,10 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 https://dzone.com/articles/javascript-convert-date
 
+<!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
+
+https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
+
 https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
 
 Check this out: https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/

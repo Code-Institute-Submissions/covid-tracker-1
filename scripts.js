@@ -2,6 +2,45 @@
 
 //TO DO: Fix Bug. If screen size changes values/comparisons will change size even though bar size has not
 
+var expanded = false;
+
+
+//https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
+
+function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
+  if (!expanded) {
+    checkboxes.style.display = "block";
+    expanded = true;
+  } else {
+    checkboxes.style.display = "none";
+    expanded = false;
+  }
+}
+
+
+
+ function filterCountries(){
+     console.log('filterCountries')    
+
+
+   // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
+
+
+
+    let colm = [...document.getElementsByClassName('select-country')].forEach((e )=> {
+         if (e.checked){
+             console.log('checked', e.id)
+         }else{
+             console.log('not checked', e.id)
+         }
+     })
+
+
+     return colm
+ }       
+
+
 const euDataSet = [
     { country: "austria", countryCode: "at", population: 88.588 },
     { country: "belgium", countryCode: "be", population: 89.011 },

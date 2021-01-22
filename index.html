@@ -17,7 +17,60 @@
         <label for="end-date">End date:</label>
 
         <input type="date" id="end-date" name="end-date" value="" min="2020-01-24" max="" onchange="changeDates()">
+
+        <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
+        <form>
+            <div class="multiselect">
+                <div class="selectBox" onclick="showCheckboxes()">
+                <select>
+                    <option>Select an option</option>
+                </select>
+                <div class="overSelect"></div>
+                </div>
+                <div id="checkboxes">
+                <label for="austria">
+                    <input type="checkbox" id="at" class="select-country" checked onclick="filterCountries()"/>Austria</label>
+                <label for="belgium">
+                    <input type="checkbox" id="be"  class="select-country" checked onclick="filterCountries()"/>Belgium</label>
+                <label for="bulgaria">
+                    <input type="checkbox" id="bg" class="select-country"  checked onclick="filterCountries()"/>Bulgaria</label>
+                </div>
+            </div>
+        </form>
+
+   
+    <!-- { country: "croatia", countryCode: "hr", population: 40.582 },
+    { country: "cyprus", countryCode: "cy", population: 08.88 },
+    { country: "czech-republic", countryCode: "cz", population: 106.939 },
+    { country: "denmark", countryCode: "dk", population: 58.228 },
+    { country: "estonia", countryCode: "ee", population: 13.29 },
+    { country: "finland", countryCode: "fi", population: 55.253 },
+    { country: "france", countryCode: "fr", population: 670.988 },
+    { country: "germany", countryCode: "de", population: 831.667 },
+    { country: "greece", countryCode: "gr", population: 107.097 },
+    { country: "hungary", countryCode: "hu", population: 97.695 },
+    { country: "ireland", countryCode: "ie", population: 49.638 },
+    { country: "italy", countryCode: "it", population: 602.446 },
+    { country: "latvia", countryCode: "lv", population: 19.077 },
+    { country: "lithuania", countryCode: "lt", population: 27.941 },
+    { country: "luxembourg", countryCode: "lu", population: 6.261 },
+    { country: "malta", countryCode: "mt", population: 5.146 },
+    { country: "netherlands", countryCode: "nl", population: 174.076 },
+    { country: "poland", countryCode: "pl", population: 379.581 },
+    { country: "portugal", countryCode: "pt", population: 102.959 },
+    { country: "romania", countryCode: "ro", population: 193.18 },
+    { country: "slovakia", countryCode: "sk", population: 54.579 },
+    { country: "slovenia", countryCode: "si", population: 20.959 },
+    { country: "spain", countryCode: "es", population: 473.3 },
+    { country: "sweden", countryCode: "se", population: 103.276 }, -->
+
+
+
+        
+
     </nav>
+
+ 
 
     <h1>Covid 19</h1>
 
