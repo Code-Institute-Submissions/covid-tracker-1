@@ -55,7 +55,6 @@ function setDefaultDates() {
 
     if (countriesDownloaded < 27) { return }
 
-    console.log('convertDateFormat(latestCommonDate)', convertDateFormat(latestCommonDate))
 
     document.getElementById("end-date").value = convertDateFormat(latestCommonDate).toString()
     document.getElementById("end-date").max = convertDateFormat(latestCommonDate).toString()
@@ -83,12 +82,24 @@ function convertDateFormat(date) {
 async function changeDates() {
 
 
-    let startDate = new Date (document.getElementById("start-date").value).setHours(0, 0, 0, 0)
+
+
+    let startDate = new Date (document.getElementById("start-date").value)
+
+    //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
+    
+    startDate = new Date (startDate.setDate(startDate.getDate()-1))
+
+
+
+    startDate = startDate.setHours(0, 0, 0, 0)
+
     let endDate = new Date (document.getElementById("end-date").value).setHours(0, 0, 0, 0)
 
-    console.log('startDate', startDate)
 
-    console.log('endDate', endDate)
+    
+
+ 
 
     let allData = await getDataFromStorage()
 
@@ -221,7 +232,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 function renderBarChart(data, metric, countryID) {
 
-    console.log('in render bar chart')
 
     function setMargins() {
 
@@ -512,8 +522,18 @@ function calculateTotalEUCases(allData) {
 
     allData
         .forEach((country) => {
-            let latestDay = country[country.length - 1];
-            totalCases.push(latestDay.casesToDate);
+            let firstDate, latestDate
+
+            if(country.length === 0){
+                firstDate = 0
+                latestDate = 0
+            }else{
+                firstDate = country[0].casesToDate
+                latestDate = country[country.length - 1].casesToDate;
+            }
+
+
+            totalCases.push(latestDate - firstDate);
         })
 
     return totalCases.reduce((a, b) => a + b);
@@ -523,7 +543,8 @@ function calculateEUPopulation() {
     return euDataSet.map((country) => country.population).reduce((a, b) => a + b)
 }
 
-function calculateCasesPerCapita(allData) {
+function calculateCasesPerCapita(allData, startDate, endDate) {
+
 
     let casesPerCapita = allData
         .map((country, index) => {
@@ -532,13 +553,33 @@ function calculateCasesPerCapita(allData) {
 
             if (country === null) { return }
 
-            let latestDay = country[country.length - 1];
+         
+
+            let firstDate
+
+            let latestDate 
+
+            if(country.length === 0){
+                firstDate = 0
+                latestDate = 0
+            }else if(country.length === 1){
+                firstDate = 0
+                latestDate = country[country.length - 1].casesToDate;
+            }else
+            {
+                firstDate = country[0].casesToDate
+                latestDate = country[country.length -1].casesToDate
+            }
+
+            let casesPerCapita = (latestDate - firstDate)/ euDataSet[index].population
+
+            if(casesPerCapita > 0.49){casesPerCapita = Math.round(casesPerCapita)}
+
+ 
 
             return {
                 ["countryCode"]: euDataSet[index].countryCode,
-                ["casesPerCapita"]: Math.round(
-                    latestDay.casesToDate / euDataSet[index].population
-                ),
+                ["casesPerCapita"]: casesPerCapita
             };
 
         })
@@ -586,15 +627,21 @@ function calculateCommonLatestDate(allData) {
 
 function filterDataByDates(allData, startDate, endDate) {
 
-    return allData.map(country => {
+
+    let dataToReturn = allData.map(country => {
         if (country === null) { return null }
         let filteredData = country.filter(dailyData => {
             let jsDate = new Date(dailyData.date).setHours(0, 0, 0, 0)
+            
             if (jsDate >= startDate && jsDate <= endDate) { return dailyData }
         })
 
         return filteredData
     })
+
+    console.log('dataToReturn', dataToReturn)
+
+    return dataToReturn
 }
 
 
@@ -615,9 +662,10 @@ function returnDataWithSameDates(allData) {
 
 }
 
-function getCasesPerCapita(requestedData) {
+function getCasesPerCapita(requestedData, startDate, endDate) {
 
-    let casesPerCapita = calculateCasesPerCapita(requestedData)
+
+    let casesPerCapita = calculateCasesPerCapita(requestedData, startDate, endDate)
 
     if (countriesDownloaded < 27) {
 
@@ -628,12 +676,10 @@ function getCasesPerCapita(requestedData) {
         return includeEUInCasesPerCapita(requestedData, casesPerCapita)
     }
 
-
 }
 
 function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
-    console.log('casesPerCapita in includeEU func', casesPerCapita)
 
     let totalEuCases = calculateTotalEUCases(allData)
 
@@ -647,17 +693,16 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
     return casesPerCapita
 }
 
-async function dataForGraphs(startDate, endDate, allData) {
-
-    console.log('in data for graphs func')
-
+ function dataForGraphs(startDate, endDate, allData) {
     
 
     if (countriesDownloaded === 0) { return }
 
     let requestedData = filterDataByDates(allData, startDate, endDate)
 
-    casesPerCapita = await getCasesPerCapita(requestedData)
+    casesPerCapita =  getCasesPerCapita(requestedData, startDate, endDate)
+
+    console.log('casesPerCapita', casesPerCapita)
 
     
 
@@ -769,6 +814,8 @@ async function processRawData(rawData, countries, failedCalls) {
 
         let countryData = cleanData(jsonData)
 
+        console.log('countryData b4 saving', countryData)
+
         await compileDataForSaving(countryData)
 
         countriesDownloaded = await getNumberOfCountriesDownloaded()
@@ -781,6 +828,8 @@ async function processRawData(rawData, countries, failedCalls) {
         displayNumberCountriesDownloaded()
 
         let allData = await getDataFromStorage()
+
+        console.log('first all Data', allData)
 
         let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0)
 

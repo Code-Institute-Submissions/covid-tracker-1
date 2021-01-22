@@ -38,6 +38,10 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 ## Credits
 
+https://dzone.com/articles/javascript-convert-date
+
+https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
+
 Check this out: https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/
 
 https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
