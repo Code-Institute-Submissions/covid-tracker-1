@@ -39,6 +39,8 @@ THIS CAUSED A BUG FOR EACH COUNTRY FOR THE FIRST DAY OF RECORDED DATA (BECAUSE I
 
 PROMISE ALL AND FETCHES
 
+CORS ISSUE - clear all cookies to prevent
+
 
 When I get a 429 on initally loading data, the x axis goes mad and has a range of 10,000 even though the data doesn't contain such numbers. Fixes itself when more data loads: filter was removing values with null. I was then using population from [i] but this mapping was out because nulls had been removed
 
@@ -47,6 +49,8 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 https://dzone.com/articles/javascript-convert-date
 
 <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
+
+https://stackoverflow.com/questions/179355/clearing-all-cookies-with-javascript/33366171#33366171
 
 https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
 

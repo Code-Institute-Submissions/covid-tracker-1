@@ -18,26 +18,26 @@ function showCheckboxes() {
   }
 }
 
+function getIndexesOfUncheckedCountries(){
+
+    // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
+
+    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked)
+
+    let countryCodes = euDataSet.map(country => country.countryCode)
+
+    let indexesOfUncheckedCountries = unCheckedCountries.map(e => countryCodes.indexOf(e))
+
+    return indexesOfUncheckedCountries
+
+}
+
 
 
  function filterCountries(){
-     console.log('filterCountries')    
+  
+   getIndexesOfUncheckedCountries()
 
-
-   // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
-
-
-
-    let colm = [...document.getElementsByClassName('select-country')].forEach((e )=> {
-         if (e.checked){
-             console.log('checked', e.id)
-         }else{
-             console.log('not checked', e.id)
-         }
-     })
-
-
-     return colm
  }       
 
 
@@ -69,7 +69,7 @@ const euDataSet = [
     { country: "slovenia", countryCode: "si", population: 20.959 },
     { country: "spain", countryCode: "es", population: 473.3 },
     { country: "sweden", countryCode: "se", population: 103.276 },
-    //   { country: "united-kingdom", countryCode: "gb", population: 670.255 },
+  
 ];
 
 let countriesDownloaded = 0
@@ -754,14 +754,26 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
     return casesPerCapita
 }
 
+function filterDataByCountry(allData){
+    let indexesToDelete = getIndexesOfUncheckedCountries()
+
+    indexesToDelete.forEach(index => allData.splice(index, 1))
+    
+    return allData
+}
+
  function dataForGraphs(startDate, endDate, allData) {
     
 
     if (countriesDownloaded === 0) { return }
 
+    let filteredByCountry = filterDataByCountry(allData)
+
     let requestedData = filterDataByDates(allData, startDate, endDate)
 
     casesPerCapita =  getCasesPerCapita(requestedData, startDate, endDate)    
+
+    console.log('casesPerCapita', casesPerCapita)
 
     renderBarChart(casesPerCapita, "casesPerCapita", "countryCode");
 }
@@ -903,6 +915,10 @@ function makeAPICalls(countries, failedCalls) {
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
             .splice(0, 10)
+           
+
+            
+     
             .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
     ).then((rawData) => {
         processRawData(rawData, countries, failedCalls);
@@ -923,6 +939,7 @@ function getData(countries, firstCall, failedCalls) {
         setTimeout(() => makeAPICalls(countries, failedCalls), 5000);
     }
 };
+
 
 
 setBarChartType()
