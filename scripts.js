@@ -8,7 +8,7 @@ var expanded = false;
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
 
 function showCheckboxes() {
-  var checkboxes = document.getElementById("checkboxes");
+  let checkboxes = document.getElementById("checkboxes");
   if (!expanded) {
     checkboxes.style.display = "block";
     expanded = true;
@@ -85,7 +85,7 @@ const countryCodes = euDataSet.map((e) => e.countryCode)
 let verticalBarChart = false
 
 function displayNav() {
-    if (countriesDownloaded < 27) { return }
+    // if (countriesDownloaded < 27) { return }
     document.getElementById('nav').classList.remove("hide-element")
     document.getElementById('nav').classList.add("show-element")
 }
@@ -941,6 +941,6 @@ function getData(countries, firstCall, failedCalls) {
 };
 
 
-
+displayNav()
 setBarChartType()
 getData([...eu], true, []);

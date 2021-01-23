@@ -3,6 +3,7 @@ body {
 
     margin: 0;
     box-sizing: border-box;
+    /* position: relative; */
 }
 
 svg text {
@@ -25,7 +26,9 @@ svg text {
 }
 
 svg {
-    border: 1px solid pink
+    border: 1px solid pink;
+    position: relative;
+    
 }
 
 .casesPerCapita {
@@ -35,7 +38,9 @@ svg {
 
 rect {
     opacity: 1;
-    transition: .3s ease-in
+    /* transition: .3s ease-in; */
+    z-index: 1;
+    position: relative;
 }
 
 
@@ -53,6 +58,18 @@ rect:hover {
     display: block
 }
 
+#nav{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    border: 1px solid red;
+    align-items: flex-start;
+    max-height: 20px;
+}
+
+
+
 
 /* https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option */
 
@@ -64,10 +81,10 @@ rect:hover {
   position: relative;
 }
 
-.selectBox select {
+/* .selectBox select {
   width: 100%;
   font-weight: bold;
-}
+}  */
 
 .overSelect {
   position: absolute;
@@ -80,6 +97,9 @@ rect:hover {
 #checkboxes {
   display: none;
   border: 1px #dadada solid;
+  z-index: 99999;
+  position: absolute;
+  background-color: white;
 }
 
 #checkboxes label {
@@ -89,3 +109,5 @@ rect:hover {
 #checkboxes label:hover {
   background-color: #1e90ff;
 }
+
+
