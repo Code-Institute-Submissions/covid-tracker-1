@@ -39,7 +39,7 @@ THIS CAUSED A BUG FOR EACH COUNTRY FOR THE FIRST DAY OF RECORDED DATA (BECAUSE I
 
 PROMISE ALL AND FETCHES
 
-CORS ISSUE - clear all cookies to prevent
+When deleting countries, I was getting spurious results. I had an array of index numbers to delete and I was looping doing a for each and splicing within the foreach. The problem was that the index number I wanted to delete changed as a result of the previous splice. I fixed this by sorting the array from biggest to smallest number (index) before doing the foreach with the splice
 
 
 When I get a 429 on initally loading data, the x axis goes mad and has a range of 10,000 even though the data doesn't contain such numbers. Fixes itself when more data loads: filter was removing values with null. I was then using population from [i] but this mapping was out because nulls had been removed

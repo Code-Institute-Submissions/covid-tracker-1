@@ -2,7 +2,8 @@
 
 //TO DO: Fix Bug. If screen size changes values/comparisons will change size even though bar size has not
 
-var expanded = false;
+let expanded = false;
+
 
 
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
@@ -22,23 +23,21 @@ function getIndexesOfUncheckedCountries(){
 
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
 
-    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked)
+    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked && e!=='eu').map(e=>e.id)
 
-    let countryCodes = euDataSet.map(country => country.countryCode)
+    return unCheckedCountries
 
-    let indexesOfUncheckedCountries = unCheckedCountries.map(e => countryCodes.indexOf(e))
+    // let countryCodes = euDataSet.map(country => country.countryCode)
 
-    return indexesOfUncheckedCountries
+  
+
+    // let indexesOfUncheckedCountries = unCheckedCountries.map(e => countryCodes.indexOf(e))
+
+   
+
+    // return indexesOfUncheckedCountries
 
 }
-
-
-
- function filterCountries(){
-  
-   getIndexesOfUncheckedCountries()
-
- }       
 
 
 const euDataSet = [
@@ -118,10 +117,7 @@ function convertDateFormat(date) {
 
 }
 
-async function changeDates() {
-
-
-
+async function changeRequestedData() {
 
     let startDate = new Date (document.getElementById("start-date").value)
 
@@ -129,14 +125,7 @@ async function changeDates() {
     
     startDate = new Date (startDate.setDate(startDate.getDate()-1)).setHours(0, 0, 0, 0)
 
-
-
     let endDate = new Date (document.getElementById("end-date").value).setHours(0, 0, 0, 0)
-
-
-    
-
- 
 
     let allData = await getDataFromStorage()
 
@@ -552,67 +541,7 @@ function getDataFromStorage() {
     return Promise.all(countryData)
 }
 
-function calculateCasesPerCapita(allData, startDate, endDate) {
 
-
-
-    
-
-
-    let casesPerCapita = allData
-        .map((country, index) => {
-
-            //prevent countries that haven't been downloaded yet from causing errors
-
-            if (country === null) { return }
-            
-
-         
-
-            let firstDateData
-
-            let latestDateData 
-
-            if(country.length === 0){
-                firstDateData = 0
-                latestDateData = 0
-            }else if(country.length === 1){
-                firstDateData = 0
-                latestDateData = country[country.length - 1].casesToDate;
-            }
-            else if(country[0].firstDayOfData){
-  
-                firstDateData = 0
-                latestDateData = country[country.length -1].casesToDate
-            }
-            else
-            {
-                firstDateData = country[0].casesToDate
-                latestDateData = country[country.length -1].casesToDate
-            }
-            
-    
-
-            if(firstDateData === latestDateData){firstDateData = 0}
-
-            let casesPerCapita = ((latestDateData - firstDateData)/ euDataSet[index].population).toFixed(3)
-
-            if(casesPerCapita > 0.49){casesPerCapita = Math.round(casesPerCapita)}
-
- 
-
-            return {
-                ["countryCode"]: euDataSet[index].countryCode,
-                ["casesPerCapita"]: casesPerCapita
-            };
-
-        })
-        //remove countries that haven't been downloaded yet & countries without data
-        .filter(country => country !== undefined && country.casesPerCapita > 0)
-
-    return casesPerCapita
-
-}
 
 function isLatestDateTheSame(allData) {
 
@@ -684,6 +613,63 @@ function returnDataWithSameDates(allData) {
 
 }
 
+function calculateCasesPerCapita(allData, startDate, endDate) {
+
+
+    let casesPerCapita = allData
+        .map((country, index) => {
+
+            //prevent countries that haven't been downloaded yet from causing errors
+
+            if (country === null) { return null }
+            
+            let firstDateData
+
+            let latestDateData 
+
+            if(country.length === 0){
+                firstDateData = 0
+                latestDateData = 0
+            }else if(country.length === 1){
+                firstDateData = 0
+                latestDateData = country[country.length - 1].casesToDate;
+            }
+            else if(country[0].firstDayOfData){
+  
+                firstDateData = 0
+                latestDateData = country[country.length -1].casesToDate
+            }
+            else
+            {
+                firstDateData = country[0].casesToDate
+                latestDateData = country[country.length -1].casesToDate
+            }
+            
+    
+
+            if(firstDateData === latestDateData){firstDateData = 0}
+
+            let casesPerCapita = ((latestDateData - firstDateData)/ euDataSet[index].population).toFixed(3)
+
+            if(casesPerCapita > 0.49){casesPerCapita = Math.round(casesPerCapita)}
+
+ 
+
+            return {
+                ["countryCode"]: euDataSet[index].countryCode,
+                ["casesPerCapita"]: casesPerCapita
+            };
+
+        })
+        //remove countries that haven't been downloaded yet & countries without data
+        .filter(country => country !== undefined && country!==null && country.casesPerCapita > 0)
+
+  
+
+    return casesPerCapita
+
+}
+
 function getCasesPerCapita(requestedData, startDate, endDate) {
 
 
@@ -752,30 +738,37 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
     });        
 
     return casesPerCapita
+   
 }
 
-function filterDataByCountry(allData){
-    let indexesToDelete = getIndexesOfUncheckedCountries()
 
-    indexesToDelete.forEach(index => allData.splice(index, 1))
-    
-    return allData
+
+function filterDataByCountry(data){
+
+    let countriesToDelete = getIndexesOfUncheckedCountries()
+
+    let countryCodes = data.map(e=>e.countryCode)
+
+
+    let indexesToDelete = countriesToDelete.map(e => countryCodes.indexOf(e)).sort((a,b)=> b-a)
+
+    indexesToDelete.forEach(e => {
+        data.splice(e,1)
+    }) 
+    return data
 }
 
  function dataForGraphs(startDate, endDate, allData) {
     
-
     if (countriesDownloaded === 0) { return }
 
-    let filteredByCountry = filterDataByCountry(allData)
+    let filteredDataByDate = filterDataByDates(allData, startDate, endDate)
 
-    let requestedData = filterDataByDates(allData, startDate, endDate)
+    casesPerCapita =  getCasesPerCapita(filteredDataByDate, startDate, endDate) 
+    
+    filteredDataByCountry = filterDataByCountry(casesPerCapita)
 
-    casesPerCapita =  getCasesPerCapita(requestedData, startDate, endDate)    
-
-    console.log('casesPerCapita', casesPerCapita)
-
-    renderBarChart(casesPerCapita, "casesPerCapita", "countryCode");
+    renderBarChart(filteredDataByCountry , "casesPerCapita", "countryCode");
 }
 
 function removeColonies(jsonData) {
