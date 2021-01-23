@@ -8,8 +8,8 @@ let expanded = false;
 
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
 
-function showCheckboxes() {
-  let checkboxes = document.getElementById("checkboxes");
+function showCheckboxes(checkboxType) {
+  let checkboxes = document.getElementById(checkboxType);
   if (!expanded) {
     checkboxes.style.display = "block";
     expanded = true;
@@ -23,12 +23,19 @@ function getUncheckedCountries(){
 
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
 
-    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked && e!=='eu').map(e=>e.id)
+    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e=>e.id)
+
+    let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e=>e.class)
+
+    console.log('unCheckedClassNames', unCheckedClassNames)
 
     return unCheckedCountries
 }
 
-function highlightCountries(){}
+function setHighlightedCountries(){
+    highlightedCountries = [...document.getElementsByClassName('highlight-country')].filter(e => e.checked).map(e=>e.id)
+
+}
 
 
 let highlightedCountries = ["eu"]
@@ -77,7 +84,6 @@ const countryCodes = euDataSet.map((e) => e.countryCode)
 let verticalBarChart = false
 
 function displayNav() {
-    // if (countriesDownloaded < 27) { return }
     document.getElementById('nav').classList.remove("hide-element")
     document.getElementById('nav').classList.add("show-element")
 }
@@ -411,11 +417,8 @@ function renderBarChart(data, metric, countryID) {
 
     function setBarColor(data) {
 
-        if (data.countryCode === 'eu') {
-            return "orange"
-        } else {
-            return "steelBlue"
-        }
+        if(highlightedCountries.includes(data.countryCode)){return 'orange'}
+        else{return "steelBlue"}
     }
 
     function removeComparisons(data, metric, countryID, measurements) {
@@ -760,6 +763,8 @@ function filterDataByCountry(data){
     
     filteredDataByCountry = filterDataByCountry(casesPerCapita)
 
+    setHighlightedCountries()
+
     renderBarChart(filteredDataByCountry , "casesPerCapita", "countryCode");
 }
 
@@ -926,6 +931,5 @@ function getData(countries, firstCall, failedCalls) {
 };
 
 
-displayNav()
 setBarChartType()
 getData([...eu], true, []);
