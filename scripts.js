@@ -84,8 +84,9 @@ const countryCodes = euDataSet.map((e) => e.countryCode)
 let verticalBarChart = false
 
 function displayNav() {
-    document.getElementById('nav').classList.remove("hide-element")
-    document.getElementById('nav').classList.add("show-element")
+
+    document.getElementById('nav').style.display = "flex";
+
 }
 
 function setDefaultDates() {
@@ -150,8 +151,8 @@ function sortByHighestValues(data, metric) {
 
 function setSpeed() {
 
-    if (countriesDownloaded !== 27) { return 3000 }
-    else { return 0 }
+    if (countriesDownloaded !== 27) { return 5000 }
+    else { return 1000 }
 }
 
 function renderValuesInBars(data, metric, countryID, measurements, barData) {

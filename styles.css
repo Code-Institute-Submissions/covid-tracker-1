@@ -50,16 +50,16 @@ rect:hover {
     transition: .3s ease-in
 }
 
-.hide-element{
+/* .hide-element{
     display: none
 }
 
 .show-element{
     display: block
-}
+} */
 
 #nav{
-    display: flex;
+    display: none;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
