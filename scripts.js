@@ -19,26 +19,19 @@ function showCheckboxes() {
   }
 }
 
-function getIndexesOfUncheckedCountries(){
+function getUncheckedCountries(){
 
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
 
     let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked && e!=='eu').map(e=>e.id)
 
     return unCheckedCountries
-
-    // let countryCodes = euDataSet.map(country => country.countryCode)
-
-  
-
-    // let indexesOfUncheckedCountries = unCheckedCountries.map(e => countryCodes.indexOf(e))
-
-   
-
-    // return indexesOfUncheckedCountries
-
 }
 
+function highlightCountries(){}
+
+
+let highlightedCountries = ["eu"]
 
 const euDataSet = [
     { country: "austria", countryCode: "at", population: 88.588 },
@@ -745,15 +738,14 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
 function filterDataByCountry(data){
 
-    let countriesToDelete = getIndexesOfUncheckedCountries()
+    let countriesToDelete = getUncheckedCountries()
 
-    let countryCodes = data.map(e=>e.countryCode)
+    let countryCodes = data.map(country=>country.countryCode)
 
+    let indexesToDelete = countriesToDelete.map(country => countryCodes.indexOf(country)).sort((a,b)=> b-a)
 
-    let indexesToDelete = countriesToDelete.map(e => countryCodes.indexOf(e)).sort((a,b)=> b-a)
-
-    indexesToDelete.forEach(e => {
-        data.splice(e,1)
+    indexesToDelete.forEach(index => {
+        data.splice(index,1)
     }) 
     return data
 }
@@ -903,7 +895,7 @@ async function processRawData(rawData, countries, failedCalls) {
 };
 
 function makeAPICalls(countries, failedCalls) {
-    //TO DO: Make this a promise all settled
+    //TO DO: Make this a promise all settled to deal with CORS error. Have a plan for when API is down.
     Promise.all(
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
