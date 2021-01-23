@@ -370,11 +370,12 @@ function renderBarChart(data, metric, countryID) {
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .merge(selectDataForBarCharts)
             // .attr("class", d => {return `${d[countryID]} ${metric}`})
-            .attr("fill", d => setBarColor(d))
+            
             .attr("height", measurements.yScale.bandwidth())
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
             .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
+            .transition().duration(1000).attr("fill", d => setBarColor(d))
             .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
             .transition().duration(setSpeed() - 500).delay(500)
             .attr("width", (d) => measurements.xScale(d[metric]))
@@ -400,17 +401,21 @@ function renderBarChart(data, metric, countryID) {
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
             // .attr("class", d => {return `${d[countryID]} ${metric}`})
-            .attr("fill", d => setBarColor(d))
+       
             .attr("transform", `translate(0, ${measurements.margin.top})`)
             .attr('width', measurements.xScale.bandwidth())
             .attr('x', (d) => measurements.xScale(d[countryID]))
+            
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
             .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
+            
             .transition()
             .ease(d3.easeLinear)
             .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
+            .attr("fill", d => setBarColor(d))
+          
         // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
 
         selectDataForBarCharts.exit().remove()
