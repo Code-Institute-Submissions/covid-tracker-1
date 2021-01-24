@@ -27,8 +27,6 @@ function getUncheckedCountries(){
 
     let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e=>e.class)
 
-    console.log('unCheckedClassNames', unCheckedClassNames)
-
     return unCheckedCountries
 }
 
@@ -149,11 +147,7 @@ function sortByHighestValues(data, metric) {
 
 
 
-function setSpeed() {
 
-    if (countriesDownloaded !== 27) { return 4500}
-    else { return 1000 }
-}
 
 
 
@@ -258,8 +252,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 function renderBarChart(data, metric, countryID) {
 
-    console.log('data', data)
-
        let tooltip = d3.select("body")
         .append("div")
         .attr("id", "tooltip")
@@ -352,7 +344,12 @@ function renderBarChart(data, metric, countryID) {
 
         if (!verticalBarChart) { return }
 
-        d3.select("svg").attr("width", width).attr("height", height).selectAll("g.x.axis").call(xAxis)
+        d3.select("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .selectAll("g.x.axis")
+        .transition().delay(500)
+        .call(xAxis)
 
 
 
@@ -363,7 +360,7 @@ function renderBarChart(data, metric, countryID) {
 
         d3.select("svg")
             .selectAll("g.y.axis")
-            .transition().delay(500)
+            .transition().delay(setSpeed()/2)
             .call(yAxis)
             .selectAll('.tick line').remove()
     }
@@ -374,15 +371,14 @@ function renderBarChart(data, metric, countryID) {
         return tooltip.style("visibility", "visible")
     }
 
+    function setSpeed() {
+
+    if (countriesDownloaded !== 27) { return 4500}
+    else { return 1000 }
+}
+
     function renderHorizontalBars(data, measurements, metric, countryID) {
 
-        function fillDuration(){
-            if(countriesDownloaded === 27){
-                return 500
-            }else{
-                return 0
-            }
-        }
 
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
@@ -395,37 +391,19 @@ function renderBarChart(data, metric, countryID) {
             .attr("height", measurements.yScale.bandwidth())
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .merge(selectDataForBarCharts) 
-            .attr("height", measurements.yScale.bandwidth())
-            .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
-            // .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
-            // .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX)+"px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
-            .transition().duration(500).attr("fill", d => setBarColor(d))
-            .transition().duration(1000).attr("y", (d) => measurements.yScale(d[countryID]))
-            .transition().duration(1000).delay(1000).attr("width", (d) => measurements.xScale(d[metric]))
-            
-
-
+            .transition().delay(setSpeed()/2)
+            .attr("fill", d => setBarColor(d))
+            .attr("height", measurements.yScale.bandwidth())
+            .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
+            .attr("y", (d) => measurements.yScale(d[countryID]))
+            .transition().duration(setSpeed()/2).attr("width", (d) => measurements.xScale(d[metric]))
 
             selectDataForBarCharts.exit()
-            
             .transition().duration(500).attr("width", 0)
             .transition().duration(500).delay(500).remove()
-
-            //             // .transition().duration(1000)
-            // .transition().duration((setSpeed()/2)).attr("y", (d) => measurements.yScale(d[countryID]))
-            // .transition().duration((setSpeed()/2)).delay(500)
-            
-            // .attr("width", (d) => measurements.xScale(d[metric]))
-
-
-
-            // selectDataForBarCharts.exit()
-            // .transition().duration(500).delay(500).attr("width", 0)
-            // .transition().duration(1000).delay(500).remove()
-
     }
 
     function renderVerticalBars(data, measurements, metric, countryID) {
@@ -444,24 +422,31 @@ function renderBarChart(data, metric, countryID) {
             .attr("height", 0)
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
-            // .attr("class", d => {return `${d[countryID]} ${metric}`})
+            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
+            .on("mousemove",(event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX)+"px"))
+            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
+            
+            .transition().delay(500)
+   
        
             .attr("transform", `translate(0, ${measurements.margin.top})`)
             .attr('width', measurements.xScale.bandwidth())
             .attr('x', (d) => measurements.xScale(d[countryID]))
-            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
-            .on("mousemove",(event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX)+"px"))
-            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
+
             .transition()
             .ease(d3.easeLinear)
             .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
             .attr("fill", d => setBarColor(d))
-          
-        // .on('end',  d => renderValuesInBars(data, metric, countryID, measurements))  
+            .on('end',  console.log('transition ended'))  
 
-        selectDataForBarCharts.exit().remove()
+        selectDataForBarCharts.exit()
+            .transition().duration(500).attr("height", 0).attr("y", d => measurements.yScale(0)).remove()
+
+            
+
+        
     }
 
     function setBarColor(data) {
