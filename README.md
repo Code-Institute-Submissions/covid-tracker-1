@@ -50,6 +50,14 @@ https://dzone.com/articles/javascript-convert-date
 
 <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
 
+https://stackoverflow.com/questions/65875370/how-do-i-use-d3-transition-end-to-invoke-a-function-after-the-transition-has-com
+
+https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
+
+https://www.w3schools.com/tags/att_data-.asp
+
+https://chartio.com/resources/tutorials/how-to-show-data-on-mouseover-in-d3js/
+
 https://stackoverflow.com/questions/179355/clearing-all-cookies-with-javascript/33366171#33366171
 
 https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
