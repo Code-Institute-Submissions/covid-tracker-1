@@ -151,9 +151,11 @@ function sortByHighestValues(data, metric) {
 
 function setSpeed() {
 
-    if (countriesDownloaded !== 27) { return 5000 }
+    if (countriesDownloaded !== 27) { return 4500}
     else { return 1000 }
 }
+
+
 
 function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
@@ -361,6 +363,7 @@ function renderBarChart(data, metric, countryID) {
 
         d3.select("svg")
             .selectAll("g.y.axis")
+            .transition().delay(500)
             .call(yAxis)
             .selectAll('.tick line').remove()
     }
@@ -373,6 +376,14 @@ function renderBarChart(data, metric, countryID) {
 
     function renderHorizontalBars(data, measurements, metric, countryID) {
 
+        function fillDuration(){
+            if(countriesDownloaded === 27){
+                return 500
+            }else{
+                return 0
+            }
+        }
+
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
             .data(data, d => d[countryID])
@@ -383,9 +394,7 @@ function renderBarChart(data, metric, countryID) {
             .attr("width", 0)
             .attr("height", measurements.yScale.bandwidth())
             .attr("y", (d) => measurements.yScale(d[countryID]))
-            .merge(selectDataForBarCharts)
-            // .attr("class", d => {return `${d[countryID]} ${metric}`})
-            
+            .merge(selectDataForBarCharts) 
             .attr("height", measurements.yScale.bandwidth())
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             // .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
@@ -393,14 +402,29 @@ function renderBarChart(data, metric, countryID) {
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX)+"px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
-            .transition().duration(1000).attr("fill", d => setBarColor(d))
-            .transition().duration(500).attr("y", (d) => measurements.yScale(d[countryID]))
-            .transition().duration(setSpeed() - 500).delay(500)
-            .attr("width", (d) => measurements.xScale(d[metric]))
+            .transition().duration(500).attr("fill", d => setBarColor(d))
+            .transition().duration(1000).attr("y", (d) => measurements.yScale(d[countryID]))
+            .transition().duration(1000).delay(1000).attr("width", (d) => measurements.xScale(d[metric]))
+            
 
 
 
-            selectDataForBarCharts.exit().remove()
+            selectDataForBarCharts.exit()
+            
+            .transition().duration(500).attr("width", 0)
+            .transition().duration(500).delay(500).remove()
+
+            //             // .transition().duration(1000)
+            // .transition().duration((setSpeed()/2)).attr("y", (d) => measurements.yScale(d[countryID]))
+            // .transition().duration((setSpeed()/2)).delay(500)
+            
+            // .attr("width", (d) => measurements.xScale(d[metric]))
+
+
+
+            // selectDataForBarCharts.exit()
+            // .transition().duration(500).delay(500).attr("width", 0)
+            // .transition().duration(1000).delay(500).remove()
 
     }
 
