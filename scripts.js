@@ -256,6 +256,13 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
 function renderBarChart(data, metric, countryID) {
 
+       let tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+
 
     function setMargins() {
 
@@ -386,7 +393,7 @@ function renderBarChart(data, metric, countryID) {
 
     function renderVerticalBars(data, measurements, metric, countryID) {
 
-
+      
 
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
@@ -405,9 +412,26 @@ function renderBarChart(data, metric, countryID) {
             .attr("transform", `translate(0, ${measurements.margin.top})`)
             .attr('width', measurements.xScale.bandwidth())
             .attr('x', (d) => measurements.xScale(d[countryID]))
+        .on("mouseover", function(event, d){
+            console.log(d)
+            tooltip.text(d.country); 
+            return tooltip.style("visibility", "visible");})
+      .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+      .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+
             
-            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements) })
-            .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
+            
+            // .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); console.log('colm') })
+            
+ 
+
+                    
+
+
+            
+
+
+            // .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
             
             .transition()
             .ease(d3.easeLinear)
@@ -658,6 +682,7 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
  
 
             return {
+                ["country"]: euDataSet[index].country,
                 ["countryCode"]: euDataSet[index].countryCode,
                 ["casesPerCapita"]: casesPerCapita
             };
@@ -735,6 +760,7 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
 
     casesPerCapita.push({
+        country: "European Union",
         countryCode: "eu",
         casesPerCapita: euCasesPerCapita,
     });        

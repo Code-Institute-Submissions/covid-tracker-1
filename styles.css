@@ -50,13 +50,7 @@ rect:hover {
     transition: .3s ease-in
 }
 
-/* .hide-element{
-    display: none
-}
 
-.show-element{
-    display: block
-} */
 
 #nav{
     display: none;
@@ -69,6 +63,15 @@ rect:hover {
 }
 
 
+
+#tooltip{
+    background: yellow;
+    color: black;
+}
+
+#tooltip:first-letter {
+    text-transform:capitalize;
+}
 
 
 /* https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option */
