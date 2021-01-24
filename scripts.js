@@ -46,7 +46,7 @@ const euDataSet = [
     { country: "bulgaria", countryCode: "bg", population: 69.515 },
     { country: "croatia", countryCode: "hr", population: 40.582 },
     { country: "cyprus", countryCode: "cy", population: 08.88 },
-    { country: "czech-republic", countryCode: "cz", population: 106.939 },
+    { country: "czechia", countryCode: "cz", population: 106.939 },
     { country: "denmark", countryCode: "dk", population: 58.228 },
     { country: "estonia", countryCode: "ee", population: 13.29 },
     { country: "finland", countryCode: "fi", population: 55.253 },
@@ -393,7 +393,11 @@ function renderBarChart(data, metric, countryID) {
 
     function renderVerticalBars(data, measurements, metric, countryID) {
 
-      
+      function displayToolTip(barData){
+            if(countriesDownloaded < 27){return}
+            tooltip.text(barData.country); 
+            return tooltip.style("visibility", "visible")
+      }
 
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
@@ -412,27 +416,9 @@ function renderBarChart(data, metric, countryID) {
             .attr("transform", `translate(0, ${measurements.margin.top})`)
             .attr('width', measurements.xScale.bandwidth())
             .attr('x', (d) => measurements.xScale(d[countryID]))
-        .on("mouseover", function(event, d){
-            console.log(d)
-            tooltip.text(d.country); 
-            return tooltip.style("visibility", "visible");})
-      .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
-      .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
-
-            
-            
-            // .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); console.log('colm') })
-            
- 
-
-                    
-
-
-            
-
-
-            // .on('mouseout', (event) => { removeComparisons(data, metric, countryID, measurements) })
-            
+            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
+            .on("mousemove", function(){return tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX)+"px")})
+            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
             .transition()
             .ease(d3.easeLinear)
             .duration(setSpeed())
