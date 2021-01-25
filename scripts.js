@@ -159,24 +159,22 @@ function displayToolTip(barData){
 
 
 
-function renderValuesInBars(data, metric, countryID, measurements, barData) {
+function renderValuesInBars(data, metric, countryID, measurements, barData, countriesDownloaded) {
 
 
+    console.log('countriesDownloaded', countriesDownloaded)
+   
 
 
     if (countriesDownloaded < 27) { return }
 
     function calculateFontSize(data) {
-
-
         if (verticalBarChart) {
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
             return ((.2 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
         } else {
             return 12
-
         }
-
     }
 
     function setXValue(countryData, measurements, countryID) {
@@ -190,8 +188,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
     function setYValue(countryData, measurements, metric) {
         if (verticalBarChart) {
-
-            return measurements.yScale(countryData[metric]) + measurements.margin.top - 2
+            return measurements.yScale(countryData[metric]) + measurements.margin.top +10
         } else {
             return (measurements.yScale(countryData[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
         }
@@ -200,18 +197,20 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
 
     function setColor(countryData, barData) {
 
-        if (!verticalBarChart) { return "white" }
+       return "white"
+
+        // if (!verticalBarChart) { return "white" }
 
 
-        let valueToReturn
+        // let valueToReturn
 
-        countryData.countryCode === 'eu' ? valueToReturn = 'orange' : valueToReturn = 'steelBlue'
+        // countryData.countryCode === 'eu' ? valueToReturn = 'orange' : valueToReturn = 'steelBlue'
 
-        if (barData === undefined) { return valueToReturn }
-        if (barData.countryCode === 'eu' && countryData.countryCode === 'eu') { return 'orange' }
-        if (typeof (countryData.comparison) === 'number') { return "steelblue" }
-        if (countryData.comparison.includes("+")) { return "tomato" }
-        return "darkgreen"
+        // if (barData === undefined) { return valueToReturn }
+        // if (barData.countryCode === 'eu' && countryData.countryCode === 'eu') { return 'orange' }
+        // if (typeof (countryData.comparison) === 'number') { return "steelblue" }
+        // if (countryData.comparison.includes("+")) { return "tomato" }
+        // return "darkgreen"
 
 
     }
@@ -239,14 +238,10 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
         .style("visibility", "hidden")
 
     function displayToolTip(barData){
-    if(countriesDownloaded < 27){return}
-    tooltip.text(barData.country); 
-    return tooltip.style("visibility", "visible")
+        if(countriesDownloaded < 27){return}
+        tooltip.text(barData.country); 
+        return tooltip.style("visibility", "visible")
     }
-
-
-
-
 
     function makeBarHover(event){
 
@@ -273,8 +268,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
         if(verticalBarChart){return}
 
         let allBars = [...document.getElementsByTagName("rect")]
-
-        let allBarData = allBars.map(e=>e.__data__)
 
         let countryCodes = allBars.map(e => e.dataset.countryCode)
 
@@ -308,14 +301,15 @@ function renderValuesInBars(data, metric, countryID, measurements, barData) {
         .text(countryData => decideTextToReturn(countryData))
         .on('mouseover', (event) => makeBarHover(event))
         .on('mouseout', (event) => {stopBarHover(event); tooltip.style("visibility", "hidden") })
-        .on("mousemove", (event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+30)+"px"))
+        .on("mousemove", (event) => tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"))
 
         values.exit().remove()
 
 
 }
 
-function renderBarChart(data, metric, countryID) {
+function renderBarChart(data, metric, countryID, countriesDownloaded) {
+
 
     let tooltip = d3.select("body")
         .append("div")
@@ -468,7 +462,7 @@ function renderBarChart(data, metric, countryID) {
             .attr('data-countryCode', d => d.countryCode)
             .merge(selectDataForBarCharts) 
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
-            .on("mousemove", (event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+30)+"px"))
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
             .transition().delay(setSpeed()/2)
             .attr("fill", d => setBarColor(d))
@@ -476,7 +470,11 @@ function renderBarChart(data, metric, countryID) {
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .transition().duration(setSpeed()/2).attr("width", (d) => measurements.xScale(d[metric]))
-            .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements))
+            // .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements))
+             .end()
+            .then(() => {
+                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
+            });
 
             selectDataForBarCharts.exit()
             .transition().duration(500).attr("width", 0)
@@ -501,7 +499,7 @@ function renderBarChart(data, metric, countryID) {
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
-            .on("mousemove",(event) => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX)+"px"))
+            .on("mousemove",(event) => tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
             .transition().delay(500)
             .attr("transform", `translate(0, ${measurements.margin.top})`)
@@ -513,7 +511,8 @@ function renderBarChart(data, metric, countryID) {
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
             .attr("fill", d => setBarColor(d))
-            .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements))
+            // .on("end", ( ) => console.log('finsiehd animation'))
+            .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
                        
 
         selectDataForBarCharts.exit()
@@ -863,7 +862,8 @@ function filterDataByCountry(data){
     return data
 }
 
- function dataForGraphs(startDate, endDate, allData) {
+ function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
+
     
     if (countriesDownloaded === 0) { return }
 
@@ -877,7 +877,7 @@ function filterDataByCountry(data){
 
     setHighlightedCountries()
 
-    renderBarChart(filteredDataByCountry , "casesPerCapita", "countryCode");
+    renderBarChart(filteredDataByCountry , "casesPerCapita", "countryCode", countriesDownloaded);
 }
 
 function removeColonies(jsonData) {
@@ -1005,7 +1005,7 @@ async function processRawData(rawData, countries, failedCalls) {
 
         let endDate = calculateCommonLatestDate(allData)
 
-        dataForGraphs(startDate, endDate, allData)
+        dataForGraphs(startDate, endDate, allData, countriesDownloaded)
 
     }
     getData(countries, false, failedCalls);
