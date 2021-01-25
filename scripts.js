@@ -9,29 +9,29 @@ let expanded = false;
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
 
 function showCheckboxes(checkboxType) {
-  let checkboxes = document.getElementById(checkboxType);
-  if (!expanded) {
-    checkboxes.style.display = "block";
-    expanded = true;
-  } else {
-    checkboxes.style.display = "none";
-    expanded = false;
-  }
+    let checkboxes = document.getElementById(checkboxType);
+    if (!expanded) {
+        checkboxes.style.display = "block";
+        expanded = true;
+    } else {
+        checkboxes.style.display = "none";
+        expanded = false;
+    }
 }
 
-function getUncheckedCountries(){
+function getUncheckedCountries() {
 
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
 
-    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e=>e.id)
+    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.id)
 
-    let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e=>e.class)
+    let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.class)
 
     return unCheckedCountries
 }
 
-function setHighlightedCountries(){
-    highlightedCountries = [...document.getElementsByClassName('highlight-country')].filter(e => e.checked).map(e=>e.id)
+function setHighlightedCountries() {
+    highlightedCountries = [...document.getElementsByClassName('highlight-country')].filter(e => e.checked).map(e => e.id)
 
 }
 
@@ -66,7 +66,7 @@ const euDataSet = [
     { country: "slovenia", countryCode: "si", population: 20.959 },
     { country: "spain", countryCode: "es", population: 473.3 },
     { country: "sweden", countryCode: "se", population: 103.276 },
-  
+
 ];
 
 let countriesDownloaded = 0
@@ -117,13 +117,13 @@ function convertDateFormat(date) {
 
 async function changeRequestedData() {
 
-    let startDate = new Date (document.getElementById("start-date").value)
+    let startDate = new Date(document.getElementById("start-date").value)
 
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
-    
-    startDate = new Date (startDate.setDate(startDate.getDate()-1)).setHours(0, 0, 0, 0)
 
-    let endDate = new Date (document.getElementById("end-date").value).setHours(0, 0, 0, 0)
+    startDate = new Date(startDate.setDate(startDate.getDate() - 1)).setHours(0, 0, 0, 0)
+
+    let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0)
 
     let allData = await getDataFromStorage()
 
@@ -148,30 +148,76 @@ function sortByHighestValues(data, metric) {
 
 
 
-function displayToolTip(barData){
-    if(countriesDownloaded < 27){return}
-    tooltip.text(barData.country); 
+function displayToolTip(barData) {
+    if (countriesDownloaded < 27) { return }
+    tooltip.text(barData.country);
     return tooltip.style("visibility", "visible")
 }
 
+var BrowserText = (function () {
+    var canvas = document.createElement('canvas'),
+        context = canvas.getContext('2d');
+
+    /**
+     * Measures the rendered width of arbitrary text given the font size and font face
+     * @param {string} text The text to measure
+     * @param {number} fontSize The font size in pixels
+     * @param {string} fontFace The font face ("Arial", "Helvetica", etc.)
+     * @returns {number} The width of the text
+     **/
+    function getWidth(text, fontSize, fontFace) {
+        context.font = fontSize + 'px ' + fontFace;
+        return context.measureText(text).width;
+    }
+
+    return {
+        getWidth: getWidth
+    };
+})();
 
 
 
 
 
-function renderValuesInBars(data, metric, countryID, measurements, barData, countriesDownloaded) {
 
+function renderValuesInBars(data, metric, countryID, measurements, barData, countriesDownloaded, barWidth) {
 
-    console.log('countriesDownloaded', countriesDownloaded)
-   
 
 
     if (countriesDownloaded < 27) { return }
 
-    function calculateFontSize(data) {
+    function calculateFontSize(countryData, data) {
         if (verticalBarChart) {
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
-            return ((.2 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+            let fontSize =  ((.25 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+
+            let text = decideTextToReturn(countryData)
+
+            
+
+            
+
+            let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
+            let barWidth = measurements.xScale.bandwidth()
+
+    
+
+            
+
+            while(textWidth > .95*barWidth){
+                console.log('text too large', textWidth > .95*barWidth)
+                console.log('countryCode', countryData.countryCode)
+                console.log('text', text)
+                console.log('original fontSize', fontSize)
+                console.log('width of text', textWidth)
+            console.log('width of bar', barWidth)
+                fontSize = fontSize -1
+                textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
+                console.log('newFont Size', fontSize)
+               console.log('-------------')
+            }
+
+            return fontSize
         } else {
             return 12
         }
@@ -188,7 +234,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     function setYValue(countryData, measurements, metric) {
         if (verticalBarChart) {
-            return measurements.yScale(countryData[metric]) + measurements.margin.top +10
+            return measurements.yScale(countryData[metric]) + measurements.margin.top + 15
         } else {
             return (measurements.yScale(countryData[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
         }
@@ -197,7 +243,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     function setColor(countryData, barData) {
 
-       return "white"
+        return "white"
 
         // if (!verticalBarChart) { return "white" }
 
@@ -230,26 +276,26 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         else { return 'central' }
     }
 
-        let tooltip = d3.select("body")
+    let tooltip = d3.select("body")
         .append("div")
         .attr("id", "tooltip")
         .style("position", "absolute")
         .style("z-index", "10")
         .style("visibility", "hidden")
 
-    function displayToolTip(barData){
-        if(countriesDownloaded < 27){return}
-        tooltip.text(barData.country); 
+    function displayToolTip(barData) {
+        if (countriesDownloaded < 27) { return }
+        tooltip.text(barData.country);
         return tooltip.style("visibility", "visible")
     }
 
-    function makeBarHover(event){
+    function makeBarHover(event) {
 
-        if(verticalBarChart){return}
+        if (verticalBarChart) { return }
 
         let allBars = [...document.getElementsByTagName("rect")]
 
-        let allBarData = allBars.map(e=>e.__data__)
+        let allBarData = allBars.map(e => e.__data__)
 
         let countryCodes = allBars.map(e => e.dataset.countryCode)
 
@@ -263,9 +309,9 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     }
 
-    function stopBarHover(event){
+    function stopBarHover(event) {
 
-        if(verticalBarChart){return}
+        if (verticalBarChart) { return }
 
         let allBars = [...document.getElementsByTagName("rect")]
 
@@ -297,16 +343,19 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .attr("x", countryData => setXValue(countryData, measurements, countryID))
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData, barData))
-        .style("font-size", calculateFontSize(data))
+        .style("font-size", countryData => calculateFontSize(countryData, data))
         .text(countryData => decideTextToReturn(countryData))
         .on('mouseover', (event) => makeBarHover(event))
-        .on('mouseout', (event) => {stopBarHover(event); tooltip.style("visibility", "hidden") })
-        .on("mousemove", (event) => tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"))
+        .on('mouseout', (event) => { stopBarHover(event); tooltip.style("visibility", "hidden") })
+        .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+        
 
-        values.exit().remove()
-
+    values.exit().remove()
 
 }
+
+
+
 
 function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
@@ -318,11 +367,11 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         .style("z-index", "10")
         .style("visibility", "hidden")
 
-    function displayToolTip(barData){
-    if(countriesDownloaded < 27){return}
-    tooltip.text(barData.country); 
-    return tooltip.style("visibility", "visible")
-}
+    function displayToolTip(barData) {
+        if (countriesDownloaded < 27) { return }
+        tooltip.text(barData.country);
+        return tooltip.style("visibility", "visible")
+    }
 
 
 
@@ -412,11 +461,11 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         if (!verticalBarChart) { return }
 
         d3.select("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .selectAll("g.x.axis")
-        .transition().delay(500)
-        .call(xAxis)
+            .attr("width", width)
+            .attr("height", height)
+            .selectAll("g.x.axis")
+            .transition().delay(500)
+            .call(xAxis)
 
 
 
@@ -427,24 +476,24 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
         d3.select("svg")
             .selectAll("g.y.axis")
-            .transition().delay(setSpeed()/2)
+            .transition().delay(setSpeed() / 2)
             .call(yAxis)
             .selectAll('.tick line').remove()
     }
 
-    function displayToolTip(barData){
-    if(countriesDownloaded < 27){return}
-    tooltip.text(barData.country); 
-    return tooltip.style("visibility", "visible")
-}
+    function displayToolTip(barData) {
+        if (countriesDownloaded < 27) { return }
+        tooltip.text(barData.country);
+        return tooltip.style("visibility", "visible")
+    }
 
- 
+
 
     function setSpeed() {
 
-    if (countriesDownloaded !== 27) { return 4500}
-    else { return 1000 }
-}
+        if (countriesDownloaded !== 27) { return 4500 }
+        else { return 1000 }
+    }
 
     function renderHorizontalBars(data, measurements, metric, countryID) {
 
@@ -460,36 +509,32 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("height", measurements.yScale.bandwidth())
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .attr('data-countryCode', d => d.countryCode)
-            .merge(selectDataForBarCharts) 
+            .merge(selectDataForBarCharts)
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
-            .on("mousemove", (event) => tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"))
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
-            .transition().delay(setSpeed()/2)
+            .transition().delay(setSpeed() / 2)
             .attr("fill", d => setBarColor(d))
             .attr("height", measurements.yScale.bandwidth())
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .attr("y", (d) => measurements.yScale(d[countryID]))
-            .transition().duration(setSpeed()/2).attr("width", (d) => measurements.xScale(d[metric]))
+            .transition().duration(setSpeed() / 2).attr("width", (d) => measurements.xScale(d[metric]))
             // .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements))
-             .end()
+            .end()
             .then(() => {
                 renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
             });
 
-            selectDataForBarCharts.exit()
+        selectDataForBarCharts.exit()
             .transition().duration(500).attr("width", 0)
             .transition().duration(500).delay(500).remove()
     }
 
     function renderVerticalBars(data, measurements, metric, countryID) {
 
-
-
-
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
             .data(data, d => d[countryID])
-
 
         selectDataForBarCharts
             .enter()
@@ -499,7 +544,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
-            .on("mousemove",(event) => tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"))
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
             .transition().delay(500)
             .attr("transform", `translate(0, ${measurements.margin.top})`)
@@ -511,19 +556,17 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
             .attr("y", (d) => measurements.yScale(d[metric]))
             .attr("fill", d => setBarColor(d))
-            // .on("end", ( ) => console.log('finsiehd animation'))
-            .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
-                       
+            .on("end", () => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
+
 
         selectDataForBarCharts.exit()
             .transition().duration(500).attr("height", 0).attr("y", d => measurements.yScale(0)).remove()
-              
     }
 
     function setBarColor(data) {
 
-        if(highlightedCountries.includes(data.countryCode)){return 'orange'}
-        else{return "steelBlue"}
+        if (highlightedCountries.includes(data.countryCode)) { return 'orange' }
+        else { return "steelBlue" }
     }
 
     function removeComparisons(data, metric, countryID, measurements) {
@@ -686,7 +729,7 @@ function filterDataByDates(allData, startDate, endDate) {
         if (country === null) { return null }
         let filteredData = country.filter(dailyData => {
             let jsDate = new Date(dailyData.date).setHours(0, 0, 0, 0)
-            
+
             if (jsDate >= startDate && jsDate <= endDate) { return dailyData }
         })
 
@@ -723,37 +766,36 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
             //prevent countries that haven't been downloaded yet from causing errors
 
             if (country === null) { return null }
-            
+
             let firstDateData
 
-            let latestDateData 
+            let latestDateData
 
-            if(country.length === 0){
+            if (country.length === 0) {
                 firstDateData = 0
                 latestDateData = 0
-            }else if(country.length === 1){
+            } else if (country.length === 1) {
                 firstDateData = 0
                 latestDateData = country[country.length - 1].casesToDate;
             }
-            else if(country[0].firstDayOfData){
+            else if (country[0].firstDayOfData) {
                 firstDateData = 0
-                latestDateData = country[country.length -1].casesToDate
+                latestDateData = country[country.length - 1].casesToDate
             }
-            else
-            {
+            else {
                 firstDateData = country[0].casesToDate
-                latestDateData = country[country.length -1].casesToDate
+                latestDateData = country[country.length - 1].casesToDate
             }
-            
-    
+
+
 
             // if(firstDateData === latestDateData){firstDateData = 0}
 
-            let casesPerCapita = ((latestDateData - firstDateData)/ euDataSet[index].population).toFixed(3)
+            let casesPerCapita = ((latestDateData - firstDateData) / euDataSet[index].population).toFixed(3)
 
-            if(casesPerCapita > 0.49){casesPerCapita = Math.round(casesPerCapita)}
+            if (casesPerCapita > 0.49) { casesPerCapita = Math.round(casesPerCapita) }
 
- 
+
 
             return {
                 ["country"]: euDataSet[index].country,
@@ -763,9 +805,9 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
 
         })
         //remove countries that haven't been downloaded yet & countries without data
-        .filter(country => country !== undefined && country!==null && country.casesPerCapita > 0)
+        .filter(country => country !== undefined && country !== null && country.casesPerCapita > 0)
 
-  
+
 
     return casesPerCapita
 
@@ -799,21 +841,20 @@ function calculateTotalEUCases(allData) {
         .forEach((country) => {
             let firstDateDate, latestDateData
 
-            if(country.length === 0){
+            if (country.length === 0) {
                 firstDateData = 0
                 latestDateData = 0
-            }else if(country.length === 1){
+            } else if (country.length === 1) {
                 firstDateData = 0
                 latestDateData = country[country.length - 1].casesToDate;
             }
-            else if(country[0].firstDayOfData){
+            else if (country[0].firstDayOfData) {
                 firstDateData = 0
-                latestDateData = country[country.length -1].casesToDate
+                latestDateData = country[country.length - 1].casesToDate
             }
-            else
-            {
+            else {
                 firstDateData = country[0].casesToDate
-                latestDateData = country[country.length -1].casesToDate
+                latestDateData = country[country.length - 1].casesToDate
             }
 
 
@@ -827,57 +868,57 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
     let totalEuCases = calculateTotalEUCases(allData)
 
-    if(totalEuCases <5){return casesPerCapita}
+    if (totalEuCases < 5) { return casesPerCapita }
 
     let euPopulation = calculateEUPopulation()
 
     let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3)
 
-    if(euCasesPerCapita > 0.49){euCasesPerCapita = Math.round(euCasesPerCapita)}
+    if (euCasesPerCapita > 0.49) { euCasesPerCapita = Math.round(euCasesPerCapita) }
 
 
     casesPerCapita.push({
         country: "european union",
         countryCode: "eu",
         casesPerCapita: euCasesPerCapita,
-    });        
+    });
 
     return casesPerCapita
-   
+
 }
 
 
 
-function filterDataByCountry(data){
+function filterDataByCountry(data) {
 
     let countriesToDelete = getUncheckedCountries()
 
-    let countryCodes = data.map(country=>country.countryCode)
+    let countryCodes = data.map(country => country.countryCode)
 
-    let indexesToDelete = countriesToDelete.map(country => countryCodes.indexOf(country)).sort((a,b)=> b-a)
+    let indexesToDelete = countriesToDelete.map(country => countryCodes.indexOf(country)).sort((a, b) => b - a)
 
     indexesToDelete.forEach(index => {
-        data.splice(index,1)
-    }) 
+        data.splice(index, 1)
+    })
     return data
 }
 
- function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
+function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
 
-    
+
     if (countriesDownloaded === 0) { return }
 
-   
+
 
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate)
 
-    casesPerCapita =  getCasesPerCapita(filteredDataByDate, startDate, endDate) 
-    
+    casesPerCapita = getCasesPerCapita(filteredDataByDate, startDate, endDate)
+
     filteredDataByCountry = filterDataByCountry(casesPerCapita)
 
     setHighlightedCountries()
 
-    renderBarChart(filteredDataByCountry , "casesPerCapita", "countryCode", countriesDownloaded);
+    renderBarChart(filteredDataByCountry, "casesPerCapita", "countryCode", countriesDownloaded);
 }
 
 function removeColonies(jsonData) {
@@ -905,7 +946,7 @@ function formatAPIData(countriesOnly) {
                 deathsToDate: dailyData.Deaths,
                 date: dailyData.Date,
             };
-            if(index === 0){objectToReturn.firstDayOfData = true}
+            if (index === 0) { objectToReturn.firstDayOfData = true }
             return objectToReturn
         })
 
@@ -992,7 +1033,7 @@ async function processRawData(rawData, countries, failedCalls) {
 
         countriesDownloaded = await getNumberOfCountriesDownloaded()
 
-        if (countriesDownloaded === 27){
+        if (countriesDownloaded === 27) {
             displayNav()
             setDefaultDates()
         }
@@ -1017,10 +1058,10 @@ function makeAPICalls(countries, failedCalls) {
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
             .splice(0, 10)
-           
 
-            
-     
+
+
+
             .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
     ).then((rawData) => {
         processRawData(rawData, countries, failedCalls);
@@ -1045,3 +1086,7 @@ function getData(countries, firstCall, failedCalls) {
 
 setBarChartType()
 getData([...eu], true, []);
+
+
+
+
