@@ -271,13 +271,13 @@ function updateXAxis(width, height, xAxis) {
 
 
 
-    function displayToolTip(barData) {
-        console.log('displayToolTip')
-        if (countriesDownloaded < 27) { return }
-        tooltip.text(barData.country);
-        // return tooltip.style("visibility", "visible")
-        tooltip.style("visibility", "visible")
-    }
+function displayToolTip(barData) {
+
+    if (countriesDownloaded < 27) { return }
+    tooltip.text(barData.country);
+
+    tooltip.style("visibility", "visible")
+}
 
 
 
@@ -376,12 +376,8 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         else { return 'central' }
     }
 
-
-
-    function makeBarHover(event) {
-
-        if (verticalBarChart) { return }
-
+ 
+    function applyHoverEffectsToBar(event) {
         let allBars = [...document.getElementsByTagName("rect")]
 
         let allBarData = allBars.map(e => e.__data__)
@@ -394,13 +390,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
         displayToolTip(allBarData[index])
         tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px")
-       
-
     }
 
-    function stopBarHover(event) {
+    function removeHoverEffectsFromBar(event) {
 
-        if (verticalBarChart) { return }
+        tooltip.style("visibility", "hidden")
 
         let allBars = [...document.getElementsByTagName("rect")]
 
@@ -409,7 +403,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         let index = countryCodes.indexOf(event.target.dataset.countryCode)
 
         document.getElementsByTagName("rect")[index].style.opacity = "1"
-
     }
 
 
@@ -432,9 +425,9 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .style("font-size", countryData => calculateFontSize(countryData, data))
         .style("opacity", "1")
         .text(countryData => decideTextToReturn(countryData, metric))
-        .on('mouseover', (event, barData) => {makeBarHover(event);  displayComparisons(event, barData, data, metric, countryID, measurements) })
+        .on('mouseover', (event, barData) => {applyHoverEffectsToBar(event);  displayComparisons(event, barData, data, metric, countryID, measurements) })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        .on('mouseout', (event, barData) => { stopBarHover(event); tooltip.style("visibility", "hidden"); removeComparisons(data, metric, countryID, measurements) })
+        .on('mouseout', (event, barData) => { removeHoverEffectsFromBar(event); removeComparisons(data, metric, countryID, measurements) })
         
 
         
@@ -611,6 +604,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr('width', setBarMaxWidth (data, countryID, measurements, metric))
             .attr("height", 0)
             .attr('y', d => measurements.yScale(0))
+            .attr('data-countryCode', d => d.countryCode)
             .merge(selectDataForBarCharts)
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
@@ -691,10 +685,6 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 };
 
 function displayComparisons(event, barData, data, metric, countryID, measurements) {
-
-    console.log('data', barData)
-
-    console.log('data', data)
 
     let comparisons = calculateComparisons(data, barData)
 
@@ -949,7 +939,6 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
     let euPopulation = calculateEUPopulation()
 
     let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(4)
-    console.log('euCasesPerCapita', euCasesPerCapita)
 
     if((totalEuCases / euPopulation).toFixed(3)>0.000){
         euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3)
