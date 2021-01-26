@@ -588,7 +588,12 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .transition().duration(setSpeed() / 2).attr("width", (d) => measurements.xScale(d[metric]))
-            .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
+             //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
+            .end()
+            .then(() => {
+                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
+            });
+        
       
 
         selectDataForBarCharts.exit()
@@ -630,11 +635,18 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
            
             .attr("y", (d) => measurements.yScale(d[metric]))
             .attr("fill", d => setBarColor(d))
-            .on("end", () => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
+            //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
+            .end()
+            .then(() => {
+                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
+            });
+        
 
 
         selectDataForBarCharts.exit()
             .transition().duration(500).attr("height", 0).attr("y", d => measurements.yScale(0)).remove()
+
+            
     }
 
     function setBarColor(data) {
