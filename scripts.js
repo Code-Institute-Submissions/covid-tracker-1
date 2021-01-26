@@ -29,6 +29,13 @@ date: "2021-01-25T00:00:00Z",
 deathsToDate: 4859}]
 ]
 
+//https://www.w3schools.com/jsref/prop_win_innerheight.asp
+
+let windowHeight= window.innerHeight;
+
+let windowWidth = window.innerWidth
+
+
 let expanded = false;
 let allCountriesDownloaded = false
 
@@ -147,6 +154,8 @@ function convertDateFormat(date) {
 
 async function changeRequestedData() {
 
+    [...document.getElementsByClassName("values-in-bar")].forEach(e => e.style.opacity = "0")
+
     let startDate = new Date(document.getElementById("start-date").value)
 
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
@@ -165,7 +174,7 @@ async function changeRequestedData() {
 
 
 function setBarChartType() {
-    if (screen.width > screen.height) { verticalBarChart = true }
+    if (windowWidth > windowHeight) { verticalBarChart = true }
 }
 
 
@@ -263,10 +272,15 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     if (countriesDownloaded < 27) { return }
 
+    
+
+    console.log('in render values in bars')
+    console.log('countriesDownloaded', countriesDownloaded)
+
     function calculateFontSize(countryData, data) {
         if (verticalBarChart) {
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
-            let fontSize =  ((.25 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
+            let fontSize =  ((.25 / data.length) * Math.max(windowWidth || 0, window.innerWidth || 0)).toString()
 
             let text = decideTextToReturn(countryData, metric)
             let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
@@ -336,9 +350,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
     }
 
     function decideTextToReturn(countryData, metric) {
-        console.log('country', countryData.country)
-        console.log('countryData[metric]', countryData[metric])
-        console.log('countryData[metric]===0', countryData[metric]===0)
         if(countryData[metric]<0.001){return ''}
         if (countryData.comparison !== undefined) { return countryData.comparison }
         else { return countryData[metric] }
@@ -409,11 +420,10 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
     values
         .enter()
         .append("text")
-
         .attr("y", 0)
-        .style("opacity", "1")
         .merge(values)
         .attr("class", metric)
+        .attr("class", "value-in-bar")
         .attr('text-anchor', setTextAnchor())
         .attr('alignment-baseline', setAlignmentBaseline())
         .attr('data-countryCode', d => d.countryCode)
@@ -421,6 +431,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData, barData))
         .style("font-size", countryData => calculateFontSize(countryData, data))
+        .style("opacity", "1")
         .text(countryData => decideTextToReturn(countryData, metric))
         .on('mouseover', (event) => makeBarHover(event))
         .on('mouseout', (event) => { stopBarHover(event); tooltip.style("visibility", "hidden") })
@@ -591,13 +602,6 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     function renderVerticalBars(data, measurements, metric, countryID) {
 
-        console.log('in render vertical bars')
-
-        // console.log('data[0][metric]', data[0][metric])
-
-        // console.log('x', measurements.xScale(data[0][countryID]))
-        // console.log('y', measurements.yScale(data[0][metric]))
-        // console.log('height', measurements.innerHeight - measurements.yScale(data[0][metric]))
 
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
@@ -651,12 +655,9 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     data = sortByHighestValues(data, metric)
 
-    // https://www.w3schools.com/jsref/prop_screen_height.asp
 
-    // https://www.w3schools.com/jsref/prop_screen_width.asp
-
-    const width = 0.9 * screen.width
-    const height = 0.8 * screen.height
+    const width = 0.9 * windowWidth
+    const height = 0.8 * windowHeight
     const margin = setMargins()
     const innerHeight = height - margin.top - margin.bottom
     const innerWidth = width - margin.left - margin.right
@@ -664,12 +665,11 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     const yScale = setYScale(metric, innerHeight, data, countryID)
     const xScale = setXScale(data, countryID, margin, innerWidth, metric)
 
-    // console.log('xScale', xScale)
+
 
     const yAxis = d3.axisLeft(yScale);
     const xAxis = d3.axisBottom(xScale).ticks(0);
 
-    // console.log('xAxis', xAxis)
 
 
     if (!barChartAxisRendered) {
@@ -941,21 +941,28 @@ function calculateTotalEUCases(allData) {
 
 function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
-    console.log('includeEUInCasesPerCapita')
+  
 
     let totalEuCases = calculateTotalEUCases(allData)
 
-    console.log('totalEuCases', totalEuCases)
-
-    // if (totalEuCases < 5) { return casesPerCapita }
 
     let euPopulation = calculateEUPopulation()
 
-    let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3)
-
-    if (euCasesPerCapita > 0.49) { euCasesPerCapita = Math.round(euCasesPerCapita) }
-
+    let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(4)
     console.log('euCasesPerCapita', euCasesPerCapita)
+
+    if((totalEuCases / euPopulation).toFixed(3)>0.000){
+        euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3)
+    }
+    
+
+
+    if(euCasesPerCapita === 0.000){euCasesPerCapita = totalEuCases / euPopulation}
+
+
+    if (euCasesPerCapita > 1) { euCasesPerCapita = Math.round(euCasesPerCapita) }
+
+ 
 
 
     casesPerCapita.push({

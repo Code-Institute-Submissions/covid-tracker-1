@@ -52,6 +52,8 @@ https://dzone.com/articles/javascript-convert-date
 
 https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
 
+https://www.w3schools.com/jsref/prop_win_innerheight.asp
+
 https://stackoverflow.com/questions/65875370/how-do-i-use-d3-transition-end-to-invoke-a-function-after-the-transition-has-com
 
 https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
