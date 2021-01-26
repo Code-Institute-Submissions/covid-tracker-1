@@ -2,7 +2,35 @@
 
 //TO DO: Fix Bug. If screen size changes values/comparisons will change size even though bar size has not
 
+let backUpData = [
+    [{casesToDate: 404714,
+date: "2021-01-24T00:00:00Z",
+deathsToDate: 7418}, {casesToDate: 405723,
+date: "2021-01-25T00:00:00Z",
+deathsToDate: 7451}], 
+
+[{casesToDate: 693666,
+date: "2021-01-24T00:00:00Z",
+deathsToDate: 20779}, {casesToDate: 694858,
+date: "2021-01-25T00:00:00Z",
+deathsToDate: 20814},
+],
+
+[{casesToDate: 214817,
+date: "2021-01-24T00:00:00Z",
+deathsToDate: 8820}, {casesToDate: 215589,
+date: "2021-01-25T00:00:00Z",
+deathsToDate: 8880}],
+
+[{casesToDate: 228920,
+date: "2021-01-24T00:00:00Z",
+deathsToDate: 4827}, {casesToDate: 229054,
+date: "2021-01-25T00:00:00Z",
+deathsToDate: 4859}]
+]
+
 let expanded = false;
+let allCountriesDownloaded = false
 
 
 
@@ -154,6 +182,8 @@ function displayToolTip(barData) {
     return tooltip.style("visibility", "visible")
 }
 
+
+//https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
 var BrowserText = (function () {
     var canvas = document.createElement('canvas'),
         context = canvas.getContext('2d');
@@ -192,11 +222,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
             let fontSize =  ((.25 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
 
             let text = decideTextToReturn(countryData)
-
-            
-
-            
-
             let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
             let barWidth = measurements.xScale.bandwidth()
 
@@ -205,16 +230,10 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
             
 
             while(textWidth > .95*barWidth){
-                console.log('text too large', textWidth > .95*barWidth)
-                console.log('countryCode', countryData.countryCode)
-                console.log('text', text)
-                console.log('original fontSize', fontSize)
-                console.log('width of text', textWidth)
-            console.log('width of bar', barWidth)
+
                 fontSize = fontSize -1
                 textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
-                console.log('newFont Size', fontSize)
-               console.log('-------------')
+      
             }
 
             return fontSize
@@ -359,6 +378,8 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
 function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
+  
+
 
     let tooltip = d3.select("body")
         .append("div")
@@ -490,9 +511,13 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
 
     function setSpeed() {
+        
+        if (!allCountriesDownloaded) { 
 
-        if (countriesDownloaded !== 27) { return 4500 }
-        else { return 1000 }
+            return 4500 }
+        else { 
+
+            return 1000 }
     }
 
     function renderHorizontalBars(data, measurements, metric, countryID) {
@@ -519,16 +544,15 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .transition().duration(setSpeed() / 2).attr("width", (d) => measurements.xScale(d[metric]))
-            // .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements))
-            .end()
-            .then(() => {
-                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
-            });
+            .on("end", ( ) => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
+      
 
         selectDataForBarCharts.exit()
             .transition().duration(500).attr("width", 0)
             .transition().duration(500).delay(500).remove()
     }
+
+
 
     function renderVerticalBars(data, measurements, metric, countryID) {
 
@@ -912,6 +936,8 @@ function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
 
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate)
 
+    console.log('filteredDataByDate', filteredDataByDate)
+
     casesPerCapita = getCasesPerCapita(filteredDataByDate, startDate, endDate)
 
     filteredDataByCountry = filterDataByCountry(casesPerCapita)
@@ -1033,7 +1059,11 @@ async function processRawData(rawData, countries, failedCalls) {
 
         countriesDownloaded = await getNumberOfCountriesDownloaded()
 
+        console.log('countriesDownloaded', countriesDownloaded)
+
+
         if (countriesDownloaded === 27) {
+            allCountriesDownloaded = true
             displayNav()
             setDefaultDates()
         }
