@@ -154,7 +154,7 @@ function convertDateFormat(date) {
 
 async function changeRequestedData() {
 
-    [...document.getElementsByClassName("values-in-bar")].forEach(e => e.style.opacity = "0")
+    d3.selectAll(".values-in-bar").style("opacity", "0")
 
     let startDate = new Date(document.getElementById("start-date").value)
 
@@ -268,14 +268,16 @@ function updateXAxis(width, height, xAxis) {
 
 function renderValuesInBars(data, metric, countryID, measurements, barData, countriesDownloaded, barWidth) {
 
+    console.log('in render values in bars')
+
+    console.log('data', data.length)
+
 
 
     if (countriesDownloaded < 27) { return }
 
     
 
-    console.log('in render values in bars')
-    console.log('countriesDownloaded', countriesDownloaded)
 
     function calculateFontSize(countryData, data) {
         if (verticalBarChart) {
@@ -420,10 +422,8 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
     values
         .enter()
         .append("text")
-        .attr("y", 0)
         .merge(values)
-        .attr("class", metric)
-        .attr("class", "value-in-bar")
+        .attr("class", `${metric} values-in-bar`)
         .attr('text-anchor', setTextAnchor())
         .attr('alignment-baseline', setAlignmentBaseline())
         .attr('data-countryCode', d => d.countryCode)
