@@ -43,7 +43,12 @@ let allCountriesDownloaded = false
 
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
 
-
+let tooltip = d3.select("body")
+    .append("div")
+    .attr("id", "tooltip")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
 
 let highlightedCountries = ["eu"]
 
@@ -266,13 +271,17 @@ function updateXAxis(width, height, xAxis) {
 
 
 
+    function displayToolTip(barData) {
+        console.log('displayToolTip')
+        if (countriesDownloaded < 27) { return }
+        tooltip.text(barData.country);
+        // return tooltip.style("visibility", "visible")
+        tooltip.style("visibility", "visible")
+    }
+
+
+
 function renderValuesInBars(data, metric, countryID, measurements, barData, countriesDownloaded, barWidth) {
-
-    console.log('in render values in bars')
-
-    console.log('data', data.length)
-
-
 
     if (countriesDownloaded < 27) { return }
 
@@ -367,18 +376,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         else { return 'central' }
     }
 
-    let tooltip = d3.select("body")
-        .append("div")
-        .attr("id", "tooltip")
-        .style("position", "absolute")
-        .style("z-index", "10")
-        .style("visibility", "hidden")
 
-    function displayToolTip(barData) {
-        if (countriesDownloaded < 27) { return }
-        tooltip.text(barData.country);
-        return tooltip.style("visibility", "visible")
-    }
 
     function makeBarHover(event) {
 
@@ -394,8 +392,9 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
         document.getElementsByTagName("rect")[index].style.opacity = "0.5"
 
-
         displayToolTip(allBarData[index])
+        tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px")
+       
 
     }
 
@@ -433,38 +432,30 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .style("font-size", countryData => calculateFontSize(countryData, data))
         .style("opacity", "1")
         .text(countryData => decideTextToReturn(countryData, metric))
-        .on('mouseover', (event) => makeBarHover(event))
-        .on('mouseout', (event) => { stopBarHover(event); tooltip.style("visibility", "hidden") })
+        .on('mouseover', (event, barData) => {makeBarHover(event);  displayComparisons(event, barData, data, metric, countryID, measurements) })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+        .on('mouseout', (event, barData) => { stopBarHover(event); tooltip.style("visibility", "hidden"); removeComparisons(data, metric, countryID, measurements) })
+        
+
+        
         
 
     values.exit().remove()
 
 }
 
-
-
-
-function renderBarChart(data, metric, countryID, countriesDownloaded) {
-
-  
-
-
-    let tooltip = d3.select("body")
-        .append("div")
-        .attr("id", "tooltip")
-        .style("position", "absolute")
-        .style("z-index", "10")
-        .style("visibility", "hidden")
-
-    function displayToolTip(barData) {
-        if (countriesDownloaded < 27) { return }
-        tooltip.text(barData.country);
-        return tooltip.style("visibility", "visible")
+    function removeComparisons(data, metric, countryID, measurements) {
+        let dataWithOutComparisons = data.map(countryData => {
+            delete countryData.comparison
+            return countryData
+        })
+        renderValuesInBars(data, metric, countryID, measurements)
     }
 
 
 
+
+function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     function setMargins() {
 
@@ -655,13 +646,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         else { return "steelBlue" }
     }
 
-    function removeComparisons(data, metric, countryID, measurements) {
-        let dataWithOutComparisons = data.map(countryData => {
-            delete countryData.comparison
-            return countryData
-        })
-        renderValuesInBars(data, metric, countryID, measurements)
-    }
+
 
 
 
@@ -707,6 +692,9 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
 function displayComparisons(event, barData, data, metric, countryID, measurements) {
 
+    console.log('data', barData)
+
+    console.log('data', data)
 
     let comparisons = calculateComparisons(data, barData)
 
@@ -1168,7 +1156,8 @@ function makeAPICalls(countries, failedCalls) {
             .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
     ).then((rawData) => {
         processRawData(rawData, countries, failedCalls);
-    });
+    })
+    .catch(err => console.log('api call error', err));
 };
 
 
