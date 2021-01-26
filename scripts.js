@@ -268,7 +268,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
             let fontSize =  ((.25 / data.length) * Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)).toString()
 
-            let text = decideTextToReturn(countryData)
+            let text = decideTextToReturn(countryData, metric)
             let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
             let barWidth = setBarMaxWidth(data, countryID, measurements, metric)
 
@@ -335,7 +335,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     }
 
-    function decideTextToReturn(countryData) {
+    function decideTextToReturn(countryData, metric) {
+        console.log('country', countryData.country)
+        console.log('countryData[metric]', countryData[metric])
+        console.log('countryData[metric]===0', countryData[metric]===0)
+        if(countryData[metric]<0.001){return ''}
         if (countryData.comparison !== undefined) { return countryData.comparison }
         else { return countryData[metric] }
     }
@@ -417,7 +421,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData, barData))
         .style("font-size", countryData => calculateFontSize(countryData, data))
-        .text(countryData => decideTextToReturn(countryData))
+        .text(countryData => decideTextToReturn(countryData, metric))
         .on('mouseover', (event) => makeBarHover(event))
         .on('mouseout', (event) => { stopBarHover(event); tooltip.style("visibility", "hidden") })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
@@ -937,15 +941,21 @@ function calculateTotalEUCases(allData) {
 
 function includeEUInCasesPerCapita(allData, casesPerCapita) {
 
+    console.log('includeEUInCasesPerCapita')
+
     let totalEuCases = calculateTotalEUCases(allData)
 
-    if (totalEuCases < 5) { return casesPerCapita }
+    console.log('totalEuCases', totalEuCases)
+
+    // if (totalEuCases < 5) { return casesPerCapita }
 
     let euPopulation = calculateEUPopulation()
 
     let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3)
 
     if (euCasesPerCapita > 0.49) { euCasesPerCapita = Math.round(euCasesPerCapita) }
+
+    console.log('euCasesPerCapita', euCasesPerCapita)
 
 
     casesPerCapita.push({
