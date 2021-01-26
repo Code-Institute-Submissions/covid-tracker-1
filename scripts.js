@@ -267,17 +267,28 @@ function updateXAxis(width, height, xAxis) {
             .selectAll("g.x.axis")
             .transition().delay(500)
             .call(xAxis)
+
+        d3.selectAll(".x.axis .tick")
+            .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+            .on("mouseout", () => tooltip.style("visibility", "hidden") )
+    }
+
+    function getCountryName(countryCode){
+
+        if(countryCode === 'eu'){ return 'European Union'}
+
+        let countryCodes = euDataSet.map(e=> e.countryCode)
+
+        let index = countryCodes.indexOf(countryCode)
+
+        return {country: euDataSet[index].country}
+
     }
 
 
 
-function displayToolTip(barData) {
 
-    if (countriesDownloaded < 27) { return }
-    tooltip.text(barData.country);
-
-    tooltip.style("visibility", "visible")
-}
 
 
 
@@ -437,13 +448,24 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
 }
 
-    function removeComparisons(data, metric, countryID, measurements) {
-        let dataWithOutComparisons = data.map(countryData => {
-            delete countryData.comparison
-            return countryData
-        })
-        renderValuesInBars(data, metric, countryID, measurements)
-    }
+function removeComparisons(data, metric, countryID, measurements) {
+    let dataWithOutComparisons = data.map(countryData => {
+        delete countryData.comparison
+        return countryData
+    })
+    renderValuesInBars(data, metric, countryID, measurements)
+}
+
+function setSpeed() {
+
+    
+    if (!allCountriesDownloaded) { 
+
+        return 4500 }
+    else { 
+
+        return 500 }
+}
 
 
 
@@ -485,6 +507,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("class", "x axis")
             .attr("transform", `translate(0, ${innerHeight + margin.top})`)
             .call(xAxis)
+            .selectAll('.tick line').remove()
 
     }
 
@@ -527,26 +550,18 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .transition().delay(setSpeed() / 2)
             .call(yAxis)
             .selectAll('.tick line').remove()
+
+            d3.selectAll(".y.axis .tick")
+            .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+            .on("mouseout", tooltip.style("visibility", "hidden") )
+            
     }
 
-    function displayToolTip(barData) {
-        if (countriesDownloaded < 27) { return }
-        tooltip.text(barData.country);
-        return tooltip.style("visibility", "visible")
-    }
 
 
 
-    function setSpeed() {
 
-        
-        if (!allCountriesDownloaded) { 
-
-            return 4500 }
-        else { 
-
-            return 500 }
-    }
 
     function renderHorizontalBars(data, measurements, metric, countryID) {
 
@@ -1146,7 +1161,14 @@ function makeAPICalls(countries, failedCalls) {
     ).then((rawData) => {
         processRawData(rawData, countries, failedCalls);
     })
-    .catch(err => console.log('api call error', err));
+    .catch((err,i, j )=> {
+         console.log('err', err)
+         console.log('i', i)
+         console.log('j', j)
+         console.log('this', this)
+         console.log('arguments', arguments)
+    
+    });
 };
 
 
