@@ -36,32 +36,6 @@ let allCountriesDownloaded = false
 
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
 
-function showCheckboxes(checkboxType) {
-    let checkboxes = document.getElementById(checkboxType);
-    if (!expanded) {
-        checkboxes.style.display = "block";
-        expanded = true;
-    } else {
-        checkboxes.style.display = "none";
-        expanded = false;
-    }
-}
-
-function getUncheckedCountries() {
-
-    // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
-
-    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.id)
-
-    let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.class)
-
-    return unCheckedCountries
-}
-
-function setHighlightedCountries() {
-    highlightedCountries = [...document.getElementsByClassName('highlight-country')].filter(e => e.checked).map(e => e.id)
-
-}
 
 
 let highlightedCountries = ["eu"]
@@ -108,6 +82,34 @@ let eu = euDataSet.map((e) => e.country);
 const countryCodes = euDataSet.map((e) => e.countryCode)
 
 let verticalBarChart = false
+
+function showCheckboxes(checkboxType) {
+    let checkboxes = document.getElementById(checkboxType);
+    if (!expanded) {
+        checkboxes.style.display = "block";
+        expanded = true;
+    } else {
+        checkboxes.style.display = "none";
+        expanded = false;
+    }
+}
+
+function getUncheckedCountries() {
+
+    // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
+
+    let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.id)
+
+    let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.class)
+
+    return unCheckedCountries
+}
+
+function setHighlightedCountries() {
+    highlightedCountries = [...document.getElementsByClassName('highlight-country')].filter(e => e.checked).map(e => e.id)
+
+}
+
 
 function displayNav() {
 
@@ -183,8 +185,10 @@ function displayToolTip(barData) {
 }
 
 
-//https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
+
 var BrowserText = (function () {
+
+    //https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
     var canvas = document.createElement('canvas'),
         context = canvas.getContext('2d');
 
@@ -206,7 +210,50 @@ var BrowserText = (function () {
 })();
 
 
+function setBarMaxWidth(data, countryID, measurements, metric){
+    let barWidth = measurements.xScale.bandwidth()
+        if(barWidth > 200){
 
+            let widthDifference = 200 - width
+            
+             const xScale = setXScale(data, countryID, measurements.margin, measurements.innerWidth - widthDifference, metric)
+
+             updateXAxis(measurements.width, measurements.height, d3.axisBottom(xScale), measurements.innerHeight)
+        
+            barWidth = 200
+        }
+        return barWidth
+    }   
+
+   
+
+function setXScale(data, countryID, margin, width, metric) {
+
+        if (verticalBarChart) {
+            return d3
+                .scaleBand()
+                .domain(data.map((d) => d[countryID]))
+                .range([margin.left, width])
+                .padding(0.2);
+        } else {
+            return d3
+                .scaleLinear()
+                .domain([0, d3.max(data, (d) => d[metric])])
+                .range([0, width]);
+        }
+    }
+
+function updateXAxis(width, height, xAxis) {
+
+        if (!verticalBarChart) { return }
+
+        d3.select("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .selectAll("g.x.axis")
+            .transition().delay(500)
+            .call(xAxis)
+    }
 
 
 
@@ -223,7 +270,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
             let text = decideTextToReturn(countryData)
             let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
-            let barWidth = measurements.xScale.bandwidth()
+            let barWidth = setBarMaxWidth(data, countryID, measurements, metric)
+
+            
+
+            
 
     
 
@@ -242,9 +293,11 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         }
     }
 
-    function setXValue(countryData, measurements, countryID) {
+    function setXValue(data, metric, countryData, measurements, countryID) {
         if (verticalBarChart) {
-            return measurements.xScale(countryData[countryID]) + measurements.xScale.bandwidth() / 2
+
+
+            return measurements.xScale(countryData[countryID]) +setBarMaxWidth(data, countryID, measurements, metric)/ 2
         } else {
 
             return (measurements.xScale(countryData[metric]) - 8)
@@ -252,8 +305,10 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
     }
 
     function setYValue(countryData, measurements, metric) {
+
+
         if (verticalBarChart) {
-            return measurements.yScale(countryData[metric]) + measurements.margin.top + 15
+            return measurements.yScale(countryData[metric]) + measurements.margin.top + setBarMaxWidth( data, countryID, measurements, metric,  )/3
         } else {
             return (measurements.yScale(countryData[countryID]) + measurements.yScale.bandwidth() / 2 + measurements.margin.top)
         }
@@ -322,7 +377,6 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
         document.getElementsByTagName("rect")[index].style.opacity = "0.5"
 
-        console.log('allBarData[index]', allBarData[index])
 
         displayToolTip(allBarData[index])
 
@@ -359,7 +413,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .attr('text-anchor', setTextAnchor())
         .attr('alignment-baseline', setAlignmentBaseline())
         .attr('data-countryCode', d => d.countryCode)
-        .attr("x", countryData => setXValue(countryData, measurements, countryID))
+        .attr("x", countryData => setXValue(data, metric, countryData, measurements, countryID))
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData, barData))
         .style("font-size", countryData => calculateFontSize(countryData, data))
@@ -420,20 +474,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         }
     }
 
-    function setXScale(data, countryID, margin, width, metric) {
-        if (verticalBarChart) {
-            return d3
-                .scaleBand()
-                .domain(data.map((d) => d[countryID]))
-                .range([margin.left, width])
-                .padding(0.2);
-        } else {
-            return d3
-                .scaleLinear()
-                .domain([0, d3.max(data, (d) => d[metric])])
-                .range([margin.left, innerWidth]);
-        }
-    }
+
 
     function renderXAxis(width, height, margin, xAxis, innerHeight) {
 
@@ -477,20 +518,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     }
 
-    function updateXAxis(width, height, xAxis) {
 
-        if (!verticalBarChart) { return }
-
-        d3.select("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .selectAll("g.x.axis")
-            .transition().delay(500)
-            .call(xAxis)
-
-
-
-    }
 
     function updateYAxis(width, height, yAxis) {
         if (verticalBarChart) { return }
@@ -511,13 +539,14 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
 
     function setSpeed() {
+
         
         if (!allCountriesDownloaded) { 
 
             return 4500 }
         else { 
 
-            return 1000 }
+            return 500 }
     }
 
     function renderHorizontalBars(data, measurements, metric, countryID) {
@@ -554,16 +583,28 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
 
 
+
+
     function renderVerticalBars(data, measurements, metric, countryID) {
+
+        console.log('in render vertical bars')
+
+        // console.log('data[0][metric]', data[0][metric])
+
+        // console.log('x', measurements.xScale(data[0][countryID]))
+        // console.log('y', measurements.yScale(data[0][metric]))
+        // console.log('height', measurements.innerHeight - measurements.yScale(data[0][metric]))
 
         let selectDataForBarCharts = d3.select("svg")
             .selectAll("rect")
             .data(data, d => d[countryID])
+        
+            
 
         selectDataForBarCharts
             .enter()
             .append("rect")
-            .attr('width', measurements.xScale.bandwidth())
+            .attr('width', setBarMaxWidth (data, countryID, measurements, metric))
             .attr("height", 0)
             .attr('y', d => measurements.yScale(0))
             .merge(selectDataForBarCharts)
@@ -572,12 +613,13 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
             .transition().delay(500)
             .attr("transform", `translate(0, ${measurements.margin.top})`)
-            .attr('width', measurements.xScale.bandwidth())
+            .attr('width', setBarMaxWidth (data, countryID, measurements, metric))
             .attr('x', (d) => measurements.xScale(d[countryID]))
             .transition()
             .ease(d3.easeLinear)
             .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
+           
             .attr("y", (d) => measurements.yScale(d[metric]))
             .attr("fill", d => setBarColor(d))
             .on("end", () => renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded))
@@ -618,8 +660,12 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     const yScale = setYScale(metric, innerHeight, data, countryID)
     const xScale = setXScale(data, countryID, margin, innerWidth, metric)
 
+    // console.log('xScale', xScale)
+
     const yAxis = d3.axisLeft(yScale);
     const xAxis = d3.axisBottom(xScale).ticks(0);
+
+    // console.log('xAxis', xAxis)
 
 
     if (!barChartAxisRendered) {
@@ -635,7 +681,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     barChartAxisRendered = true
 
-    let measurements = { yScale, xScale, margin, height, innerHeight }
+    let measurements = { yScale, xScale, margin, height, innerHeight, innerWidth }
 
     verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID)
 
@@ -829,7 +875,8 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
 
         })
         //remove countries that haven't been downloaded yet & countries without data
-        .filter(country => country !== undefined && country !== null && country.casesPerCapita > 0)
+        // .filter(country => country !== undefined && country !== null && country.casesPerCapita > 0)
+        .filter(country => country !== undefined && country !== null)
 
 
 
@@ -935,8 +982,6 @@ function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
 
 
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate)
-
-    console.log('filteredDataByDate', filteredDataByDate)
 
     casesPerCapita = getCasesPerCapita(filteredDataByDate, startDate, endDate)
 
@@ -1059,7 +1104,6 @@ async function processRawData(rawData, countries, failedCalls) {
 
         countriesDownloaded = await getNumberOfCountriesDownloaded()
 
-        console.log('countriesDownloaded', countriesDownloaded)
 
 
         if (countriesDownloaded === 27) {
