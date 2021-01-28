@@ -578,7 +578,9 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .transition().duration(setSpeed() / 2).attr("width", (d) => measurements.xScale(d[metric]))
-             //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
+             
+            .ease(d3.easeBounce)
+            //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
             .end()
             .then(() => {
                 renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
@@ -620,7 +622,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr('width', setBarMaxWidth (data, countryID, measurements, metric))
             .attr('x', (d) => measurements.xScale(d[countryID]))
             .transition()
-            .ease(d3.easeLinear)
+            .ease(d3.easeBounce)
             .duration(setSpeed())
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
            
@@ -1139,7 +1141,6 @@ async function processRawData(rawData, countries, failedCalls) {
 };
 
 function makeAPICalls(countries, failedCalls) {
-    //TO DO: Make this a promise all settled to deal with CORS error. Have a plan for when API is down.
     console.log('countries', countries)
     Promise.all(
         countries
@@ -1152,10 +1153,13 @@ function makeAPICalls(countries, failedCalls) {
         processRawData(rawData, countries, failedCalls);
     })
     .catch((err)=> {
+        console.log('err')
+
+        //TO DO: Make error display on UI if promise fails three times
    
          apiFailedCalls++
-         console.log('apiFailedCalls')
-         if(apiFailedCalls === 3){console.log('api call failed three times')}
+         console.log('apiFailedCalls', apiFailedCalls)
+         if(apiFailedCalls > 2){console.log('api call failed three times')}
         getData([...eu], true, []);
     
     });
