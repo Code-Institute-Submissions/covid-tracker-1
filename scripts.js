@@ -32,13 +32,10 @@ deathsToDate: 4859}]
 //https://www.w3schools.com/jsref/prop_win_innerheight.asp
 
 let windowHeight= window.innerHeight;
-
 let windowWidth = window.innerWidth
-
-
 let expanded = false;
 let allCountriesDownloaded = false
-
+let apiFailedCalls = 0
 
 
 //https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option
@@ -51,7 +48,6 @@ let tooltip = d3.select("body")
     .style("visibility", "hidden")
 
 let highlightedCountries = ["eu"]
-
 const euDataSet = [
     { country: "austria", countryCode: "at", population: 88.588 },
     { country: "belgium", countryCode: "be", population: 89.011 },
@@ -82,18 +78,13 @@ const euDataSet = [
     { country: "sweden", countryCode: "se", population: 103.276 },
 
 ];
-
-let countriesDownloaded = 0
-
-let barChartAxisRendered = false
-
-let latestCommonDate
-
 let eu = euDataSet.map((e) => e.country);
-
 const countryCodes = euDataSet.map((e) => e.countryCode)
-
+let countriesDownloaded = 0
+let barChartAxisRendered = false
+let latestCommonDate = new Date()
 let verticalBarChart = false
+
 
 function showCheckboxes(checkboxType) {
     let checkboxes = document.getElementById(checkboxType);
@@ -1149,24 +1140,23 @@ async function processRawData(rawData, countries, failedCalls) {
 
 function makeAPICalls(countries, failedCalls) {
     //TO DO: Make this a promise all settled to deal with CORS error. Have a plan for when API is down.
+    console.log('countries', countries)
     Promise.all(
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
             .splice(0, 10)
-
-
-
-
             .map((country) => fetch(`https://api.covid19api.com/dayone/country/${country}`))
-    ).then((rawData) => {
+    )
+    .then((rawData) => {
+  
         processRawData(rawData, countries, failedCalls);
     })
-    .catch((err,i, j )=> {
-         console.log('err', err)
-         console.log('i', i)
-         console.log('j', j)
-         console.log('this', this)
-         console.log('arguments', arguments)
+    .catch((err)=> {
+   
+         apiFailedCalls++
+         console.log('apiFailedCalls')
+         if(apiFailedCalls === 3){console.log('api call failed three times')}
+        getData([...eu], true, []);
     
     });
 };
