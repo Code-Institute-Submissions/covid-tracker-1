@@ -97,6 +97,12 @@ function showCheckboxes(checkboxType) {
     }
 }
 
+function collapseCheckboxes(checkboxType){
+    let checkboxes = document.getElementById(checkboxType);
+    checkboxes.style.display = "none";
+    expanded = false;
+}
+
 function getUncheckedCountries() {
 
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
@@ -541,11 +547,11 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         if (verticalBarChart) { return }
 
         d3.select("svg").attr("width", width).attr("height", height)
-            // .append("g")
-            // .attr("transform", `translate(${margin.left}, ${margin.top})`)
-            // .attr("class", "y axis")
-            // .call(yAxis)
-            // .selectAll('.tick line').remove()
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            .attr("class", "y axis")
+            .call(yAxis)
+            .selectAll('.tick line').remove()
 
 
 
@@ -570,16 +576,16 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     function updateYAxis(width, height, yAxis) {
         if (verticalBarChart) { return }
 
-        // d3.select("svg")
-        //     .selectAll("g.y.axis")
-        //     .transition().delay(setSpeed() / 2)
-        //     .call(yAxis)
-        //     .selectAll('.tick line').remove()
+        d3.select("svg")
+            .selectAll("g.y.axis")
+            .transition().delay(setSpeed() / 2)
+            .call(yAxis)
+            .selectAll('.tick line').remove()
 
-        //     d3.selectAll(".y.axis .tick")
-        //     .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
-        //     .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        //     .on("mouseout", tooltip.style("visibility", "hidden") )
+            d3.selectAll(".y.axis .tick")
+            .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+            .on("mouseout", tooltip.style("visibility", "hidden") )
             
     }
 
@@ -1219,8 +1225,8 @@ function getData(countries, firstCall, failedCalls) {
 };
 
 displayNav()
-setBarChartType()
-getData([...eu], true, []);
+// setBarChartType()
+// getData([...eu], true, []);
 
 
 

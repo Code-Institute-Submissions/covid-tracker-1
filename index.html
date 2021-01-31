@@ -20,14 +20,14 @@
 
         <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
      
-            <div class="multiselect">
+            <div class="multiselect" onmouseleave="collapseCheckboxes('select-country-checkboxes')">
                 <div class="selectBox" onclick="showCheckboxes('select-country-checkboxes')">
                 <select>
                     <option>Select Countries</option>
                 </select>
                 <div class="overSelect"></div>
                 </div>
-                <div id="select-country-checkboxes" class="checkboxes">
+                <div id="select-country-checkboxes" class="checkboxes" >
                 <label for="austria">
                     <input type="checkbox" id="at" class="select-country" checked onclick="changeRequestedData()"/>Austria</label>
                 <label for="belgium">
@@ -88,7 +88,7 @@
                 </div>
             </div>
 
-            <div class="multiselect">
+            <div class="multiselect" onmouseleave="collapseCheckboxes('highlight-country-checkboxes')">
                 <div class="selectBox" onclick="showCheckboxes('highlight-country-checkboxes')">
                 <select>
                     <option>Highlight Countries</option>
