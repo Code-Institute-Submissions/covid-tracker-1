@@ -214,14 +214,21 @@ var BrowserText = (function () {
     };
 })();
 
+function getBarWidth(measurements, countryData, metric){
+
+    if(verticalBarChart){return measurements.xScale.bandwidth()}
+    return  measurements.xScale(countryData[metric])
+
+}
+
 
 function setBarMaxWidth(data, countryID, measurements, metric, countryData){
 
-    if(!verticalBarChart){return}
+    // if(!verticalBarChart){return}
 
-    let barWidth = 0
+    let barWidth = getBarWidth(measurements)
 
-    verticalBarChart ? barWidth= measurements.xScale.bandwidth() : barWidth = measurements.xScale(countryData[metric])
+    // verticalBarChart ? barWidth= measurements.xScale.bandwidth() : barWidth = measurements.xScale(countryData[metric])
     
 
         if(barWidth > 200){
@@ -272,17 +279,17 @@ function updateXAxis(width, height, xAxis) {
             .on("mouseout", () => tooltip.style("visibility", "hidden") )
     }
 
-    function getCountryName(countryCode){
+function getCountryName(countryCode){
 
-        if(countryCode === 'eu'){ return 'European Union'}
+    if(countryCode === 'eu'){ return 'European Union'}
 
-        let countryCodes = euDataSet.map(e=> e.countryCode)
+    let countryCodes = euDataSet.map(e=> e.countryCode)
 
-        let index = countryCodes.indexOf(countryCode)
+    let index = countryCodes.indexOf(countryCode)
 
-        return {country: euDataSet[index].country}
+    return {country: euDataSet[index].country}
 
-    }
+}
 
 
 
@@ -298,26 +305,31 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
 
     function calculateFontSize(countryData, data, measurements, metric) {
+            let text = decideTextToReturn(countryData, metric, data, measurements)
+            let textWidth = 0
+            let barWidth = getBarWidth(measurements, countryData, metric)
+            let fontSize = 0
+         
+
         if (verticalBarChart) {
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
-            let fontSize =  ((.25 / data.length) * Math.max(windowWidth || 0, window.innerWidth || 0)).toString()
+            fontSize =  ((.25 / data.length) * Math.max(windowWidth || 0, window.innerWidth || 0)).toString()
+            barWidth = setBarMaxWidth(data, countryID, measurements, metric)
+            textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
 
-            let text = decideTextToReturn(countryData, metric, data, measurements)
-            let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
-            let barWidth = setBarMaxWidth(data, countryID, measurements, metric)
-
-
-            while(textWidth > .95*barWidth){
-
-                fontSize = fontSize -1
-                textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
-      
-            }
-
-            return fontSize
         } else {
-            return 12
+            fontSize = 12
+            textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
         }
+
+        while(textWidth > .95*barWidth){
+
+            fontSize = fontSize -1
+            textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
+    
+        }
+
+        return fontSize
     }
 
     function setXValue(data, metric, countryData, measurements, countryID) {
@@ -330,22 +342,10 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
             let fontSize =  calculateFontSize(countryData, data, measurements, metric)
             let text = decideTextToReturn(countryData, metric)
             let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
-            console.log('country', countryData)
-            console.log('text', text)
-            console.log('textWidth', textWidth)
-            console.log('------')
-            // let barWidth = setBarMaxWidth(data, countryID, measurements, metric, countryData)
-            const numberOfCharacters = (decideTextToReturn(countryData, metric, data, measurements).toString().length)
-            let reduction = 0
-            if(numberOfCharacters === 1){reduction = numberOfCharacters * 5}
-            else if(numberOfCharacters === 2){reduction = numberOfCharacters * 2.5}
-            // else if(numberOfCharacters === 3){reduction = numberOfCharacters * 4}
-            // else if(numberOfCharacters === 4){reduction = numberOfCharacters * 4.7}
-            // else if(numberOfCharacters === 5){reduction = numberOfCharacters * 5}
-            // else if(numberOfCharacters === 6){reduction = numberOfCharacters * 5.5}
-            else if(numberOfCharacters > 2){reduction = numberOfCharacters * (2.7 + numberOfCharacters*0.6)}
 
-            reduction = textWidth/1.3
+            let reduction = 0
+
+            reduction = textWidth -Math.log(10000)
  
             return (measurements.xScale(countryData[metric]) +20 - reduction)
         }
@@ -393,14 +393,12 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
        
 
-        // let fontSize =  calculateFontSize(countryData, data, measurements, metric)
-        // let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
-        // let barWidth = setBarMaxWidth(data, countryID, measurements, metric)
+  
 
         //or make fontSize smaller?
         //below if statement should be if fontsize is below a certain level
 
-        // if(textWidth > barWidth){text = ''}
+     
         return text
     }
 
@@ -543,11 +541,11 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         if (verticalBarChart) { return }
 
         d3.select("svg").attr("width", width).attr("height", height)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`)
-            .attr("class", "y axis")
-            .call(yAxis)
-            .selectAll('.tick line').remove()
+            // .append("g")
+            // .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            // .attr("class", "y axis")
+            // .call(yAxis)
+            // .selectAll('.tick line').remove()
 
 
 
@@ -572,16 +570,16 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     function updateYAxis(width, height, yAxis) {
         if (verticalBarChart) { return }
 
-        d3.select("svg")
-            .selectAll("g.y.axis")
-            .transition().delay(setSpeed() / 2)
-            .call(yAxis)
-            .selectAll('.tick line').remove()
+        // d3.select("svg")
+        //     .selectAll("g.y.axis")
+        //     .transition().delay(setSpeed() / 2)
+        //     .call(yAxis)
+        //     .selectAll('.tick line').remove()
 
-            d3.selectAll(".y.axis .tick")
-            .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
-            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-            .on("mouseout", tooltip.style("visibility", "hidden") )
+        //     d3.selectAll(".y.axis .tick")
+        //     .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
+        //     .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+        //     .on("mouseout", tooltip.style("visibility", "hidden") )
             
     }
 
@@ -1173,7 +1171,7 @@ async function processRawData(rawData, countries, failedCalls) {
 };
 
 function makeAPICalls(countries, failedCalls) {
-    console.log('countries', countries)
+
     Promise.all(
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
