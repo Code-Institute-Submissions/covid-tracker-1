@@ -215,11 +215,18 @@ var BrowserText = (function () {
 })();
 
 
-function setBarMaxWidth(data, countryID, measurements, metric){
-    let barWidth = measurements.xScale.bandwidth()
+function setBarMaxWidth(data, countryID, measurements, metric, countryData){
+
+    if(!verticalBarChart){return}
+
+    let barWidth = 0
+
+    verticalBarChart ? barWidth= measurements.xScale.bandwidth() : barWidth = measurements.xScale(countryData[metric])
+    
+
         if(barWidth > 200){
 
-            let widthDifference = 200 - width
+            let widthDifference = 200 - barWidth
             
              const xScale = setXScale(data, countryID, measurements.margin, measurements.innerWidth - widthDifference, metric)
 
@@ -287,25 +294,18 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     if (countriesDownloaded < 27) { return }
 
-    
 
 
-    function calculateFontSize(countryData, data) {
+
+    function calculateFontSize(countryData, data, measurements, metric) {
         if (verticalBarChart) {
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
             let fontSize =  ((.25 / data.length) * Math.max(windowWidth || 0, window.innerWidth || 0)).toString()
 
-            let text = decideTextToReturn(countryData, metric)
+            let text = decideTextToReturn(countryData, metric, data, measurements)
             let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
             let barWidth = setBarMaxWidth(data, countryID, measurements, metric)
 
-            
-
-            
-
-    
-
-            
 
             while(textWidth > .95*barWidth){
 
@@ -327,7 +327,27 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
             return measurements.xScale(countryData[countryID]) +setBarMaxWidth(data, countryID, measurements, metric)/ 2
         } else {
 
-            return (measurements.xScale(countryData[metric]) - 8)
+            let fontSize =  calculateFontSize(countryData, data, measurements, metric)
+            let text = decideTextToReturn(countryData, metric)
+            let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
+            console.log('country', countryData)
+            console.log('text', text)
+            console.log('textWidth', textWidth)
+            console.log('------')
+            // let barWidth = setBarMaxWidth(data, countryID, measurements, metric, countryData)
+            const numberOfCharacters = (decideTextToReturn(countryData, metric, data, measurements).toString().length)
+            let reduction = 0
+            if(numberOfCharacters === 1){reduction = numberOfCharacters * 5}
+            else if(numberOfCharacters === 2){reduction = numberOfCharacters * 2.5}
+            // else if(numberOfCharacters === 3){reduction = numberOfCharacters * 4}
+            // else if(numberOfCharacters === 4){reduction = numberOfCharacters * 4.7}
+            // else if(numberOfCharacters === 5){reduction = numberOfCharacters * 5}
+            // else if(numberOfCharacters === 6){reduction = numberOfCharacters * 5.5}
+            else if(numberOfCharacters > 2){reduction = numberOfCharacters * (2.7 + numberOfCharacters*0.6)}
+
+            reduction = textWidth/1.3
+ 
+            return (measurements.xScale(countryData[metric]) +20 - reduction)
         }
     }
 
@@ -363,9 +383,25 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
     }
 
     function decideTextToReturn(countryData, metric) {
-        if(countryData[metric]<0.001){return ''}
-        if (countryData.comparison !== undefined) { return countryData.comparison }
-        else { return countryData[metric] }
+
+
+        let text = ''
+
+        if (countryData.comparison !== undefined) { text = countryData.comparison }
+        else if(countryData[metric]<0.001){text = ''}
+        else { text = countryData[metric] }
+
+       
+
+        // let fontSize =  calculateFontSize(countryData, data, measurements, metric)
+        // let textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif')
+        // let barWidth = setBarMaxWidth(data, countryID, measurements, metric)
+
+        //or make fontSize smaller?
+        //below if statement should be if fontsize is below a certain level
+
+        // if(textWidth > barWidth){text = ''}
+        return text
     }
 
     function setTextAnchor() {
@@ -424,9 +460,9 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .attr("x", countryData => setXValue(data, metric, countryData, measurements, countryID))
         .attr("y", countryData => setYValue(countryData, measurements, metric))
         .style("fill", countryData => setColor(countryData, barData))
-        .style("font-size", countryData => calculateFontSize(countryData, data))
+        .style("font-size", countryData => calculateFontSize(countryData, data, measurements, metric))
         .style("opacity", "1")
-        .text(countryData => decideTextToReturn(countryData, metric))
+        .text(countryData => decideTextToReturn(countryData, metric, data, measurements))
         .on('mouseover', (event, barData) => {applyHoverEffectsToBar(event);  displayComparisons(event, barData, data, metric, countryID, measurements) })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on('mouseout', (event, barData) => { removeHoverEffectsFromBar(event); removeComparisons(data, metric, countryID, measurements) })
@@ -993,8 +1029,6 @@ function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
 
     if (countriesDownloaded === 0) { return }
 
-
-
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate)
 
     casesPerCapita = getCasesPerCapita(filteredDataByDate, startDate, endDate)
@@ -1059,7 +1093,6 @@ function cleanData(jsonData) {
     return cleanedData;
 };
 
-
 function recordFailedAPICalls(rawData, failedCalls) {
     rawData
         .filter((apiCall) => apiCall.status !== 200)
@@ -1073,7 +1106,6 @@ function recordFailedAPICalls(rawData, failedCalls) {
 
     return failedCalls
 }
-
 
 async function displayNumberCountriesDownloaded() {
 
@@ -1159,8 +1191,15 @@ function makeAPICalls(countries, failedCalls) {
    
          apiFailedCalls++
          console.log('apiFailedCalls', apiFailedCalls)
-         if(apiFailedCalls > 2){console.log('api call failed three times')}
-        getData([...eu], true, []);
+         if(apiFailedCalls >=35){
+             console.log('api call failed five times')
+             return
+            }else{
+
+                setTimeout(() => getData([...eu], true, []), 10000);
+         
+            }
+        
     
     });
 };
@@ -1176,11 +1215,12 @@ function getData(countries, firstCall, failedCalls) {
         makeAPICalls(countries, failedCalls);
     } else {
         //the api won't allow more than 10 calls from my ip within 5 seconds
+
         setTimeout(() => makeAPICalls(countries, failedCalls), 5000);
     }
 };
 
-
+displayNav()
 setBarChartType()
 getData([...eu], true, []);
 
