@@ -1,8 +1,19 @@
 
+
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+
+  font-family: "Nunito", sans-serif;
+}
+
 body {
 
     margin: 0;
     box-sizing: border-box;
+      background-color: #eeecec;
     /* position: relative; */
 }
 
@@ -51,16 +62,65 @@ rect:hover {
 }
 
 
-
 #nav{
     display: none;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
-    border: 1px solid red;
-    align-items: flex-start;
-    max-height: 20px;
+    align-items: center;
+    padding: 10px;
+    background-color: #f7f7f7;
+    color: #293d6a;
+    font-size: clamp(10px, 3vw, 16px);
+    border-bottom: 1px solid #293d6a;
+    width: 100%;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    height: 2.5rem;
 }
+
+.nav-div{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50%;
+
+}
+
+
+
+input, select {
+    background-color: #f7f7f7;
+    color: #293d6a;
+    border: none;
+    font-size: clamp(10px, 3vw, 16px);
+}
+
+
+
+
+::-webkit-calendar-picker-indicator{
+    /* https://stackoverflow.com/questions/65409348/html-input-date-how-to-decrease-space-between-date-and-icon */
+    margin-left: -15px;
+}
+
+
+#start-date, #end-date {
+    font-size: clamp(10px, 3vw, 16px);
+    
+}
+
+.nav-div > div{
+margin-right: 5px;
+}
+
+
+
+
+
 
 
 
@@ -76,9 +136,9 @@ rect:hover {
 
 /* https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option */
 
-.multiselect {
+/* .multiselect {
   width: 200px;
-}
+} */
 
 .selectBox {
   position: relative;
@@ -99,18 +159,63 @@ rect:hover {
 
 .checkboxes {
   display: none;
-  border: 1px #dadada solid;
+  border: 1px #f7f7f7 solid;
   z-index: 99999;
   position: absolute;
-  background-color: white;
+  background-color: #f7f7f7;
+  border-radius: 5px;
 }
 
 .checkboxes label {
-  display: block;
+  display: flex;
+  align-items: center;
 }
 
 .checkboxes label:hover {
-  background-color: #1e90ff;
+  background-color: #293d6a;
+  color: #f7f7f7;
 }
+
+.checkboxes label input{
+    margin-right: 8%;
+    margin-left: 8%;
+}
+
+#content-wrapper {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#content-wrapper > div, #content-wrapper > svg {
+    max-width: 95vw;
+    background-color: #f7f7f7;
+    color: #293d6a;
+    border-radius: 5px;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+
+}
+
+
+@media only screen and (max-width: 673px) {
+.nav-div > div {
+    margin-bottom: 5px;
+}
+
+.nav-div {
+    margin-top: 5px;
+}
+}
+
+
 
 

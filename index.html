@@ -10,15 +10,19 @@
 
 <body>
     <nav id="nav" class="hide-element">
-        <div>
-            <label for="start-date">Start:</label>
-            <input type="date" id="start-date" name="start-date" value="2020-01-24" min="2020-01-24" max="" onchange="changeRequestedData()">
+        <div class="nav-div">
+            <div>
+                <label for="start-date">Start:</label>
+                <input type="date" id="start-date" name="start-date" value="2020-01-24" min="2020-01-24" max="" onchange="changeRequestedData()">
+            </div>
+
+            <div>
+                <label for="end-date">End:</label>
+                <input type="date" id="end-date" name="end-date" value="" min="2020-01-24" max="" onchange="changeRequestedData()">
+            </div>
         </div>
 
-        <div>
-            <label for="end-date">End:</label>
-            <input type="date" id="end-date" name="end-date" value="" min="2020-01-24" max="" onchange="changeRequestedData()">
-        </div>
+        <div class="nav-div">
 
         <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
      
@@ -27,7 +31,7 @@
                 <select>
                     <option>Select Countries</option>
                 </select>
-                <div class="overSelect"></div>
+                <div class="overSelect" id="overSelect-select-country-checkboxes"></div>
                 </div>
                 <div id="select-country-checkboxes" class="checkboxes" >
                 <label for="austria">
@@ -95,7 +99,7 @@
                 <select>
                     <option>Highlight Countries</option>
                 </select>
-                <div class="overSelect"></div>
+                <div class="overSelect" id="overSelect-highlight-country-checkboxes"></div>
                 </div>
                 <div id="highlight-country-checkboxes" class="checkboxes">
                 <label for="austria">
@@ -156,42 +160,28 @@
                     <input type="checkbox" id="se" class="highlight-country"  onclick="changeRequestedData()"/>Sweden</label>
                             
                 </div>
-            </div>            
+            </div>  
+        </div>          
 
     </nav>
 
  
 
-    <h1>Covid 19</h1>
+ 
 
 
+    <div id="content-wrapper">
 
-
-    <div>
-        Cases Per Capita by Country
-    </div>
-
-    <hr>
-
-
-
-
-
+    <div>Downloaded Data for <span id="downloads">0</span> of 27 countries</div>
 
     <svg id="casesPerCapita"></svg>
 
-    <div>
-        <p>Downloaded Data for</p>
-        <p id="downloads">0</p>
-        <p>of 27 countries</p>
     </div>
 
-    <hr>
+    
 
-    <ul id="countries">
+  
 
-
-    </ul>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="./scripts.js"></script>
 </body>

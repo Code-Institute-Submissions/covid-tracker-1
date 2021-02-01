@@ -91,6 +91,18 @@ function showCheckboxes(checkboxType) {
     if (!expanded) {
         checkboxes.style.display = "block";
         expanded = true;
+        console.log(`overSelect-${checkboxType}`)
+      let width =   document.getElementById(`overSelect-${checkboxType}`).clientWidth;
+      console.log('width', width)
+      console.log(document.getElementsByClassName('checkboxes'))
+
+      let checkboxHTML = [...document.getElementsByClassName('checkboxes')]
+    
+      checkboxHTML.forEach(e => e.style.width = `${width}px`)
+
+
+      
+
     } else {
         checkboxes.style.display = "none";
         expanded = false;
