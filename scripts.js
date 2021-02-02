@@ -1207,18 +1207,14 @@ function makeAPICalls(countries, failedCalls) {
   
         processRawData(rawData, countries, failedCalls);
     })
-    .catch((err)=> {
-        console.log('err')
-
-        //TO DO: Make error display on UI if promise fails three times
-   
+    .catch((err)=> {   
          apiFailedCalls++
-         console.log('apiFailedCalls', apiFailedCalls)
-         if(apiFailedCalls >=35){
-             console.log('api call failed five times')
+    
+         if(apiFailedCalls >=4){
+             document.getElementsByClassName("loading-message").innerHTML("Sorry. We can't load the data right now. Please try again later.")
              return
             }else{
-
+                document.getElementsByClassName("loading-message").innerHTML("There is a delay in loading the data. This may take 30 seconds. Please be patient")
                 setTimeout(() => getData([...eu], true, []), 10000);
          
             }
