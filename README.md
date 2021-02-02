@@ -48,6 +48,8 @@ When I get a 429 on initally loading data, the x axis goes mad and has a range o
 
 https://dzone.com/articles/javascript-convert-date
 
+https://projects.lukehaas.me/css-loaders/
+
 <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
 
 https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
