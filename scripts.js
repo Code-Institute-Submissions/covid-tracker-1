@@ -142,7 +142,6 @@ function setDefaultDates() {
 
     if (countriesDownloaded < 27) { return }
 
-
     document.getElementById("end-date").value = convertDateFormat(latestCommonDate).toString()
     document.getElementById("end-date").max = convertDateFormat(latestCommonDate).toString()
     document.getElementById("start-date").max = convertDateFormat(latestCommonDate).toString()
@@ -154,12 +153,19 @@ function convertDateFormat(date) {
     //https://dzone.com/articles/javascript-convert-date
 
     let month = new Date(date).getMonth() + 1
+    let day = new Date(date).getDate()
+    let year = new Date(date).getFullYear()
 
     if (month < 10) {
         month = `0${month.toString()}`
     }
-    let day = new Date(date).getDate()
-    let year = new Date(date).getFullYear()
+
+    if (day < 10) {
+        day = `0${day.toString()}`
+    }
+
+
+
 
 
     return `${year}-${month}-${day}`
@@ -1170,8 +1176,8 @@ async function processRawData(rawData, countries, failedCalls) {
 
         if (countriesDownloaded === 27) {
             allCountriesDownloaded = true
-            displayNav()
             setDefaultDates()
+            displayNav()       
         }
 
         displayNumberCountriesDownloaded()
@@ -1181,6 +1187,7 @@ async function processRawData(rawData, countries, failedCalls) {
         let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0)
 
         let endDate = calculateCommonLatestDate(allData)
+
 
         dataForGraphs(startDate, endDate, allData, countriesDownloaded)
 
@@ -1236,9 +1243,9 @@ function getData(countries, firstCall, failedCalls) {
     }
 };
 
-displayNav()
-// setBarChartType()
-// getData([...eu], true, []);
+// displayNav()
+setBarChartType()
+getData([...eu], true, []);
 
 
 

@@ -36,11 +36,7 @@ svg text {
     stroke: #C0C0BB;
 }
 
-svg {
-    border: 1px solid pink;
-    position: relative;
-    
-}
+
 
 .casesPerCapita {
     font-size: 10px;
@@ -104,7 +100,7 @@ input, select {
 
 ::-webkit-calendar-picker-indicator{
     /* https://stackoverflow.com/questions/65409348/html-input-date-how-to-decrease-space-between-date-and-icon */
-    margin-left: -15px;
+    margin-left: -5px;
 }
 
 
@@ -192,7 +188,7 @@ margin-right: 5px;
 }
 
 #content-wrapper > div, #content-wrapper > svg {
-    max-width: 95vw;
+    /* max-width: 95vw; */
     background-color: #f7f7f7;
     color: #293d6a;
     border-radius: 5px;
@@ -203,6 +199,13 @@ margin-right: 5px;
     justify-content: space-around;
     align-items: center;
 
+}
+
+svg {
+    display: none;
+    border: 1px solid #293d6a;;
+    position: relative;
+    
 }
 
 
