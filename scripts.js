@@ -1177,7 +1177,18 @@ async function processRawData(rawData, countries, failedCalls) {
         if (countriesDownloaded === 27) {
             allCountriesDownloaded = true
             setDefaultDates()
-            displayNav()       
+            displayNav() 
+
+            setTimeout(() => {
+            document.getElementsByClassName("loading")[0].style.opacity = "0"; 
+            document.getElementsByClassName("loading")[0].style.maxHeight = "0"; 
+            }, 500);
+
+   
+            setTimeout(() => {
+               document.getElementsByClassName("loading")[0].style.display = "none";   
+            }, 1500);
+                
         }
 
         displayNumberCountriesDownloaded()
@@ -1209,12 +1220,14 @@ function makeAPICalls(countries, failedCalls) {
     })
     .catch((err)=> {   
          apiFailedCalls++
+
+         console.log('apiFailedCalled', apiFailedCalls)
     
          if(apiFailedCalls >=4){
-             document.getElementsByClassName("loading-message").innerHTML("Sorry. We can't load the data right now. Please try again later.")
+             document.getElementsByClassName("loading-message")[0].innerHTML("Sorry. We can't load the data right now. Please try again later.")
              return
             }else{
-                document.getElementsByClassName("loading-message").innerHTML("There is a delay in loading the data. This may take 30 seconds. Please be patient")
+                document.getElementsByClassName("loading-message")[0].innerHTML("There is a delay in loading the data. This may take 30 seconds. Please be patient")
                 setTimeout(() => getData([...eu], true, []), 10000);
          
             }
@@ -1240,8 +1253,8 @@ function getData(countries, firstCall, failedCalls) {
 };
 
 
-// setBarChartType()
-// getData([...eu], true, []);
+setBarChartType()
+getData([...eu], true, []);
 
 
 
