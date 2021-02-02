@@ -1220,20 +1220,15 @@ function makeAPICalls(countries, failedCalls) {
         processRawData(rawData, countries, failedCalls);
     })
     .catch((err)=> {   
-         apiFailedCalls++
-
-         console.log('apiFailedCalled', apiFailedCalls)
-    
+         apiFailedCalls++    
          if(apiFailedCalls >=4){
-             document.getElementsByClassName("loading-message")[0].innerHTML("Sorry. We can't load the data right now. Please try again later.")
+             document.getElementsByClassName("loading-message")[0].innerHTML = "Sorry. We can't load the data right now. Please try again later."
              return
             }else{
-                document.getElementsByClassName("loading-message")[0].innerHTML("There is a delay in loading the data. This may take 30 seconds. Please be patient")
+                document.getElementsByClassName("loading-message")[0].innerHTML = "There is a delay in loading the data. This may take 30 seconds. Please be patient"
                 setTimeout(() => getData([...eu], true, []), 10000);
-         
             }
         
-    
     });
 };
 
