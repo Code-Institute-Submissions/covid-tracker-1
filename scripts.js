@@ -296,6 +296,7 @@ function updateXAxis(width, height, xAxis) {
             .selectAll("g.x.axis")
             .transition().delay(500)
             .call(xAxis)
+            .selectAll('.tick line').remove()
 
         d3.selectAll(".x.axis .tick")
             .on("mouseover", function(event, countryCode) {  displayToolTip(getCountryName(countryCode))        })
@@ -585,7 +586,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("y", 15)
             .attr('x', xScaleMidPoint)
             .attr("text-anchor", "middle")
-            .text('Cases Per 100,000 People By Country')
+            .text('Cases Per 100,000 People')
 
     }
 

@@ -190,6 +190,8 @@ margin-right: 5px;
 
 
 svg {
+    display: block;
+    margin: 50px auto;
     border: 1px solid #293d6a;
     position: relative;
     background-color: #f7f7f7;
