@@ -1248,9 +1248,9 @@ function getData(countries, firstCall, failedCalls) {
     }
 };
 
-
-setBarChartType()
-getData([...eu], true, []);
+displayNav()
+// setBarChartType()
+// getData([...eu], true, []);
 
 
 
