@@ -1243,6 +1243,7 @@ function makeAPICalls(countries, failedCalls) {
     .catch((err)=> {   
          apiFailedCalls++    
          if(apiFailedCalls >=4){
+             document.getElementsByClassName("loader")[0].stlye.display = "none"
              document.getElementsByClassName("loading-message")[0].innerHTML = "Sorry. We can't load the data right now. Please try again later."
              return
             }else{
@@ -1269,9 +1270,9 @@ function getData(countries, firstCall, failedCalls) {
     }
 };
 
-
-setBarChartType()
-getData([...eu], true, []);
+displayNav()
+// setBarChartType()
+// getData([...eu], true, []);
 
 
 

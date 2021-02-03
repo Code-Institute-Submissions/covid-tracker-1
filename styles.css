@@ -65,7 +65,7 @@ rect:hover {
     display: none;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
     padding: 10px;
     background-color: #f7f7f7;
@@ -107,7 +107,7 @@ input, select {
 
 ::-webkit-calendar-picker-indicator{
     /* https://stackoverflow.com/questions/65409348/html-input-date-how-to-decrease-space-between-date-and-icon */
-    opacity: 0;
+    display:none;
 }
 
 
