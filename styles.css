@@ -71,7 +71,7 @@ rect {
 
 rect:hover {
     opacity: 0.5;
-    transition: .3s ease-in
+    /* transition: .3s ease-in */
 }
 
 
@@ -142,8 +142,11 @@ margin-right: 15px;
 
 
 #tooltip{
-    background: yellow;
-    color: black;
+    background: #f7f7f7;
+    color:#293d6a;
+    padding: 5px;
+    border: 1px solid #293d6a;
+    border-radius: 5px;
 }
 
 #tooltip:first-letter {

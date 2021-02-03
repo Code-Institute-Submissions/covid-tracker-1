@@ -177,8 +177,6 @@ function checkDateErrors(startDate, endDate) {
         document.getElementById("users-countries").style.display = "flex"
     }
 
- 
-    
     document.getElementById("nav-error").innerHTML = error
     return error
 }
@@ -735,7 +733,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     data = sortByHighestValues(data, metric)
 
 
-    const width = 0.9 * windowWidth
+    const width = 0.95 * windowWidth
     const height = 0.8 * windowHeight
     const margin = setMargins()
     const innerHeight = height - margin.top - margin.bottom
@@ -1270,9 +1268,9 @@ function getData(countries, firstCall, failedCalls) {
     }
 };
 
-displayNav()
-// setBarChartType()
-// getData([...eu], true, []);
+// displayNav()
+setBarChartType()
+getData([...eu], true, []);
 
 
 
