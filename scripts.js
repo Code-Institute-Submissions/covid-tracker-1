@@ -543,7 +543,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     function setMargins() {
 
-        let margin = { top: 30, right: 0, bottom: 20, left: 30 }
+        let margin = { top: 50, right: 0, bottom: 30, left: 30 }
         if (verticalBarChart) { margin.left = 0 }
 
         return margin
@@ -563,8 +563,6 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
                 .padding(0.2);
         }
     }
-
-
 
     function renderXAxis(width, height, margin, xAxis, innerHeight) {
 
@@ -602,14 +600,13 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         d3.select("svg")
             .append("text")
             .attr("fill", "black")
-            .attr("y", 15)
+            .attr("y", 45)
             .attr('x', xScaleMidPoint)
             .attr("text-anchor", "middle")
+            .attr("font-size", "3vw")
             .text('Cases Per 100,000 People')
 
     }
-
-
 
     function updateYAxis(width, height, yAxis) {
         if (verticalBarChart) { return }
@@ -626,9 +623,6 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .on("mouseout", tooltip.style("visibility", "hidden") )
             
     }
-
-
-
 
 
 
