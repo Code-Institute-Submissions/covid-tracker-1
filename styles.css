@@ -89,6 +89,10 @@ rect:hover {
     margin-bottom: 5px;
 }
 
+#nav-error{
+    color: tomato;
+}
+
 
 
 input, select {

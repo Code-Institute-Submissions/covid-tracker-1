@@ -163,13 +163,24 @@ function convertDateFormat(date) {
     if (day < 10) {
         day = `0${day.toString()}`
     }
-
-
-
-
-
     return `${year}-${month}-${day}`
+}
 
+
+function checkDateErrors(startDate, endDate) {
+    let error = ''
+
+    if(endDate < startDate){
+        error = 'Start date must be before end date'
+        document.getElementById("users-countries").style.display = "none"
+    }else{
+        document.getElementById("users-countries").style.display = "flex"
+    }
+
+ 
+    
+    document.getElementById("nav-error").innerHTML = error
+    return error
 }
 
 async function changeRequestedData() {
@@ -178,11 +189,21 @@ async function changeRequestedData() {
 
     let startDate = new Date(document.getElementById("start-date").value)
 
+    let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0)
+
+    const DATEERROR = checkDateErrors(startDate, endDate)
+
+    if(DATEERROR !== ''){return}
+
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
+
+    //I want the date before the start date selected so that I get correct values when I subtract cases, deaths etc.
 
     startDate = new Date(startDate.setDate(startDate.getDate() - 1)).setHours(0, 0, 0, 0)
 
-    let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0)
+    
+
+ 
 
     let allData = await getDataFromStorage()
 
