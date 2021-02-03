@@ -107,7 +107,7 @@ input, select {
 
 ::-webkit-calendar-picker-indicator{
     /* https://stackoverflow.com/questions/65409348/html-input-date-how-to-decrease-space-between-date-and-icon */
-    margin-left: -17px;
+    opacity: 0;
 }
 
 
