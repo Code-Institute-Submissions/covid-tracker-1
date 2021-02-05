@@ -603,7 +603,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("y", 45)
             .attr('x', xScaleMidPoint)
             .attr("text-anchor", "middle")
-            .attr("font-size", "3vw")
+            .attr("font-size", "16")
             .text('Cases Per 100,000 People')
 
     }
