@@ -13,204 +13,268 @@
         <div class="nav-div">
             <div>
                 <label for="start-date">Start:</label>
-                <input type="date" id="start-date" name="start-date" value="2020-01-24" min="2020-01-24" max="" onchange="changeRequestedData()">
+                <input type="date" id="start-date" name="start-date" value="2020-01-24" min="2020-01-24" max=""
+                    onchange="changeRequestedData()">
             </div>
 
             <div>
                 <label for="end-date">End:</label>
-                <input type="date" id="end-date" name="end-date" value="" min="2020-01-24" max="" onchange="changeRequestedData()">
+                <input type="date" id="end-date" name="end-date" value="" min="2020-01-24" max=""
+                    onchange="changeRequestedData()">
             </div>
             <div id="nav-error"></div>
         </div>
 
         <div class="nav-div" id="users-countries">
 
-        <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
-     
+            <!-- https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option -->
+
             <div class="multiselect" onmouseleave="collapseCheckboxes('select-country-checkboxes')">
                 <div class="selectBox" onclick="showCheckboxes('select-country-checkboxes')">
-                <select>
-                    <option>Select Countries</option>
-                </select>
-                <div class="overSelect" id="overSelect-select-country-checkboxes"></div>
+                    <select>
+                        <option>Select Countries</option>
+                    </select>
+                    <div class="overSelect" id="overSelect-select-country-checkboxes"></div>
                 </div>
-                <div id="select-country-checkboxes" class="checkboxes" >
-                <label for="austria">
-                    <input type="checkbox" id="at" class="select-country" checked onclick="changeRequestedData()"/>Austria</label>
-                <label for="belgium">
-                    <input type="checkbox" id="be"  class="select-country" checked onclick="changeRequestedData()"/>Belgium</label>
-                <label for="bulgaria">
-                    <input type="checkbox" id="bg" class="select-country"  checked onclick="changeRequestedData()"/>Bulgaria</label>
-                <label for="croatia">
-                    <input type="checkbox" id="hr" class="select-country"  checked onclick="changeRequestedData()"/>Croatia</label>
-                <label for="cyprus">
-                    <input type="checkbox" id="cy" class="select-country"  checked onclick="changeRequestedData()"/>Cyprus</label>
-                <label for="czechia">
-                    <input type="checkbox" id="cz" class="select-country" checked onclick="changeRequestedData()"/>Czechia</label>
-                <label for="denmark">
-                    <input type="checkbox" id="dk"  class="select-country" checked onclick="changeRequestedData()"/>Denmark</label>
-                <label for="estonia">
-                    <input type="checkbox" id="ee" class="select-country"  checked onclick="changeRequestedData()"/>Estonia</label>
-                <label for="eu">
-                    <input type="checkbox" id="eu" class="select-country"  checked onclick="changeRequestedData()"/>EU</label>
-                <label for="finland">
-                    <input type="checkbox" id="fi" class="select-country"  checked onclick="changeRequestedData()"/>Finland</label>
-                <label for="france">
-                    <input type="checkbox" id="fr" class="select-country"  checked onclick="changeRequestedData()"/>France</label>
-                <label for="germany">
-                    <input type="checkbox" id="de" class="select-country" checked onclick="changeRequestedData()"/>Germany</label>
-                <label for="greece">
-                    <input type="checkbox" id="gr"  class="select-country" checked onclick="changeRequestedData()"/>Greece</label>
-                <label for="hungary">
-                    <input type="checkbox" id="hu" class="select-country"  checked onclick="changeRequestedData()"/>Hungary</label>
-                <label for="ireland">
-                    <input type="checkbox" id="ie" class="select-country"  checked onclick="changeRequestedData()"/>Ireland</label>
-                <label for="italy">
-                    <input type="checkbox" id="it" class="select-country"  checked onclick="changeRequestedData()"/>Italy</label>
-                <label for="latvia">
-                    <input type="checkbox" id="lv" class="select-country" checked onclick="changeRequestedData()"/>Latvia</label>
-                <label for="lithuania">
-                    <input type="checkbox" id="lt"  class="select-country" checked onclick="changeRequestedData()"/>Lithuania</label>
-                <label for="luxembourg">
-                    <input type="checkbox" id="lu" class="select-country"  checked onclick="changeRequestedData()"/>Luxembourg</label>
-                <label for="malta">
-                    <input type="checkbox" id="mt" class="select-country"  checked onclick="changeRequestedData()"/>Malta</label>
-                <label for="netherlands">
-                    <input type="checkbox" id="nl" class="select-country"  checked onclick="changeRequestedData()"/>Netherlands</label>
-                <label for="poland">
-                    <input type="checkbox" id="pl" class="select-country"  checked onclick="changeRequestedData()"/>Poland</label>
-                <label for="portugal">
-                    <input type="checkbox" id="pt" class="select-country"  checked onclick="changeRequestedData()"/>Portugal</label>
-                <label for="romania">
-                    <input type="checkbox" id="ro" class="select-country" checked onclick="changeRequestedData()"/>Romania</label>
-                <label for="slovakia">
-                    <input type="checkbox" id="sk"  class="select-country" checked onclick="changeRequestedData()"/>Slovakia</label>
-                <label for="slovenia">
-                    <input type="checkbox" id="si" class="select-country"  checked onclick="changeRequestedData()"/>Slovenia</label>
-                <label for="spain">
-                    <input type="checkbox" id="es" class="select-country"  checked onclick="changeRequestedData()"/>Spain</label>
-                <label for="sweden">
-                    <input type="checkbox" id="se" class="select-country"  checked onclick="changeRequestedData()"/>Sweden</label>
-                            
+                <div id="select-country-checkboxes" class="checkboxes">
+                    <label for="austria">
+                        <input type="checkbox" id="at" class="select-country" checked
+                            onclick="changeRequestedData()" />Austria</label>
+                    <label for="belgium">
+                        <input type="checkbox" id="be" class="select-country" checked
+                            onclick="changeRequestedData()" />Belgium</label>
+                    <label for="bulgaria">
+                        <input type="checkbox" id="bg" class="select-country" checked
+                            onclick="changeRequestedData()" />Bulgaria</label>
+                    <label for="croatia">
+                        <input type="checkbox" id="hr" class="select-country" checked
+                            onclick="changeRequestedData()" />Croatia</label>
+                    <label for="cyprus">
+                        <input type="checkbox" id="cy" class="select-country" checked
+                            onclick="changeRequestedData()" />Cyprus</label>
+                    <label for="czechia">
+                        <input type="checkbox" id="cz" class="select-country" checked
+                            onclick="changeRequestedData()" />Czechia</label>
+                    <label for="denmark">
+                        <input type="checkbox" id="dk" class="select-country" checked
+                            onclick="changeRequestedData()" />Denmark</label>
+                    <label for="estonia">
+                        <input type="checkbox" id="ee" class="select-country" checked
+                            onclick="changeRequestedData()" />Estonia</label>
+                    <label for="eu">
+                        <input type="checkbox" id="eu" class="select-country" checked
+                            onclick="changeRequestedData()" />EU</label>
+                    <label for="finland">
+                        <input type="checkbox" id="fi" class="select-country" checked
+                            onclick="changeRequestedData()" />Finland</label>
+                    <label for="france">
+                        <input type="checkbox" id="fr" class="select-country" checked
+                            onclick="changeRequestedData()" />France</label>
+                    <label for="germany">
+                        <input type="checkbox" id="de" class="select-country" checked
+                            onclick="changeRequestedData()" />Germany</label>
+                    <label for="greece">
+                        <input type="checkbox" id="gr" class="select-country" checked
+                            onclick="changeRequestedData()" />Greece</label>
+                    <label for="hungary">
+                        <input type="checkbox" id="hu" class="select-country" checked
+                            onclick="changeRequestedData()" />Hungary</label>
+                    <label for="ireland">
+                        <input type="checkbox" id="ie" class="select-country" checked
+                            onclick="changeRequestedData()" />Ireland</label>
+                    <label for="italy">
+                        <input type="checkbox" id="it" class="select-country" checked
+                            onclick="changeRequestedData()" />Italy</label>
+                    <label for="latvia">
+                        <input type="checkbox" id="lv" class="select-country" checked
+                            onclick="changeRequestedData()" />Latvia</label>
+                    <label for="lithuania">
+                        <input type="checkbox" id="lt" class="select-country" checked
+                            onclick="changeRequestedData()" />Lithuania</label>
+                    <label for="luxembourg">
+                        <input type="checkbox" id="lu" class="select-country" checked
+                            onclick="changeRequestedData()" />Luxembourg</label>
+                    <label for="malta">
+                        <input type="checkbox" id="mt" class="select-country" checked
+                            onclick="changeRequestedData()" />Malta</label>
+                    <label for="netherlands">
+                        <input type="checkbox" id="nl" class="select-country" checked
+                            onclick="changeRequestedData()" />Netherlands</label>
+                    <label for="poland">
+                        <input type="checkbox" id="pl" class="select-country" checked
+                            onclick="changeRequestedData()" />Poland</label>
+                    <label for="portugal">
+                        <input type="checkbox" id="pt" class="select-country" checked
+                            onclick="changeRequestedData()" />Portugal</label>
+                    <label for="romania">
+                        <input type="checkbox" id="ro" class="select-country" checked
+                            onclick="changeRequestedData()" />Romania</label>
+                    <label for="slovakia">
+                        <input type="checkbox" id="sk" class="select-country" checked
+                            onclick="changeRequestedData()" />Slovakia</label>
+                    <label for="slovenia">
+                        <input type="checkbox" id="si" class="select-country" checked
+                            onclick="changeRequestedData()" />Slovenia</label>
+                    <label for="spain">
+                        <input type="checkbox" id="es" class="select-country" checked
+                            onclick="changeRequestedData()" />Spain</label>
+                    <label for="sweden">
+                        <input type="checkbox" id="se" class="select-country" checked
+                            onclick="changeRequestedData()" />Sweden</label>
+
                 </div>
             </div>
 
             <div class="multiselect" onmouseleave="collapseCheckboxes('highlight-country-checkboxes')">
                 <div class="selectBox" onclick="showCheckboxes('highlight-country-checkboxes')">
-                <select>
-                    <option>Highlight Countries</option>
-                </select>
-                <div class="overSelect" id="overSelect-highlight-country-checkboxes"></div>
+                    <select>
+                        <option>Highlight Countries</option>
+                    </select>
+                    <div class="overSelect" id="overSelect-highlight-country-checkboxes"></div>
                 </div>
                 <div id="highlight-country-checkboxes" class="checkboxes">
-                <label for="austria">
-                    <input type="checkbox" id="at" class="highlight-country"  onclick="changeRequestedData()"/>Austria</label>
-                <label for="belgium">
-                    <input type="checkbox" id="be"  class="highlight-country"  onclick="changeRequestedData()"/>Belgium</label>
-                <label for="bulgaria">
-                    <input type="checkbox" id="bg" class="highlight-country"  onclick="changeRequestedData()"/>Bulgaria</label>
-                <label for="croatia">
-                    <input type="checkbox" id="hr" class="highlight-country"  onclick="changeRequestedData()"/>Croatia</label>
-                <label for="cyprus">
-                    <input type="checkbox" id="cy" class="highlight-country"  onclick="changeRequestedData()"/>Cyprus</label>
-                <label for="czechia">
-                    <input type="checkbox" id="cz" class="highlight-country"  onclick="changeRequestedData()"/>Czechia</label>
-                <label for="denmark">
-                    <input type="checkbox" id="dk"  class="highlight-country"  onclick="changeRequestedData()"/>Denmark</label>
-                <label for="estonia">
-                    <input type="checkbox" id="ee" class="highlight-country"  onclick="changeRequestedData()"/>Estonia</label>
-                <label for="eu">
-                    <input type="checkbox" id="eu" class="highlight-country" checked  onclick="changeRequestedData()"/>EU</label>
-                <label for="finland">
-                    <input type="checkbox" id="fi" class="highlight-country"  onclick="changeRequestedData()"/>Finland</label>
-                <label for="france">
-                    <input type="checkbox" id="fr" class="highlight-country"  onclick="changeRequestedData()"/>France</label>
-                <label for="germany">
-                    <input type="checkbox" id="de" class="highlight-country"  onclick="changeRequestedData()"/>Germany</label>
-                <label for="greece">
-                    <input type="checkbox" id="gr"  class="highlight-country"  onclick="changeRequestedData()"/>Greece</label>
-                <label for="hungary">
-                    <input type="checkbox" id="hu" class="highlight-country"  onclick="changeRequestedData()"/>Hungary</label>
-                <label for="ireland">
-                    <input type="checkbox" id="ie" class="highlight-country"  onclick="changeRequestedData()"/>Ireland</label>
-                <label for="italy">
-                    <input type="checkbox" id="it" class="highlight-country"  onclick="changeRequestedData()"/>Italy</label>
-                <label for="latvia">
-                    <input type="checkbox" id="lv" class="highlight-country"  onclick="changeRequestedData()"/>Latvia</label>
-                <label for="lithuania">
-                    <input type="checkbox" id="lt"  class="highlight-country"  onclick="changeRequestedData()"/>Lithuania</label>
-                <label for="luxembourg">
-                    <input type="checkbox" id="lu" class="highlight-country"  onclick="changeRequestedData()"/>Luxembourg</label>
-                <label for="malta">
-                    <input type="checkbox" id="mt" class="highlight-country"  onclick="changeRequestedData()"/>Malta</label>
-                <label for="netherlands">
-                    <input type="checkbox" id="nl" class="highlight-country"  onclick="changeRequestedData()"/>Netherlands</label>
-                <label for="poland">
-                    <input type="checkbox" id="pl" class="highlight-country"  onclick="changeRequestedData()"/>Poland</label>
-                <label for="portugal">
-                    <input type="checkbox" id="pt" class="highlight-country"  onclick="changeRequestedData()"/>Portugal</label>
-                <label for="romania">
-                    <input type="checkbox" id="ro" class="highlight-country"  onclick="changeRequestedData()"/>Romania</label>
-                <label for="slovakia">
-                    <input type="checkbox" id="sk"  class="highlight-country"  onclick="changeRequestedData()"/>Slovakia</label>
-                <label for="slovenia">
-                    <input type="checkbox" id="si" class="highlight-country"  onclick="changeRequestedData()"/>Slovenia</label>
-                <label for="spain">
-                    <input type="checkbox" id="es" class="highlight-country"  onclick="changeRequestedData()"/>Spain</label>
-                <label for="sweden">
-                    <input type="checkbox" id="se" class="highlight-country"  onclick="changeRequestedData()"/>Sweden</label>
-                            
+                    <label for="austria">
+                        <input type="checkbox" id="at" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Austria</label>
+                    <label for="belgium">
+                        <input type="checkbox" id="be" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Belgium</label>
+                    <label for="bulgaria">
+                        <input type="checkbox" id="bg" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Bulgaria</label>
+                    <label for="croatia">
+                        <input type="checkbox" id="hr" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Croatia</label>
+                    <label for="cyprus">
+                        <input type="checkbox" id="cy" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Cyprus</label>
+                    <label for="czechia">
+                        <input type="checkbox" id="cz" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Czechia</label>
+                    <label for="denmark">
+                        <input type="checkbox" id="dk" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Denmark</label>
+                    <label for="estonia">
+                        <input type="checkbox" id="ee" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Estonia</label>
+                    <label for="eu">
+                        <input type="checkbox" id="eu" class="highlight-country" checked
+                            onclick="changeRequestedData(true)" />EU</label>
+                    <label for="finland">
+                        <input type="checkbox" id="fi" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Finland</label>
+                    <label for="france">
+                        <input type="checkbox" id="fr" class="highlight-country"
+                            onclick="changeRequestedData(true)" />France</label>
+                    <label for="germany">
+                        <input type="checkbox" id="de" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Germany</label>
+                    <label for="greece">
+                        <input type="checkbox" id="gr" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Greece</label>
+                    <label for="hungary">
+                        <input type="checkbox" id="hu" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Hungary</label>
+                    <label for="ireland">
+                        <input type="checkbox" id="ie" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Ireland</label>
+                    <label for="italy">
+                        <input type="checkbox" id="it" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Italy</label>
+                    <label for="latvia">
+                        <input type="checkbox" id="lv" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Latvia</label>
+                    <label for="lithuania">
+                        <input type="checkbox" id="lt" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Lithuania</label>
+                    <label for="luxembourg">
+                        <input type="checkbox" id="lu" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Luxembourg</label>
+                    <label for="malta">
+                        <input type="checkbox" id="mt" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Malta</label>
+                    <label for="netherlands">
+                        <input type="checkbox" id="nl" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Netherlands</label>
+                    <label for="poland">
+                        <input type="checkbox" id="pl" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Poland</label>
+                    <label for="portugal">
+                        <input type="checkbox" id="pt" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Portugal</label>
+                    <label for="romania">
+                        <input type="checkbox" id="ro" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Romania</label>
+                    <label for="slovakia">
+                        <input type="checkbox" id="sk" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Slovakia</label>
+                    <label for="slovenia">
+                        <input type="checkbox" id="si" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Slovenia</label>
+                    <label for="spain">
+                        <input type="checkbox" id="es" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Spain</label>
+                    <label for="sweden">
+                        <input type="checkbox" id="se" class="highlight-country"
+                            onclick="changeRequestedData(true)" />Sweden</label>
+
                 </div>
-            </div>  
-        </div> 
-         
+            </div>
+        </div>
+
 
     </nav>
 
- 
 
- 
+
+
 
 
     <div id="content-wrapper">
- 
+
 
         <div class="summary">
             <h1>Covid Comparisons</h1>
             <hr>
-            <p>This website compares how covid 19 is impacting countries in the European Union. The data takes account of population differences to enable meaningful comparisons.</p>
+            <p>This website compares how covid 19 is impacting countries in the European Union. The data takes account
+                of population differences to enable meaningful comparisons.</p>
 
         </div>
 
         <div class="loading">
-             <div class="loader"></div>
-             <div class="loading-message">Loading...</div>
-             <p>Downloaded Data for <span id="downloads">0</span> of 27 countries</p>
+            <div class="loader"></div>
+            <div class="loading-message">Loading...</div>
+            <p>Downloaded Data for <span id="downloads">0</span> of 27 countries</p>
         </div>
 
         <svg id="casesPerCapita"></svg>
 
         <div class="statistic-details">
             <p>
-                EU population is sourced from <a href="https://ec.europa.eu/eurostat/documents/2995521/11081093/3-10072020-AP-EN.pdf/d2f799bf-4412-05cc-a357-7b49b93615f1" target="_blank">eurostat data</a> from July 2020.
+                EU population is sourced from <a
+                    href="https://ec.europa.eu/eurostat/documents/2995521/11081093/3-10072020-AP-EN.pdf/d2f799bf-4412-05cc-a357-7b49b93615f1"
+                    target="_blank">eurostat data</a> from July 2020.
             </p>
             <p>
-                All covid data is downloaded from <a href="https://github.com/CSSEGISandData/COVID-19" target="_blank">the Center for Systems Science and Engineering at Johns Hopkins University</a> using the <a href="https://covid19api.com/" target="_blank">Covid 19 API.</a>
+                All covid data is downloaded from <a href="https://github.com/CSSEGISandData/COVID-19"
+                    target="_blank">the Center for Systems Science and Engineering at Johns Hopkins University</a> using
+                the <a href="https://covid19api.com/" target="_blank">Covid 19 API.</a>
             </p>
             <p>
-                Not all countries report figures daily. As a result, care should be taken when comparing time periods of under seven days.
+                Not all countries report figures daily. As a result, care should be taken when comparing time periods of
+                under seven days.
             </p>
-        </div>  
+        </div>
 
     </div>
 
 
-      <footer>
+    <footer>
         © Covid Comparisons 2021
     </footer>
-    
 
-  
+
+
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="./scripts.js"></script>

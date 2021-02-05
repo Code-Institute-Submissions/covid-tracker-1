@@ -123,8 +123,11 @@ function checkDateErrors(startDate, endDate) {
     return error;
 }
 
-function changeRequestedData() {
-    d3.selectAll(".values-in-bar").style("opacity", "0");
+function changeRequestedData(changeHighlightedCountry) {
+    if (changeHighlightedCountry !== true) {
+        d3.selectAll(".values-in-bar").style("opacity", "0");
+    }
+
     let startDate = new Date(document.getElementById("start-date").value);
     let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0);
     const DATEERROR = checkDateErrors(startDate, endDate);
@@ -486,6 +489,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr('y', d => measurements.yScale(0))
             .attr('data-countryCode', d => d.countryCode)
             .merge(selectDataForBarCharts)
+            .attr("fill", d => setBarColor(d))
             .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData); })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
             .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden"); })
@@ -499,7 +503,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("height", d => measurements.innerHeight - measurements.yScale(d[metric]))
 
             .attr("y", (d) => measurements.yScale(d[metric]))
-            .attr("fill", d => setBarColor(d))
+
             //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
             .end()
             .then(() => {
@@ -810,8 +814,8 @@ function recordFailedAPICalls(rawData, failedCalls) {
 function displayNumberCountriesDownloaded() {
     let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
     let CountriesDownloaded = countryCodes.map(countryCode => { return localStorage.getItem(countryCode); });
-    Promise.allSettled(CountriesDownloaded).then(countries => {
-        let countriesDownloaded = countries.filter(country => country.value !== null).length;
+    Promise.all(CountriesDownloaded).then(countries => {
+        let countriesDownloaded = countries.filter(country => country !== null).length;
         document.getElementById("downloads").innerHTML = countriesDownloaded;
     });
 
@@ -825,43 +829,24 @@ function compileDataForSaving(countryData) {
 }
 
 function compileSuccessfulCalls(successfulCalls) {
-    return Promise.all(
-        successfulCalls.map((res) => res.json())
-    );
+    return Promise.all(successfulCalls.map((res) => res.json()));
 }
 
 function processRawData(rawData, countries, failedCalls) {
     failedCalls = recordFailedAPICalls(rawData, failedCalls);
     let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200);
-
-
-
-
     let JsonData = Promise.all(successfulCalls.map((res) => res.json()));
-
-
-
     JsonData.then(jsonData => {
-
         if (successfulCalls.length > 0) {
             let countryData = cleanData(jsonData);
             let SaveData = compileDataForSaving(countryData);
 
             Promise.all(SaveData).then(savedData => {
-
                 let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
                 let CountriesDownloaded = Promise.all(countryCodes.map(countryCode => { return localStorage.getItem(countryCode); }));
-
-
-
                 CountriesDownloaded.then(countriesDownloadedData => {
 
-
-
-
-
                     countriesDownloaded = countriesDownloadedData.filter(country => country !== null).length;
-
                     if (countriesDownloaded === 27) {
                         allCountriesDownloaded = true;
                         setDefaultDates();
@@ -874,48 +859,21 @@ function processRawData(rawData, countries, failedCalls) {
                             document.getElementsByClassName("loading")[0].style.display = "none";
                         }, 1500);
                     }
-
                     displayNumberCountriesDownloaded();
-
-
                     let countryData = EUDATASET.map((country) =>
                         JSON.parse(localStorage.getItem(country.countryCode))
                     );
-
                     Promise.all(countryData).then(allData => {
-
                         let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0);
                         let endDate = calculateCommonLatestDate(allData);
-                        console.log('endDate', endDate)
                         dataForGraphs(startDate, endDate, allData, countriesDownloaded);
-                        getData(countries, false, failedCalls);
-
                     });
-
-
-
-                    // });
-
-
-
-
                 })
-
-
-
-
             })
 
-        } else {
-            getData(countries, false, failedCalls);
         }
-
-
-
-
+        getData(countries, false, failedCalls);
     })
-
-
 }
 
 function makeAPICalls(countries, failedCalls) {
