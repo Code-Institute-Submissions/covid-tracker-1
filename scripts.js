@@ -123,7 +123,7 @@ function checkDateErrors(startDate, endDate) {
     return error;
 }
 
-async function changeRequestedData() {
+function changeRequestedData() {
     d3.selectAll(".values-in-bar").style("opacity", "0");
     let startDate = new Date(document.getElementById("start-date").value);
     let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0);
@@ -132,8 +132,11 @@ async function changeRequestedData() {
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
     //I want the date before the start date selected so that I get correct values when I subtract cases, deaths etc.
     startDate = new Date(startDate.setDate(startDate.getDate() - 1)).setHours(0, 0, 0, 0);
-    let allData = await getDataFromStorage();
-    dataForGraphs(startDate, endDate, allData);
+    let countryData = EUDATASET.map((country) =>
+        JSON.parse(localStorage.getItem(country.countryCode))
+    );
+    //don't filter out nulls here. You use the index in next function to assign the correct data to the correct country
+    Promise.all(countryData).then(allData => dataForGraphs(startDate, endDate, allData));
 }
 
 function setBarChartType() {
@@ -804,16 +807,21 @@ function recordFailedAPICalls(rawData, failedCalls) {
     return failedCalls;
 }
 
-async function displayNumberCountriesDownloaded() {
-    let countriesDownloaded = await getNumberOfCountriesDownloaded();
-    document.getElementById("downloads").innerHTML = countriesDownloaded;
+function displayNumberCountriesDownloaded() {
+    let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
+    let CountriesDownloaded = countryCodes.map(countryCode => { return localStorage.getItem(countryCode); });
+    Promise.allSettled(CountriesDownloaded).then(countries => {
+        let countriesDownloaded = countries.filter(country => country.value !== null).length;
+        document.getElementById("downloads").innerHTML = countriesDownloaded;
+    });
+
 }
 
 function compileDataForSaving(countryData) {
     let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
-    return Promise.allSettled(SaveData).then();
+    return SaveData
 }
 
 function compileSuccessfulCalls(successfulCalls) {
@@ -822,34 +830,92 @@ function compileSuccessfulCalls(successfulCalls) {
     );
 }
 
-async function processRawData(rawData, countries, failedCalls) {
+function processRawData(rawData, countries, failedCalls) {
     failedCalls = recordFailedAPICalls(rawData, failedCalls);
     let successfulCalls = rawData.filter((apiCall) => apiCall.status === 200);
-    let jsonData = await compileSuccessfulCalls(successfulCalls);
-    if (successfulCalls.length > 0) {
-        let countryData = cleanData(jsonData);
-        await compileDataForSaving(countryData);
-        countriesDownloaded = await getNumberOfCountriesDownloaded();
-        if (countriesDownloaded === 27) {
-            allCountriesDownloaded = true;
-            setDefaultDates();
-            displayNav();
-            setTimeout(() => {
-                document.getElementsByClassName("loading")[0].style.opacity = "0";
-                document.getElementsByClassName("loading")[0].style.maxHeight = "0";
-            }, 500);
-            setTimeout(() => {
-                document.getElementsByClassName("loading")[0].style.display = "none";
-            }, 1500);
+
+
+
+
+    let JsonData = Promise.all(successfulCalls.map((res) => res.json()));
+
+
+
+    JsonData.then(jsonData => {
+
+        if (successfulCalls.length > 0) {
+            let countryData = cleanData(jsonData);
+            let SaveData = compileDataForSaving(countryData);
+
+            Promise.all(SaveData).then(savedData => {
+
+                let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
+                let CountriesDownloaded = Promise.all(countryCodes.map(countryCode => { return localStorage.getItem(countryCode); }));
+
+
+
+                CountriesDownloaded.then(countriesDownloadedData => {
+
+
+
+
+
+                    countriesDownloaded = countriesDownloadedData.filter(country => country !== null).length;
+
+                    if (countriesDownloaded === 27) {
+                        allCountriesDownloaded = true;
+                        setDefaultDates();
+                        displayNav();
+                        setTimeout(() => {
+                            document.getElementsByClassName("loading")[0].style.opacity = "0";
+                            document.getElementsByClassName("loading")[0].style.maxHeight = "0";
+                        }, 500);
+                        setTimeout(() => {
+                            document.getElementsByClassName("loading")[0].style.display = "none";
+                        }, 1500);
+                    }
+
+                    displayNumberCountriesDownloaded();
+
+
+                    let countryData = EUDATASET.map((country) =>
+                        JSON.parse(localStorage.getItem(country.countryCode))
+                    );
+
+                    Promise.all(countryData).then(allData => {
+
+                        let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0);
+                        let endDate = calculateCommonLatestDate(allData);
+                        console.log('endDate', endDate)
+                        dataForGraphs(startDate, endDate, allData, countriesDownloaded);
+                        getData(countries, false, failedCalls);
+
+                    });
+
+
+
+                    // });
+
+
+
+
+                })
+
+
+
+
+            })
+
+        } else {
+            getData(countries, false, failedCalls);
         }
 
-        displayNumberCountriesDownloaded();
-        let allData = await getDataFromStorage();
-        let startDate = new Date('January 24, 2020 03:24:00').setHours(0, 0, 0, 0);
-        let endDate = calculateCommonLatestDate(allData);
-        dataForGraphs(startDate, endDate, allData, countriesDownloaded);
-    }
-    getData(countries, false, failedCalls);
+
+
+
+    })
+
+
 }
 
 function makeAPICalls(countries, failedCalls) {
@@ -865,8 +931,10 @@ function makeAPICalls(countries, failedCalls) {
         })
         .catch((err) => {
             apiFailedCalls++;
+            console.log('apiFailedCalls', apiFailedCalls)
             if (apiFailedCalls >= 4) {
-                document.getElementsByClassName("loader")[0].stlye.display = "none";
+                console.log('more than 4 failed api calls triggered')
+                document.getElementsByClassName("loader")[0].style.display = "none";
                 document.getElementsByClassName("loading-message")[0].innerHTML = "Sorry. We can't load the data right now. Please try again later.";
                 return;
             } else {
