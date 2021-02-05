@@ -65,13 +65,13 @@ function showCheckboxes(checkboxType) {
         checkboxes.style.display = "none";
         expanded = false;
     }
-};
+}
 
 function collapseCheckboxes(checkboxType) {
     let checkboxes = document.getElementById(checkboxType);
     checkboxes.style.display = "none";
     expanded = false;
-};
+}
 
 function getUncheckedCountries() {
 
@@ -79,22 +79,22 @@ function getUncheckedCountries() {
     let unCheckedCountries = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.id);
     let unCheckedClassNames = [...document.getElementsByClassName('select-country')].filter(e => !e.checked).map(e => e.class);
     return unCheckedCountries;
-};
+}
 
 function setHighlightedCountries() {
     highlightedCountries = [...document.getElementsByClassName('highlight-country')].filter(e => e.checked).map(e => e.id);
-};
+}
 
 function displayNav() {
     document.getElementById('nav').style.display = "flex";
-};
+}
 
 function setDefaultDates() {
-    if (countriesDownloaded < 27) { return }
+    if (countriesDownloaded < 27) { return; }
     document.getElementById("end-date").value = convertDateFormat(latestCommonDate).toString();
     document.getElementById("end-date").max = convertDateFormat(latestCommonDate).toString();
     document.getElementById("start-date").max = convertDateFormat(latestCommonDate).toString();
-};
+}
 
 function convertDateFormat(date) {
     //https://dzone.com/articles/javascript-convert-date
@@ -108,7 +108,7 @@ function convertDateFormat(date) {
         day = `0${day.toString()}`;
     }
     return `${year}-${month}-${day}`;
-};
+}
 
 function checkDateErrors(startDate, endDate) {
     let error = '';
@@ -121,36 +121,36 @@ function checkDateErrors(startDate, endDate) {
     }
     document.getElementById("nav-error").innerHTML = error;
     return error;
-};
+}
 
 async function changeRequestedData() {
     d3.selectAll(".values-in-bar").style("opacity", "0");
     let startDate = new Date(document.getElementById("start-date").value);
     let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0);
     const DATEERROR = checkDateErrors(startDate, endDate);
-    if (DATEERROR !== '') { return };
+    if (DATEERROR !== '') { return; }
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
     //I want the date before the start date selected so that I get correct values when I subtract cases, deaths etc.
     startDate = new Date(startDate.setDate(startDate.getDate() - 1)).setHours(0, 0, 0, 0);
     let allData = await getDataFromStorage();
     dataForGraphs(startDate, endDate, allData);
-};
+}
 
 function setBarChartType() {
-    if (windowWidth > windowHeight) { verticalBarChart = true };
-};
+    if (windowWidth > windowHeight) { verticalBarChart = true; }
+}
 
 function sortByHighestValues(data, metric) {
     return data.sort((a, b) => b[metric] - a[metric]);
-};
+}
 
 function displayToolTip(barData) {
-    if (countriesDownloaded < 27) { return };
+    if (countriesDownloaded < 27) { return; }
     tooltip.text(barData.country);
     return tooltip.style("visibility", "visible");
-};
+}
 
-var BrowserText = (function () {
+function getTextWidth(text, fontSize, fontFace) {
     //https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
     var canvas = document.createElement('canvas');
     context = canvas.getContext('2d');
@@ -162,20 +162,21 @@ var BrowserText = (function () {
      * @param {string} fontFace The font face ("Arial", "Helvetica", etc.)
      * @returns {number} The width of the text
      **/
-    function getWidth(text, fontSize, fontFace) {
-        context.font = fontSize + 'px ' + fontFace;
-        return context.measureText(text).width;
-    }
 
-    return {
-        getWidth: getWidth
-    };
-})();
+    // function getWidth(text, fontSize, fontFace) {
+    context.font = fontSize + 'px ' + fontFace;
+    return context.measureText(text).width;
+    // }
+
+    // return {
+    //     getWidth: getWidth
+    // };
+}
 
 function getBarWidth(measurements, countryData, metric) {
-    if (verticalBarChart) { return measurements.xScale.bandwidth() };
+    if (verticalBarChart) { return measurements.xScale.bandwidth(); }
     return measurements.xScale(countryData[metric]);
-};
+}
 
 function setBarMaxWidth(data, countryID, measurements, metric, countryData) {
     // if(!verticalBarChart){return}
@@ -187,8 +188,8 @@ function setBarMaxWidth(data, countryID, measurements, metric, countryData) {
         updateXAxis(measurements.width, measurements.height, d3.axisBottom(xScale), measurements.innerHeight);
         barWidth = 200;
     }
-    return barWidth
-};
+    return barWidth;
+}
 
 function setXScale(data, countryID, margin, width, metric) {
     if (verticalBarChart) {
@@ -203,10 +204,10 @@ function setXScale(data, countryID, margin, width, metric) {
             .domain([0, d3.max(data, (d) => d[metric])])
             .range([0, width]);
     }
-};
+}
 
 function updateXAxis(width, height, xAxis) {
-    if (!verticalBarChart) { return };
+    if (!verticalBarChart) { return; }
     d3.select("svg")
         .attr("width", width)
         .attr("height", height)
@@ -216,20 +217,20 @@ function updateXAxis(width, height, xAxis) {
         .selectAll('.tick line').remove();
 
     d3.selectAll(".x.axis .tick")
-        .on("mouseover", function (event, countryCode) { displayToolTip(getCountryName(countryCode)) })
+        .on("mouseover", function (event, countryCode) { displayToolTip(getCountryName(countryCode)); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
-};
+}
 
 function getCountryName(countryCode) {
-    if (countryCode === 'eu') { return 'European Union' };
+    if (countryCode === 'eu') { return 'European Union'; }
     let countryCodes = EUDATASET.map(e => e.countryCode);
     let index = countryCodes.indexOf(countryCode);
     return { country: EUDATASET[index].country };
-};
+}
 
 function renderValuesInBars(data, metric, countryID, measurements, barData, countriesDownloaded, barWidth) {
-    if (countriesDownloaded < 27) { return };
+    if (countriesDownloaded < 27) { return; }
 
     function calculateFontSize(countryData, data, measurements, metric) {
         let text = decideTextToReturn(countryData, metric, data, measurements);
@@ -241,15 +242,15 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
             //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
             fontSize = ((.25 / data.length) * Math.max(windowWidth || 0, window.innerWidth || 0)).toString();
             barWidth = setBarMaxWidth(data, countryID, measurements, metric);
-            textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif');
+            textWidth = getTextWidth(text, fontSize, 'sans-serif');
         } else {
             fontSize = 12;
-            textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif');
+            textWidth = getTextWidth(text, fontSize, 'sans-serif');
         }
 
         while (textWidth > .95 * barWidth) {
             fontSize = fontSize - 1;
-            textWidth = BrowserText.getWidth(text, fontSize, 'sans-serif');
+            textWidth = getTextWidth(text, fontSize, 'sans-serif');
         }
 
         return fontSize;
@@ -261,7 +262,7 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         } else {
             let fontSize = calculateFontSize(countryData, data, measurements, metric);
             let text = decideTextToReturn(countryData, metric);
-            let textWidth = BrowserText.getWidth(text, fontSize, "sans-serif");
+            let textWidth = getTextWidth(text, fontSize, "sans-serif");
             let reduction = 0;
             reduction = textWidth - Math.log(10000);
             return (measurements.xScale(countryData[metric]) + 20 - reduction);
@@ -283,9 +284,9 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
 
     function decideTextToReturn(countryData, metric) {
         let text = '';
-        if (countryData.comparison !== undefined) { text = countryData.comparison }
-        else if (countryData[metric] < 0.001) { text = '' }
-        else { text = countryData[metric] };
+        if (countryData.comparison !== undefined) { text = countryData.comparison; }
+        else if (countryData[metric] < 0.001) { text = ''; }
+        else { text = countryData[metric]; }
         return text;
     }
 
@@ -335,22 +336,22 @@ function renderValuesInBars(data, metric, countryID, measurements, barData, coun
         .style("font-size", countryData => calculateFontSize(countryData, data, measurements, metric))
         .style("opacity", "1")
         .text(countryData => decideTextToReturn(countryData, metric, data, measurements))
-        .on('mouseover', (event, barData) => { applyHoverEffectsToBar(event); displayComparisons(event, barData, data, metric, countryID, measurements) })
+        .on('mouseover', (event, barData) => { applyHoverEffectsToBar(event); displayComparisons(event, barData, data, metric, countryID, measurements); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        .on('mouseout', (event, barData) => { removeHoverEffectsFromBar(event); removeComparisons(data, metric, countryID, measurements) });
+        .on('mouseout', (event, barData) => { removeHoverEffectsFromBar(event); removeComparisons(data, metric, countryID, measurements); });
 
     values.exit().remove();
 
-};
+}
 
 function removeComparisons(data, metric, countryID, measurements) {
     //DOES THIS FUNC DO ANYTHING? VAR ISNT USED
     let dataWithOutComparisons = data.map(countryData => {
         delete countryData.comparison;
         return countryData;
-    })
+    });
     renderValuesInBars(data, metric, countryID, measurements);
-};
+}
 
 function setSpeed() {
     if (!allCountriesDownloaded) {
@@ -359,13 +360,13 @@ function setSpeed() {
     else {
         return 500;
     }
-};
+}
 
 function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     function setMargins() {
         let margin = { top: 50, right: 0, bottom: 30, left: 30 };
-        if (verticalBarChart) { margin.left = 0 };
+        if (verticalBarChart) { margin.left = 0; }
         return margin;
     }
 
@@ -386,7 +387,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     function renderXAxis(width, height, margin, xAxis, innerHeight) {
 
-        if (!verticalBarChart) { return };
+        if (!verticalBarChart) { return; }
         d3.select("svg").attr("width", width).attr("height", height)
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`)
@@ -397,7 +398,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     }
 
     function renderYAxis(width, height, margin, yAxis) {
-        if (verticalBarChart) { return }
+        if (verticalBarChart) { return; }
         d3.select("svg").attr("width", width).attr("height", height)
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`)
@@ -419,7 +420,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     }
 
     function updateYAxis(width, height, yAxis) {
-        if (verticalBarChart) { return };
+        if (verticalBarChart) { return; }
 
         d3.select("svg")
             .selectAll("g.y.axis")
@@ -428,7 +429,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .selectAll('.tick line').remove();
 
         d3.selectAll(".y.axis .tick")
-            .on("mouseover", function (event, countryCode) { displayToolTip(getCountryName(countryCode)) })
+            .on("mouseover", function (event, countryCode) { displayToolTip(getCountryName(countryCode)); })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
             .on("mouseout", tooltip.style("visibility", "hidden"));
     }
@@ -447,9 +448,9 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr("y", (d) => measurements.yScale(d[countryID]))
             .attr('data-countryCode', d => d.countryCode)
             .merge(selectDataForBarCharts)
-            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
+            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData); })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
+            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden"); })
             .transition().delay(setSpeed() / 2)
             .attr("fill", d => setBarColor(d))
             .attr("height", measurements.yScale.bandwidth())
@@ -460,7 +461,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
             .end()
             .then(() => {
-                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
+                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded);
             });
 
         selectDataForBarCharts.exit()
@@ -482,9 +483,9 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             .attr('y', d => measurements.yScale(0))
             .attr('data-countryCode', d => d.countryCode)
             .merge(selectDataForBarCharts)
-            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData) })
+            .on('mouseover', (event, barData) => { displayComparisons(event, barData, data, metric, countryID, measurements); displayToolTip(barData); })
             .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden") })
+            .on('mouseout', () => { removeComparisons(data, metric, countryID, measurements); tooltip.style("visibility", "hidden"); })
             .transition().delay(500)
             .attr("transform", `translate(0, ${measurements.margin.top})`)
             .attr('width', setBarMaxWidth(data, countryID, measurements, metric))
@@ -499,7 +500,7 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
             //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
             .end()
             .then(() => {
-                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded)
+                renderValuesInBars(data, metric, countryID, measurements, [], countriesDownloaded);
             });
 
         selectDataForBarCharts.exit()
@@ -507,8 +508,8 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
     }
 
     function setBarColor(data) {
-        if (highlightedCountries.includes(data.countryCode)) { return 'orange' }
-        else { return "steelBlue" };
+        if (highlightedCountries.includes(data.countryCode)) { return 'orange'; }
+        else { return "steelBlue"; }
     }
 
     data = sortByHighestValues(data, metric);
@@ -533,13 +534,19 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
 
     barChartAxisRendered = true;
     let measurements = { yScale, xScale, margin, height, innerHeight, innerWidth };
-    verticalBarChart ? renderVerticalBars(data, measurements, metric, countryID) : renderHorizontalBars(data, measurements, metric, countryID);
-};
+
+    if (verticalBarChart) {
+        renderVerticalBars(data, measurements, metric, countryID);
+    } else {
+        renderHorizontalBars(data, measurements, metric, countryID);
+    }
+
+}
 
 function displayComparisons(event, barData, data, metric, countryID, measurements) {
     let comparisons = calculateComparisons(data, barData);
     renderValuesInBars(comparisons, metric, countryID, measurements, barData);
-};
+}
 
 function calculateComparisons(data, barData) {
     const selectedCountry = barData.countryCode;
@@ -561,20 +568,20 @@ function calculateComparisons(data, barData) {
 
         }
         return country;
-    })
+    });
 
     return comparisons;
-};
+}
 
 function getNumberOfCountriesDownloaded() {
     let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
-    let CountriesDownloaded = countryCodes.map(countryCode => { return localStorage.getItem(countryCode) });
+    let CountriesDownloaded = countryCodes.map(countryCode => { return localStorage.getItem(countryCode); });
     let promiseToReturn = Promise.allSettled(CountriesDownloaded).then(countries => {
         let countriesDownloaded = countries.filter(country => country.value !== null).length;
         return countriesDownloaded;
-    })
+    });
     return promiseToReturn;
-};
+}
 
 function getDataFromStorage() {
     let countryData = EUDATASET.map((country) =>
@@ -582,7 +589,7 @@ function getDataFromStorage() {
     );
     //don't filter out nulls here. You use the index in next function to assign the correct data to the correct country
     return Promise.all(countryData);
-};
+}
 
 function isLatestDateTheSame(allData) {
     let dataWithOutNulls = allData.filter(country => country !== null);
@@ -591,7 +598,7 @@ function isLatestDateTheSame(allData) {
     //https://stackoverflow.com/questions/14832603/check-if-all-values-of-array-are-equal
     let sameLatestDateForAll = latestDaysIgnoringTime.every((val, i, arr) => val === arr[0]);
     return sameLatestDateForAll;
-};
+}
 
 function calculateCommonLatestDate(allData) {
     let dataWithOutNulls = allData.filter(country => country !== null);
@@ -600,7 +607,7 @@ function calculateCommonLatestDate(allData) {
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
     latestCommonDate = Math.min(...latestDaysIgnoringTime);
     return latestCommonDate;
-};
+}
 
 function filterDataByDates(allData, startDate, endDate) {
     let dataToReturn = allData.map(country => {
@@ -608,11 +615,11 @@ function filterDataByDates(allData, startDate, endDate) {
         let filteredData = country.filter(dailyData => {
             let jsDate = new Date(dailyData.date).setHours(0, 0, 0, 0);
             if (jsDate >= startDate && jsDate <= endDate) { return dailyData; }
-        })
+        });
         return filteredData;
-    })
+    });
     return dataToReturn;
-};
+}
 
 function returnDataWithSameDates(allData) {
     const sameLatestDateForAll = isLatestDateTheSame(allData);
@@ -623,13 +630,13 @@ function returnDataWithSameDates(allData) {
         let dataWithSameEndDate = filterDataByDates(allData, startDate, commonLatestDate);
         return dataWithSameEndDate;
     }
-};
+}
 
 function calculateCasesPerCapita(allData, startDate, endDate) {
     let casesPerCapita = allData
         .map((country, index) => {
             //prevent countries that haven't been downloaded yet from causing errors
-            if (country === null) { return null };
+            if (country === null) { return null; }
             let firstDateData;
             let latestDateData;
             if (country.length === 0) {
@@ -657,21 +664,21 @@ function calculateCasesPerCapita(allData, startDate, endDate) {
         })
         .filter(country => country !== undefined && country !== null);
     return casesPerCapita;
-};
+}
 
 function getCasesPerCapita(requestedData, startDate, endDate) {
-    let casesPerCapita = calculateCasesPerCapita(requestedData, startDate, endDate)
+    let casesPerCapita = calculateCasesPerCapita(requestedData, startDate, endDate);
     if (countriesDownloaded < 27) {
         return casesPerCapita;
     }
     else {
         return includeEUInCasesPerCapita(requestedData, casesPerCapita);
     }
-};
+}
 
 function calculateEUPopulation() {
     return EUDATASET.map((country) => country.population).reduce((a, b) => a + b);
-};
+}
 
 function calculateTotalEUCases(allData) {
 
@@ -697,9 +704,9 @@ function calculateTotalEUCases(allData) {
                 latestDateData = country[country.length - 1].casesToDate;
             }
             totalCases.push(latestDateData - firstDateData);
-        })
+        });
     return totalCases.reduce((a, b) => a + b);
-};
+}
 
 function includeEUInCasesPerCapita(allData, casesPerCapita) {
     let totalEuCases = calculateTotalEUCases(allData);
@@ -716,7 +723,7 @@ function includeEUInCasesPerCapita(allData, casesPerCapita) {
         casesPerCapita: euCasesPerCapita,
     });
     return casesPerCapita;
-};
+}
 
 function filterDataByCountry(data) {
     let countriesToDelete = getUncheckedCountries();
@@ -724,9 +731,9 @@ function filterDataByCountry(data) {
     let indexesToDelete = countriesToDelete.map(country => countryCodes.indexOf(country)).sort((a, b) => b - a);
     indexesToDelete.forEach(index => {
         data.splice(index, 1);
-    })
+    });
     return data;
-};
+}
 
 function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
     if (countriesDownloaded === 0) { return; }
@@ -735,11 +742,11 @@ function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
     filteredDataByCountry = filterDataByCountry(casesPerCapita);
     setHighlightedCountries();
     renderBarChart(filteredDataByCountry, "casesPerCapita", "countryCode", countriesDownloaded);
-};
+}
 
 function removeColonies(jsonData) {
     return jsonData.map(country => country.filter(dailyData => dailyData.Province === ""));
-};
+}
 
 function formatAPIData(countriesOnly) {
 
@@ -764,7 +771,7 @@ function formatAPIData(countriesOnly) {
             };
             if (index === 0) { objectToReturn.firstDayOfData = true; }
             return objectToReturn;
-        })
+        });
 
 
         //return an array of objects
@@ -778,13 +785,13 @@ function formatAPIData(countriesOnly) {
     });
 
     return cleanedData;
-};
+}
 
 function cleanData(jsonData) {
     let countriesOnly = removeColonies(jsonData);
     let cleanedData = formatAPIData(countriesOnly);
     return cleanedData;
-};
+}
 
 function recordFailedAPICalls(rawData, failedCalls) {
     rawData
@@ -793,27 +800,27 @@ function recordFailedAPICalls(rawData, failedCalls) {
             // I based this on similar code that I found here: https://stackoverflow.com/questions/3568921/how-to-remove-part-of-a-string
             countryName = apiCall.url.split("country/").pop();
             failedCalls.push(countryName);
-        })
+        });
     return failedCalls;
-};
+}
 
 async function displayNumberCountriesDownloaded() {
     let countriesDownloaded = await getNumberOfCountriesDownloaded();
     document.getElementById("downloads").innerHTML = countriesDownloaded;
-};
+}
 
 function compileDataForSaving(countryData) {
     let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
     return Promise.allSettled(SaveData).then();
-};
+}
 
 function compileSuccessfulCalls(successfulCalls) {
     return Promise.all(
         successfulCalls.map((res) => res.json())
-    )
-};
+    );
+}
 
 async function processRawData(rawData, countries, failedCalls) {
     failedCalls = recordFailedAPICalls(rawData, failedCalls);
@@ -843,7 +850,7 @@ async function processRawData(rawData, countries, failedCalls) {
         dataForGraphs(startDate, endDate, allData, countriesDownloaded);
     }
     getData(countries, false, failedCalls);
-};
+}
 
 function makeAPICalls(countries, failedCalls) {
 
@@ -867,7 +874,7 @@ function makeAPICalls(countries, failedCalls) {
                 setTimeout(() => getData([...eu], true, []), 10000);
             }
         });
-};
+}
 
 function getData(countries, firstCall, failedCalls) {
     if (countries.length === 0 && failedCalls.length === 0) { return; }
@@ -879,7 +886,7 @@ function getData(countries, firstCall, failedCalls) {
         //the api won't allow more than 10 calls from my ip within 5 seconds
         setTimeout(() => makeAPICalls(countries, failedCalls), 5000);
     }
-};
+}
 
 setBarChartType();
 getData([...eu], true, []);
