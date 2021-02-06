@@ -531,8 +531,8 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         measurements.innerWidth = measurements.width - measurements.margin.left - measurements.margin.right;
         measurements.yScale = setYScale(metric, data, countryID);
         measurements.xScale = setXScale(data, countryID, metric);
-        measurements.yAxis = d3.axisLeft(yScale);
-        measurements.xAxis = d3.axisBottom(xScale).ticks(0);
+        measurements.yAxis = d3.axisLeft(measurements.yScale);
+        measurements.xAxis = d3.axisBottom(measurements.xScale).ticks(0);
         renderYAxis();
         renderXAxis();
         renderChartTitle();
@@ -876,7 +876,6 @@ function processRawData(rawData, countries, failedCalls) {
         getData(countries, false, failedCalls);
     })
 }
-
 function makeAPICalls(countries, failedCalls) {
 
     Promise.all(
@@ -915,6 +914,7 @@ function getData(countries, firstCall, failedCalls) {
     }
 }
 
+console.log('15:54')
 setBarChartType();
 getData([...eu], true, []);
 
