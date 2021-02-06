@@ -527,10 +527,10 @@ function renderBarChart(data, metric, countryID, countriesDownloaded) {
         setMargins();
         measurements.width = 0.95 * windowWidth;
         measurements.height = 0.8 * windowHeight;
-        measurements.innerHeight = height - margin.top - margin.bottom;
-        measurements.innerWidth = width - margin.left - margin.right;
-        measurements.yScale = setYScale(metric, innerHeight, data, countryID);
-        measurements.xScale = setXScale(data, countryID, margin, innerWidth, metric);
+        measurements.innerHeight = measurements.height - measurements.margin.top - measurements.margin.bottom;
+        measurements.innerWidth = measurements.width - measurements.margin.left - measurements.margin.right;
+        measurements.yScale = setYScale(metric, data, countryID);
+        measurements.xScale = setXScale(data, countryID, metric);
         measurements.yAxis = d3.axisLeft(yScale);
         measurements.xAxis = d3.axisBottom(xScale).ticks(0);
         renderYAxis();
