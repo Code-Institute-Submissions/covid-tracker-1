@@ -211,7 +211,7 @@ function setXScale(data, metric) {
         return d3
             .scaleLinear()
             .domain([0, d3.max(data, (d) => d[metric])])
-            .range([0, measurements.width]);
+            .range([0, measurements.innerWidth]);
     }
 }
 
@@ -373,8 +373,6 @@ function setSpeed() {
 }
 
 function renderBarChart(data, metric, countriesDownloaded) {
-
-    console.log('in render bar chart', countriesDownloaded)
 
     function setMargins() {
         let margin = { top: 50, right: 0, bottom: 30, left: 30 };
