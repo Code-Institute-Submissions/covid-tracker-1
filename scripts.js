@@ -239,6 +239,7 @@ function getCountryName(countryCode) {
 }
 
 function renderValuesInBars(data, metric, barData, countriesDownloaded, barWidth) {
+    console.log('renderValuesInBars', countriesDownloaded)
     if (countriesDownloaded < 27) { return; }
 
     function calculateFontSize(countryData, data, metric) {
@@ -372,6 +373,8 @@ function setSpeed() {
 }
 
 function renderBarChart(data, metric, countriesDownloaded) {
+
+    console.log('in render bar chart', countriesDownloaded)
 
     function setMargins() {
         let margin = { top: 50, right: 0, bottom: 30, left: 30 };
@@ -761,7 +764,7 @@ function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
     let casesPerCapita = getCasesPerCapita(filteredDataByDate, startDate, endDate);
     filteredDataByCountry = filterDataByCountry(casesPerCapita);
     setHighlightedCountries();
-    renderBarChart(filteredDataByCountry, "casesPerCapita", "countryCode", countriesDownloaded);
+    renderBarChart(filteredDataByCountry, "casesPerCapita", countriesDownloaded);
 }
 
 function removeColonies(jsonData) {
