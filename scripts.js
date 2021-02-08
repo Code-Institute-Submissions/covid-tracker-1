@@ -412,8 +412,6 @@ function updateYAxis(data, metric) {
         .on("mouseout", tooltip.style("visibility", "hidden"));
 }
 
-
-
 function updateXAxis(data, metric) {
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
@@ -432,7 +430,7 @@ function updateXAxis(data, metric) {
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
 
-function renderHorizontalBars(data, metric) {
+function renderHorizontalBars(data, metric, countriesDownloaded) {
     let yScale = setYScale(metric, data);
     let xScale = setXScale(data, metric);
     let selectDataForBarCharts = d3.select(`#${metric}`)
@@ -468,7 +466,7 @@ function renderHorizontalBars(data, metric) {
         .transition().duration(500).delay(500).remove();
 }
 
-function renderVerticalBars(data, metric) {
+function renderVerticalBars(data, metric, countriesDownloaded) {
     let yScale = setYScale(metric, data);
     let xScale = setXScale(data, metric);
     let selectDataForBarCharts = d3.select(`#${metric}`)
@@ -495,9 +493,7 @@ function renderVerticalBars(data, metric) {
         .ease(d3.easeBounce)
         .duration(setSpeed())
         .attr("height", d => measurements.innerHeight - yScale(d[metric]))
-
         .attr("y", (d) => yScale(d[metric]))
-
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
         .end()
         .then(() => {
@@ -512,7 +508,6 @@ function setBarColor(data) {
     if (highlightedCountries.includes(data.countryCode)) { return "orange"; }
     else { return "steelBlue"; }
 }
-
 
 function renderAxis(data, metric) {
 
@@ -535,23 +530,12 @@ function renderAxis(data, metric) {
 
 function renderBarChart(data, metric, countriesDownloaded) {
 
-
-
     data = sortByHighestValues(data, metric);
 
-
-
-
-
-
-
-
-
-
     if (verticalBarChart) {
-        renderVerticalBars(data, metric);
+        renderVerticalBars(data, metric, countriesDownloaded);
     } else {
-        renderHorizontalBars(data, metric);
+        renderHorizontalBars(data, metric, countriesDownloaded);
     }
 
 }
