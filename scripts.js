@@ -129,14 +129,13 @@ function checkDateErrors(startDate, endDate) {
     if (endDate < startDate) {
         error = "Start date must be before end date";
         document.getElementById("users-countries").style.display = "none";
-    } else if (startDate > latestCommonDate) {
-        error = `Start date can't be after ${convertDateFormatForDisplay(latestCommonDate)}`
+    } else if (startDate > latestCommonDate || endDate > latestCommonDate) {
+        error = `No data is available after ${convertDateFormatForDisplay(latestCommonDate)}`
         document.getElementById("users-countries").style.display = "none";
     } else if (endDate < new Date("2020-01-24")) {
         error = `End date can't be before 24th January 2020`
         document.getElementById("users-countries").style.display = "none";
     }
-
     else {
         document.getElementById("users-countries").style.display = "flex";
     }
