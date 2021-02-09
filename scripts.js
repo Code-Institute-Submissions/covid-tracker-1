@@ -148,11 +148,25 @@ function sortByHighestValues(data, metric) {
     return data.sort((a, b) => b[metric] - a[metric]);
 }
 
+
+/**
+* makes tooltip visible. This is used to display data on screen
+* @param {object} barData data for a specific country
+**/
+
 function displayToolTip(barData) {
     if (countriesDownloaded < 27) { return; }
     tooltip.text(barData.country);
-    return tooltip.style("visibility", "visible");
+    tooltip.style("visibility", "visible");
 }
+
+/**
+* gets the width of text before it is rendered
+* @param {string} text the text to get the width of
+* @param {number} fontSize the font size of the text
+* @param {string} fontFace the name of the font
+** @return {number} width of text when rendered
+**/
 
 function getTextWidth(text, fontSize, fontFace) {
     //https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
@@ -161,6 +175,14 @@ function getTextWidth(text, fontSize, fontFace) {
     context.font = fontSize + "px " + fontFace;
     return context.measureText(text).width;
 }
+
+/**
+* gets the width of a bar
+* @param {object} countryData data for a specific country
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @return {number} bar Width
+**/
 
 function getBarWidth(countryData, data, metric) {
     const xScale = setXScale(data, metric);
@@ -178,15 +200,18 @@ function getBarWidth(countryData, data, metric) {
 **/
 
 function setBarMaxWidth(data, metric, countryData) {
-    // if(!verticalBarChart){return}
+    // if (!verticalBarChart) { return }
     let barWidth = getBarWidth(countryData, data, metric);
-    // verticalBarChart ? barWidth= measurements.xScale.bandwidth() : barWidth = measurements.xScale(countryData[metric])
+    // verticalBarChart ? barWidth = measurements.xScale.bandwidth() : barWidth = measurements.xScale(countryData[metric])
     if (barWidth > 200) {
-        // let widthDifference = 200 - barWidth;
-        // const xScale = setXScale(data, measurements.margin, measurements.innerWidth - widthDifference, metric);
-
-        const xScale = setXScale(data, metric);
-        updateXAxis(d3.axisBottom(xScale));
+        //     let widthDifference = 200 - barWidth;
+        //     // const xScale = setXScale(data, measurements.margin, measurements.innerWidth - widthDifference, metric);
+        //     console.log('widthDifference', widthDifference)
+        //     let newMeasurements = measurements
+        //     console.log('innerwidth1, ', newMeasurements.width)
+        //     newMeasurements.width = (measurements.width - widthDifference) / 2
+        //     console.log('innerwidth2, ', newMeasurements.width)
+        //     updateXAxis(data, metric, newMeasurements);
         barWidth = 200;
     }
     return barWidth;
@@ -237,18 +262,17 @@ function calculateFontSize(countryData, data, metric) {
     return fontSize;
 }
 
-/**
-* decides x value for displaying on screen
-* @param {object} data data to display for each country
-* @param {object} countryData data for a specific country
-* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
-** @return {number} x value
-**/
 
-function setXValue(data, metric, countryData) {
+
+function setXPositionValueInBars(data, metric, countryData) {
+
     let xScale = setXScale(data, metric)
+
     if (verticalBarChart) {
-        return xScale(countryData.countryCode) + setBarMaxWidth(data, metric) / 2;
+        let adjustment = 0
+        let width = getBarWidth(countryData, data, metric)
+        if (width > 200) { adjustment = (width - 200) / 2 }
+        return xScale(countryData.countryCode) + (setBarMaxWidth(data, metric) / 2) + adjustment;
     } else {
         let fontSize = calculateFontSize(countryData, data, metric);
         let text = decideTextToReturn(countryData, metric);
@@ -267,7 +291,7 @@ function setXValue(data, metric, countryData) {
 ** @return {number} value or comparison to display within bar
 **/
 
-function setYValue(data, countryData, metric) {
+function setYPositionValueInBars(data, countryData, metric) {
 
     let yScale = setYScale(metric, data)
     if (verticalBarChart) {
@@ -367,8 +391,8 @@ function renderValuesInBars(data, metric, barData, countriesDownloaded, barWidth
         .attr("text-anchor", setTextAnchor())
         .attr("alignment-baseline", setAlignmentBaseline())
         .attr("data-countryCode", d => d.countryCode)
-        .attr("x", countryData => setXValue(data, metric, countryData))
-        .attr("y", countryData => setYValue(data, countryData, metric))
+        .attr("x", countryData => setXPositionValueInBars(data, metric, countryData))
+        .attr("y", countryData => setYPositionValueInBars(data, countryData, metric))
         .style("fill", "white")
         .style("font-size", countryData => calculateFontSize(countryData, data, metric))
         .style("opacity", "1")
@@ -562,7 +586,6 @@ function updateYAxis(data, metric) {
 **/
 
 function updateXAxis(data, metric) {
-
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
     const xAxis = d3.axisBottom(xScale).ticks(0);
@@ -630,6 +653,19 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
 * @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
 **/
 
+
+function setXPositionOfBar(data, metric, countryData) {
+
+    let width = getBarWidth(countryData, data, metric)
+    let xScale = setXScale(data, metric)
+    let adjustment = 0
+    if (width > 200) { adjustment = (width - 200) / 2 }
+    if (verticalBarChart) {
+        return xScale(countryData.countryCode) + adjustment
+    }
+}
+
+
 function renderVerticalBars(data, metric, countriesDownloaded) {
     let yScale = setYScale(metric, data);
     let xScale = setXScale(data, metric);
@@ -652,7 +688,8 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .transition().delay(500)
         .attr("transform", `translate(0, ${measurements.margin.top})`)
         .attr("width", setBarMaxWidth(data, metric))
-        .attr("x", (d) => xScale(d.countryCode))
+        // .attr("x", (d) => xScale(d.countryCode))
+        .attr("x", countryData => setXPositionOfBar(data, metric, countryData))
         .transition()
         .ease(d3.easeBounce)
         .duration(setSpeed())
