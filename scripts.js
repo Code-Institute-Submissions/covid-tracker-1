@@ -361,7 +361,7 @@ function applyHoverEffectsToBar(event, metric) {
 function removeHoverEffectsFromBar(event, metric) {
     tooltip.style("visibility", "hidden");
     let selectedChart = document.getElementById(metric);
-    let allBars = [...document.getElementsByTagName("rect")];
+    let allBars = [...selectedChart.getElementsByTagName("rect")];
     let countryCodes = allBars.map(e => e.dataset.countryCode);
     let index = countryCodes.indexOf(event.target.dataset.countryCode);
     selectedChart.getElementsByTagName("rect")[index].style.opacity = "1";
