@@ -9,9 +9,9 @@
 body {
 
     margin: 0;
+    padding: 0;
     box-sizing: border-box;
-      background-color: #eeecec;
-    /* position: relative; */
+    background-color: #eeecec;
 }
 
 a {
@@ -23,7 +23,7 @@ a {
 footer {
   /* code in first 4 attributes from https://www.freecodecamp.org/news/how-to-keep-your-footer-where-it-belongs-59c6aa05c59c/*/
   bottom: 0;
-  width: 100vw;
+  width: 100%;
   height: 2.5rem;
   /* end copied code */
   background-color: #f7f7f7;

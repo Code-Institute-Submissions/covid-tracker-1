@@ -46,7 +46,7 @@ const EUDATASET = [
 ];
 let eu = EUDATASET.map((e) => e.country);
 let countriesDownloaded = 0;
-let barChartAxisRendered = false;
+let barChartAxisRendered = { casesPerCapita: false, deathsPerCapita: false }
 let latestCommonDate = new Date();
 let verticalBarChart = false;
 let measurements = {};
@@ -167,6 +167,15 @@ function getBarWidth(countryData, data, metric) {
     return xScale(countryData[metric]);
 }
 
+
+/**
+* sets maximum width for bar
+* @param {object} data data to display for each country
+* @param {object} countryData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @return {number} bar Width
+**/
+
 function setBarMaxWidth(data, metric, countryData) {
     // if(!verticalBarChart){return}
     let barWidth = getBarWidth(countryData, data, metric);
@@ -182,12 +191,26 @@ function setBarMaxWidth(data, metric, countryData) {
     return barWidth;
 }
 
+/**
+* returns country Name
+* @param {string} countryCode data for a specific country
+** @return {string or object} name of country
+**/
+
 function getCountryName(countryCode) {
     if (countryCode === "eu") { return "European Union"; }
     let countryCodes = EUDATASET.map(e => e.countryCode);
     let index = countryCodes.indexOf(countryCode);
     return { country: EUDATASET[index].country };
 }
+
+/**
+* calculates font size so text fits within bar
+* @param {object} data data to display for each country
+* @param {object} countryData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @return {number} the font size
+**/
 
 function calculateFontSize(countryData, data, metric) {
     let text = decideTextToReturn(countryData, metric, data);
@@ -213,6 +236,14 @@ function calculateFontSize(countryData, data, metric) {
     return fontSize;
 }
 
+/**
+* decides x value for displaying on screen
+* @param {object} data data to display for each country
+* @param {object} countryData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @return {number} x value
+**/
+
 function setXValue(data, metric, countryData) {
     let xScale = setXScale(data, metric)
     if (verticalBarChart) {
@@ -227,7 +258,16 @@ function setXValue(data, metric, countryData) {
     }
 }
 
+/**
+* decides y value for displaying on screen
+* @param {object} data data to display for each country
+* @param {object} countryData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @return {number} value or comparison to display within bar
+**/
+
 function setYValue(data, countryData, metric) {
+
     let yScale = setYScale(metric, data)
     if (verticalBarChart) {
         return yScale(countryData[metric]) + measurements.margin.top + setBarMaxWidth(data, metric) / 3;
@@ -237,9 +277,12 @@ function setYValue(data, countryData, metric) {
 }
 
 
-function setColor(countryData, barData) {
-    return "white";
-}
+/**
+* decides whether to display value or comparison within bar
+* @param {object} countryData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @return {string or number} value or comparison to display within bar
+**/
 
 function decideTextToReturn(countryData, metric) {
     let text = "";
@@ -249,67 +292,111 @@ function decideTextToReturn(countryData, metric) {
     return text;
 }
 
+/**
+* decides positioning of text within bar
+* @param {object} event the event data
+**/
+
 function setTextAnchor() {
     if (verticalBarChart) { return "middle"; }
     else { return "start"; }
 }
+
+/**
+* decides positioning of text within bar
+* @param {object} event the event data
+**/
 
 function setAlignmentBaseline() {
     if (verticalBarChart) { return "auto"; }
     else { return "central"; }
 }
 
-function applyHoverEffectsToBar(event) {
-    let allBars = [...document.getElementsByTagName("rect")];
+/**
+* adds hover effect from bar when user moves mouse out of value within bar
+* @param {object} event the event data
+**/
+
+function applyHoverEffectsToBar(event, metric) {
+    let selectedChart = document.getElementById(metric);
+    let allBars = [...selectedChart.getElementsByTagName("rect")];
     let allBarData = allBars.map(e => e.__data__);
     let countryCodes = allBars.map(e => e.dataset.countryCode);
     let index = countryCodes.indexOf(event.target.dataset.countryCode);
-    document.getElementsByTagName("rect")[index].style.opacity = "0.5";
+    selectedChart.getElementsByTagName("rect")[index].style.opacity = "0.5";
     displayToolTip(allBarData[index]);
     tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
 }
 
-function removeHoverEffectsFromBar(event) {
+/**
+* removes hover effect from bar when user moves mouse out of value within bar
+* @param {object} event the event data
+**/
+
+function removeHoverEffectsFromBar(event, metric) {
     tooltip.style("visibility", "hidden");
+    let selectedChart = document.getElementById(metric);
     let allBars = [...document.getElementsByTagName("rect")];
     let countryCodes = allBars.map(e => e.dataset.countryCode);
     let index = countryCodes.indexOf(event.target.dataset.countryCode);
-    document.getElementsByTagName("rect")[index].style.opacity = "1";
+    selectedChart.getElementsByTagName("rect")[index].style.opacity = "1";
 }
 
+/**
+* renders the values within the bars
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {object} barData data for a specific country
+* @param {number} countriesDownloaded number of countries for which data has been downloaded from the api
+* @param {number} barWidth width of each bar
+**/
 
 function renderValuesInBars(data, metric, barData, countriesDownloaded, barWidth) {
     if (countriesDownloaded < 27) { return; }
 
     let values = d3.select(`#${metric}`)
-        .selectAll(".casesPerCapita")
+        .selectAll(`.${metric}-values-in-bar`)
         .data(data, d => d.countryCode);
 
     values
         .enter()
         .append("text")
         .merge(values)
-        .attr("class", `${metric} values-in-bar`)
+        .attr("class", `${metric}-values-in-bar`)
         .attr("text-anchor", setTextAnchor())
         .attr("alignment-baseline", setAlignmentBaseline())
         .attr("data-countryCode", d => d.countryCode)
         .attr("x", countryData => setXValue(data, metric, countryData))
         .attr("y", countryData => setYValue(data, countryData, metric))
-        .style("fill", countryData => setColor(countryData, barData))
+        .style("fill", "white")
         .style("font-size", countryData => calculateFontSize(countryData, data, metric))
         .style("opacity", "1")
         .text(countryData => decideTextToReturn(countryData, metric, data))
-        .on("mouseover", (event, barData) => { applyHoverEffectsToBar(event); displayComparisons(event, barData, data, metric); })
+        .on("mouseover", (event, barData) => { applyHoverEffectsToBar(event, metric); displayComparisons(event, barData, data, metric); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        .on("mouseout", (event, barData) => { removeHoverEffectsFromBar(event); removeComparisons(data, metric); });
+        .on("mouseout", (event, barData) => { removeHoverEffectsFromBar(event, metric); removeComparisons(data, metric); });
 
     values.exit().remove();
 
 }
 
+/**
+* removes comparisons from bars and replaces them with original values
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function removeComparisons(data, metric) {
-    renderValuesInBars(data, metric);
+    let dataWithOutComparisons = data.map(countryData => {
+        delete countryData.comparison;
+        return countryData;
+    });
+    renderValuesInBars(dataWithOutComparisons, metric);
 }
+
+/**
+* sets the speed for the chart animations
+**/
 
 function setSpeed() {
     if (!allCountriesDownloaded) {
@@ -320,11 +407,21 @@ function setSpeed() {
     }
 }
 
+/**
+* sets the charts margins
+**/
+
 function setMargins() {
     let margin = { top: 50, right: 0, bottom: 30, left: 30 };
     if (verticalBarChart) { margin.left = 0; }
     measurements.margin = margin;
 }
+
+/**
+* sets the x scale
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
 
 function setXScale(data, metric) {
     if (verticalBarChart) {
@@ -341,6 +438,12 @@ function setXScale(data, metric) {
     }
 }
 
+/**
+* sets the y scale
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function setYScale(metric, data) {
     if (verticalBarChart) {
         return d3
@@ -356,6 +459,12 @@ function setYScale(metric, data) {
     }
 }
 
+/**
+* renders x axis for the first time
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function renderXAxis(data, metric) {
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
@@ -369,6 +478,12 @@ function renderXAxis(data, metric) {
         .selectAll(".tick line").remove();
 }
 
+/**
+* renders y axis for the first time.
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function renderYAxis(data, metric) {
     if (verticalBarChart) { return; }
     let yScale = setYScale(metric, data);
@@ -381,6 +496,27 @@ function renderYAxis(data, metric) {
         .selectAll(".tick line").remove();
 }
 
+/**
+* decides what the chart title should be
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
+function decideChartTitleText(metric) {
+
+    if (metric === "casesPerCapita") {
+        return "Cases Per 100,000 People"
+    } else if (metric === "deathsPerCapita") {
+        return "Deaths Per Million People"
+    } else { return "title error" }
+
+}
+
+/**
+* renders chart title
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function renderChartTitle(data, metric) {
 
     let xScale = setXScale(data, metric);
@@ -392,9 +528,15 @@ function renderChartTitle(data, metric) {
         .attr("x", xScaleMidPoint)
         .attr("text-anchor", "middle")
         .attr("font-size", "16")
-        .text("Cases Per 100,000 People");
+        .text(decideChartTitleText(metric));
 }
 
+
+/**
+* updates already rendered y axis
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
 function updateYAxis(data, metric) {
     if (verticalBarChart) { return; }
     let yScale = setYScale(metric, data);
@@ -412,7 +554,14 @@ function updateYAxis(data, metric) {
         .on("mouseout", tooltip.style("visibility", "hidden"));
 }
 
+/**
+* updates already rendered x axis.
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function updateXAxis(data, metric) {
+
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
     const xAxis = d3.axisBottom(xScale).ticks(0);
@@ -429,6 +578,13 @@ function updateXAxis(data, metric) {
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
+
+/**
+* renders horizontal bars.
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
+**/
 
 function renderHorizontalBars(data, metric, countriesDownloaded) {
     let yScale = setYScale(metric, data);
@@ -465,6 +621,13 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .transition().duration(500).attr("width", 0)
         .transition().duration(500).delay(500).remove();
 }
+
+/**
+* renders vertical bars.
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
+**/
 
 function renderVerticalBars(data, metric, countriesDownloaded) {
     let yScale = setYScale(metric, data);
@@ -504,14 +667,25 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .transition().duration(500).attr("height", 0).attr("y", d => yScale(0)).remove();
 }
 
+/**
+* decides what color each bar should be.
+* @param {object} data data to display for each country
+**/
+
 function setBarColor(data) {
     if (highlightedCountries.includes(data.countryCode)) { return "orange"; }
     else { return "steelBlue"; }
 }
 
-function renderAxis(data, metric) {
+/**
+* renders the axis on the screen
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
 
-    if (!barChartAxisRendered) {
+function renderAxis(data, metric) {
+    data = sortByHighestValues(data, metric);
+    if (!barChartAxisRendered[metric]) {
         setMargins();
         measurements.width = 0.95 * windowWidth;
         measurements.height = 0.8 * windowHeight;
@@ -520,55 +694,79 @@ function renderAxis(data, metric) {
         renderYAxis(data, metric);
         renderXAxis(data, metric);
         renderChartTitle(data, metric);
-        barChartAxisRendered = true;
+        barChartAxisRendered[metric] = true;
     } else {
         updateYAxis(data, metric);
         updateXAxis(data, metric);
     }
-
 }
+
+/**
+* decides whether to render vertical or horizontal bars.
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
+**/
 
 function renderBarChart(data, metric, countriesDownloaded) {
-
-    data = sortByHighestValues(data, metric);
-
+    const graphData = sortByHighestValues(JSON.parse(JSON.stringify(data)), metric);
     if (verticalBarChart) {
-        renderVerticalBars(data, metric, countriesDownloaded);
+        renderVerticalBars(graphData, metric, countriesDownloaded);
     } else {
-        renderHorizontalBars(data, metric, countriesDownloaded);
+        renderHorizontalBars(graphData, metric, countriesDownloaded);
     }
-
 }
 
+/**
+* compares a country's data to all other countries.
+* @param {object} event the event data
+* @param {object} data data to display for each country
+* @param {object} barData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+**/
+
 function displayComparisons(event, barData, data, metric) {
-    let comparisons = calculateComparisons(data, barData);
+    let comparisons = calculateComparisons(data, barData, metric);
     renderValuesInBars(comparisons, metric, barData);
 }
 
-function calculateComparisons(data, barData) {
+/**
+* compares a country's data to all other countries.
+* @param {object} data data to display for each country
+* @param {object} barData data for a specific country
+* * @returns {object} compares a country's data to all other countries.
+**/
+
+
+function calculateComparisons(data, barData, metric) {
     const selectedCountry = barData.countryCode;
     let comparisons = data.map(country => {
-        let difference = (country.casesPerCapita - barData.casesPerCapita);
+        let difference = (country[metric] - barData[metric]);
         if (country.countryCode === selectedCountry) {
-            country.comparison = barData.casesPerCapita;
+            country.comparison = barData[metric];
         }
-        else if (difference === 0 || Math.round(100 * difference / barData.casesPerCapita) === 0) {
+        else if (difference === 0 || Math.round(100 * difference / barData[metric]) === 0) {
             country.comparison = "=";
         }
         else if (difference > 0) {
             //https://www.w3schools.com/jsref/jsref_round.asp
-            country.comparison = `+${Math.round(100 * difference / barData.casesPerCapita)}%`;
+            country.comparison = `+${Math.round(100 * difference / barData[metric])}%`;
         } else {
-            difference = barData.casesPerCapita - country.casesPerCapita;
-            country.comparison = `-${Math.round(100 * difference / barData.casesPerCapita)}%`;
-            if (Math.round(100 * difference / barData.casesPerCapita) === 0) { country.comparison = "="; }
+            difference = barData[metric] - country[metric];
+            country.comparison = `-${Math.round(100 * difference / barData[metric])}%`;
+            if (Math.round(100 * difference / barData[metric]) === 0) { country.comparison = "="; }
 
         }
         return country;
     });
-
     return comparisons;
 }
+
+/**
+* checks that the most recent downloaded date for each country is the same
+* @param {array} allData data from the api for each country that is cleaned and formatted
+* * @returns {boolean} is the most recent downloaded date for each country the same?
+**/
 
 function isLatestDateTheSame(allData) {
     let dataWithOutNulls = allData.filter(country => country !== null);
@@ -579,6 +777,12 @@ function isLatestDateTheSame(allData) {
     return sameLatestDateForAll;
 }
 
+/**
+* calculates the most recent date for which data is available for all countries
+* @param {array} allData data from the api for each country that is cleaned and formatted
+* * @returns {number} the most recent date for which data is available for all countries in the format of a number that is the number of seconds between the 1 Jan 1970 and the relevant date.
+**/
+
 function calculateCommonLatestDate(allData) {
     let dataWithOutNulls = allData.filter(country => country !== null);
     let latestDays = dataWithOutNulls.map(country => country[country.length - 1].date);
@@ -587,6 +791,16 @@ function calculateCommonLatestDate(allData) {
     latestCommonDate = Math.min(...latestDaysIgnoringTime);
     return latestCommonDate;
 }
+
+
+/**
+* filters data by the dates the user selects
+* @param {array} allData data from the api for each country that is cleaned and formatted
+ * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+* @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+* * @returns {array} array containing data for each country for the dates that the user selected
+**/
+
 
 function filterDataByDates(allData, startDate, endDate) {
     let dataToReturn = allData.map(country => {
@@ -600,42 +814,62 @@ function filterDataByDates(allData, startDate, endDate) {
     return dataToReturn;
 }
 
-function calculateCasesPerCapita(allData, startDate, endDate) {
+/**
+ * calculates cases per capita and deaths per capita for countries
+ * @param {array} allData data from the api for each country that is cleaned and formatted
+ * * @returns {object} contains cases per capita and deaths per capita for countries
+ **/
+
+function calculatePerCapitaData(allData) {
+
     let casesPerCapita = allData
         .map((country, index) => {
             //prevent countries that haven't been downloaded yet from causing errors
             if (country === null) { return null; }
-            let firstDateData;
-            let latestDateData;
+            let firstDateData = {};
+            let latestDateData = {};
             if (country.length === 0) {
-                firstDateData = 0;
-                latestDateData = 0;
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
             } else if (country.length === 1) {
-                firstDateData = 0;
-                latestDateData = country[country.length - 1].casesToDate;
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: [country.length - 1].casesToDate, deathsPerCapita: [country.length - 1].deathsToDate };
             }
             else if (country[0].firstDayOfData) {
-                firstDateData = 0;
-                latestDateData = country[country.length - 1].casesToDate;
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
             }
             else {
-                firstDateData = country[0].casesToDate;
-                latestDateData = country[country.length - 1].casesToDate;
+                firstDateData = { casesPerCapita: country[0].casesToDate, deathsPerCapita: country[0].deathsToDate };
+                latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
             }
-            let casesPerCapita = ((latestDateData - firstDateData) / EUDATASET[index].population).toFixed(3);
+            let casesPerCapita = ((latestDateData.casesPerCapita - firstDateData.casesPerCapita) / EUDATASET[index].population).toFixed(3);
             if (casesPerCapita > 0.49) { casesPerCapita = Math.round(casesPerCapita); }
+
+            let deathsPerCapita = ((latestDateData.deathsPerCapita - firstDateData.deathsPerCapita) / (EUDATASET[index].population / 10)).toFixed(3);
+            if (deathsPerCapita > 0.49) { deathsPerCapita = Math.round(deathsPerCapita); }
             return {
                 ["country"]: EUDATASET[index].country,
                 ["countryCode"]: EUDATASET[index].countryCode,
-                ["casesPerCapita"]: casesPerCapita
+                ["casesPerCapita"]: casesPerCapita,
+                ["deathsPerCapita"]: deathsPerCapita,
             };
         })
         .filter(country => country !== undefined && country !== null);
+
     return casesPerCapita;
 }
 
-function getCasesPerCapita(requestedData, startDate, endDate) {
-    let casesPerCapita = calculateCasesPerCapita(requestedData, startDate, endDate);
+/**
+ * calculates cases per capita and deaths per capita for countries
+ * @param {array} requestedData data for each country that user has requested
+ * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+ * @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+ * * @returns {object} contains cases per capita and deaths per capita for countries
+ **/
+
+function getPerCapitaData(requestedData, startDate, endDate) {
+    let casesPerCapita = calculatePerCapitaData(requestedData, startDate, endDate);
     if (countriesDownloaded < 27) {
         return casesPerCapita;
     }
@@ -644,54 +878,92 @@ function getCasesPerCapita(requestedData, startDate, endDate) {
     }
 }
 
+/**
+ * calculates total EU population
+ * * @returns {number} total EU population
+ **/
+
 function calculateEUPopulation() {
     return EUDATASET.map((country) => country.population).reduce((a, b) => a + b);
 }
 
-function calculateTotalEUCases(allData) {
 
+/**
+ * calculates total EU cases and total EU deaths
+ * @param {array} allData data from the api for each country that is cleaned and formatted
+ * * @returns {object} contains total EU cases and total EU deaths
+ **/
+
+function calculateEUTotals(allData) {
     let totalCases = [];
-
+    let totalDeaths = []
     allData
         .forEach((country) => {
-            let firstDateData = 0;
-            let latestDateData = 0;
+            let firstDateData = {};
+            let latestDateData = {};
             if (country.length === 0) {
-                firstDateData = 0;
-                latestDateData = 0;
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
             } else if (country.length === 1) {
-                firstDateData = 0;
-                latestDateData = country[country.length - 1].casesToDate;
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
             }
             else if (country[0].firstDayOfData) {
-                firstDateData = 0;
-                latestDateData = country[country.length - 1].casesToDate;
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
             }
             else {
-                firstDateData = country[0].casesToDate;
-                latestDateData = country[country.length - 1].casesToDate;
+                firstDateData = { casesPerCapita: country[0].casesToDate, deathsPerCapita: country[0].deathsToDate };
+                latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
             }
-            totalCases.push(latestDateData - firstDateData);
+            totalCases.push(latestDateData.casesPerCapita - firstDateData.casesPerCapita);
+            totalDeaths.push(latestDateData.deathsPerCapita - firstDateData.deathsPerCapita);
         });
-    return totalCases.reduce((a, b) => a + b);
+    totalCases = totalCases.reduce((a, b) => a + b);
+    totalDeaths = totalDeaths.reduce((a, b) => a + b);
+    return { totalCases, totalDeaths };
 }
 
-function includeEUInCasesPerCapita(allData, casesPerCapita) {
-    let totalEuCases = calculateTotalEUCases(allData);
+/**
+ * includes per capita data for EU along with per capita data for country data
+ * @param {array} allData data from the api for each country that is cleaned and formatted
+ * @param {array} countryPerCapitaData data from each country containing perCapita data
+ * * @returns {array} includes per capita data for EU along with per capita data for country data
+ **/
+
+function includeEUInCasesPerCapita(allData, countryPerCapitaData) {
+    let totalEuCases = calculateEUTotals(allData).totalCases;
+    let totalEuDeaths = calculateEUTotals(allData).totalDeaths;
     let euPopulation = calculateEUPopulation();
     let euCasesPerCapita = (totalEuCases / euPopulation).toFixed(4);
+    let euDeathsPerCapita = (totalEuDeaths / (euPopulation / 10)).toFixed(4);
     if ((totalEuCases / euPopulation).toFixed(3) > 0.000) {
         euCasesPerCapita = (totalEuCases / euPopulation).toFixed(3);
     }
     if (euCasesPerCapita === 0.000) { euCasesPerCapita = totalEuCases / euPopulation; }
     if (euCasesPerCapita > 1) { euCasesPerCapita = Math.round(euCasesPerCapita); }
-    casesPerCapita.push({
+
+
+    if ((totalEuDeaths / (euPopulation / 10)).toFixed(3) > 0.000) {
+        euDeathsPerCapita = (totalEuDeaths / (euPopulation / 10)).toFixed(3);
+    }
+    if (euDeathsPerCapita === 0.000) { euDeathsPerCapita = totalEuDeaths / (euPopulation / 10); }
+    if (euCasesPerCapita > 1) { euDeathsPerCapita = Math.round(euDeathsPerCapita); }
+
+    countryPerCapitaData.push({
         country: "european union",
         countryCode: "eu",
         casesPerCapita: euCasesPerCapita,
+        deathsPerCapita: euDeathsPerCapita
     });
-    return casesPerCapita;
+    return countryPerCapitaData;
 }
+
+/**
+ * removes countries that user has unselected from data
+ * @param {array} allData data from the api for each country that is cleaned and formatted
+ * * @returns {array} data without countries that user has unselected from data
+ **/
 
 function filterDataByCountry(data) {
     let countriesToDelete = getUncheckedCountries();
@@ -703,19 +975,39 @@ function filterDataByCountry(data) {
     return data;
 }
 
+/**
+ * renders charts on screen
+ * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+ * @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+ * @param {array} allData data from the api for each country that is cleaned and formatted
+ **/
 function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
     if (countriesDownloaded === 0) { return; }
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate);
-    let casesPerCapita = getCasesPerCapita(filteredDataByDate, startDate, endDate);
+    let casesPerCapita = getPerCapitaData(filteredDataByDate, startDate, endDate);
     let filteredDataByCountry = filterDataByCountry(casesPerCapita);
     setHighlightedCountries();
-    renderAxis(filteredDataByCountry, "casesPerCapita")
+    renderAxis(filteredDataByCountry, "casesPerCapita");
     renderBarChart(filteredDataByCountry, "casesPerCapita", countriesDownloaded);
+    renderAxis(filteredDataByCountry, "deathsPerCapita");
+    renderBarChart(filteredDataByCountry, "deathsPerCapita", countriesDownloaded);
 }
+
+/**
+ * Formats data so that countries with overseas territories have that data removed
+ * @param {array} jsonData Lists the data returned from API in json format
+ * * @returns {array} returns array of data for each country with overseas territories removed
+ **/
 
 function removeColonies(jsonData) {
     return jsonData.map(country => country.filter(dailyData => dailyData.Province === ""));
 }
+
+/**
+ * returns data in format required to display on screen
+ * @param {array} countriesOnly Lists the data from the api calls with colonies removed.
+ * * @returns {array} returns data in format required to display on screen
+ **/
 
 function formatAPIData(countriesOnly) {
 
@@ -756,11 +1048,24 @@ function formatAPIData(countriesOnly) {
     return cleanedData;
 }
 
+/**
+ * Decides whether to make api call
+ * @param {array} jsonData Lists the data returned from API in json format
+ * * @returns {array} returns array of data in format required for display on screen
+ **/
+
 function cleanData(jsonData) {
     let countriesOnly = removeColonies(jsonData);
     let cleanedData = formatAPIData(countriesOnly);
     return cleanedData;
 }
+
+/**
+ * Decides whether to make api call
+ * @param {array} rawData Lists the data returned from API
+ * @param {array} failedCalls List of countries for which api calls that have been made and have failed
+ * * @returns {array} Updated list of countries for which api calls that have been made and have failed
+ **/
 
 function recordFailedAPICalls(rawData, failedCalls) {
     rawData
@@ -783,12 +1088,25 @@ function displayNumberCountriesDownloaded() {
 
 }
 
+/**
+ * Decides whether to make api call
+ * @param {array} countryData Lists the data for eacn country
+ * * @returns {array} returns array of promises
+ **/
+
 function compileDataForSaving(countryData) {
     let SaveData = countryData.map((country) => {
         return localStorage.setItem(country.countryCode, JSON.stringify(country.data));
     });
     return SaveData;
 }
+
+/**
+ * Decides whether to make api call
+ * @param {array} rawData Lists the data returned from API
+ * @param {array} countries The countries for which api calls have yet to be successfully made
+ * @param {array} failedCalls List of countries for which api calls that have been made and have failed
+ **/
 
 function processRawData(rawData, countries, failedCalls) {
     failedCalls = recordFailedAPICalls(rawData, failedCalls);
@@ -798,12 +1116,10 @@ function processRawData(rawData, countries, failedCalls) {
         if (successfulCalls.length > 0) {
             let countryData = cleanData(jsonData);
             let SaveData = compileDataForSaving(countryData);
-
             Promise.all(SaveData).then(savedData => {
                 let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
                 let CountriesDownloaded = Promise.all(countryCodes.map(countryCode => { return localStorage.getItem(countryCode); }));
                 CountriesDownloaded.then(countriesDownloadedData => {
-
                     countriesDownloaded = countriesDownloadedData.filter(country => country !== null).length;
                     if (countriesDownloaded === 27) {
                         allCountriesDownloaded = true;
@@ -834,6 +1150,12 @@ function processRawData(rawData, countries, failedCalls) {
     });
 }
 
+/**
+ * Makes API calls
+ * @param {array} countries The countries for which api calls have yet to be successfully made
+ * @param {array} failedCalls List of countries for which api calls that have been made and have failed
+ **/
+
 function makeAPICalls(countries, failedCalls) {
 
     Promise.all(
@@ -857,6 +1179,13 @@ function makeAPICalls(countries, failedCalls) {
             }
         });
 }
+
+/**
+ * Decides whether to make api call
+ * @param {array} countries The countries for which api calls have yet to be successfully made
+ * @param {boolean} firstCall Whether or not this is the first call to the api
+ * @param {array} failedCalls List of countries for which api calls that have been made and have failed
+ **/
 
 function getData(countries, firstCall, failedCalls) {
     if (countries.length === 0 && failedCalls.length === 0) { return; }
