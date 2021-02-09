@@ -146,7 +146,7 @@ If the user tries to select dates where:
 
 * The start date is before the latest date for which there is data available
 
-* The start date is before the first recorded case in the European Union
+* The end date is before the first recorded case in the European Union
 
 An error message will appear in the nav bar and the bar chart will not update.
 

@@ -107,13 +107,37 @@ function convertDateFormat(date) {
     return `${year}-${month}-${day}`;
 }
 
+function convertDateFormatForDisplay(date) {
+    //https://dzone.com/articles/javascript-convert-date
+    let month = new Date(date).getMonth() + 1;
+    let day = new Date(date).getDate();
+    let year = new Date(date).getFullYear();
+    if (month < 10) {
+        month = `0${month.toString()}`;
+    }
+    if (day < 10) {
+        day = `0${day.toString()}`;
+    }
+    return `${day}-${month}-${year}`;
+}
+
 function checkDateErrors(startDate, endDate) {
     let error = "";
+
+    // The end date is before the first recorded case in the European Union
 
     if (endDate < startDate) {
         error = "Start date must be before end date";
         document.getElementById("users-countries").style.display = "none";
-    } else {
+    } else if (startDate > latestCommonDate) {
+        error = `Start date can't be after ${convertDateFormatForDisplay(latestCommonDate)}`
+        document.getElementById("users-countries").style.display = "none";
+    } else if (endDate < new Date("2020-01-24")) {
+        error = `End date can't be before 24th January 2020`
+        document.getElementById("users-countries").style.display = "none";
+    }
+
+    else {
         document.getElementById("users-countries").style.display = "flex";
     }
     document.getElementById("nav-error").innerHTML = error;
