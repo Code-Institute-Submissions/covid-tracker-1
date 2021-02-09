@@ -428,7 +428,7 @@ function setSpeed() {
         return 4500;
     }
     else {
-        return 500;
+        return 1000;
     }
 }
 
