@@ -177,9 +177,12 @@ function sortByHighestValues(data, metric) {
 * @param {object} barData data for a specific country
 **/
 
-function displayToolTip(barData) {
+function displayToolTip(barData, metric) {
     if (countriesDownloaded < 27) { return; }
-    tooltip.text(barData.country);
+    let value = ""
+    if (barData.comparison !== undefined) { value = barData.comparison }
+    else { value = barData[metric] }
+    tooltip.text(`${barData.country}: ${value}`);
     tooltip.style("visibility", "visible");
 }
 
@@ -188,7 +191,7 @@ function displayToolTip(barData) {
 * @param {string} text the text to get the width of
 * @param {number} fontSize the font size of the text
 * @param {string} fontFace the name of the font
-** @return {number} width of text when rendered
+** @returns {number} width of text when rendered
 **/
 
 function getTextWidth(text, fontSize, fontFace) {
@@ -204,7 +207,7 @@ function getTextWidth(text, fontSize, fontFace) {
 * @param {object} countryData data for a specific country
 * @param {object} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
-** @return {number} bar Width
+** @returns {number} width of bar
 **/
 
 function getBarWidth(countryData, data, metric) {
@@ -219,38 +222,23 @@ function getBarWidth(countryData, data, metric) {
 * @param {object} data data to display for each country
 * @param {object} countryData data for a specific country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
-** @return {number} bar Width
+** @return {number} the bar;s width
 **/
 
 function setBarMaxWidth(data, metric, countryData) {
-    // if (!verticalBarChart) { return }
     let barWidth = getBarWidth(countryData, data, metric);
-    // verticalBarChart ? barWidth = measurements.xScale.bandwidth() : barWidth = measurements.xScale(countryData[metric])
-    if (barWidth > 200) {
-        //     let widthDifference = 200 - barWidth;
-        //     // const xScale = setXScale(data, measurements.margin, measurements.innerWidth - widthDifference, metric);
-        //     console.log('widthDifference', widthDifference)
-        //     let newMeasurements = measurements
-        //     console.log('innerwidth1, ', newMeasurements.width)
-        //     newMeasurements.width = (measurements.width - widthDifference) / 2
-        //     console.log('innerwidth2, ', newMeasurements.width)
-        //     updateXAxis(data, metric, newMeasurements);
-        barWidth = 200;
-    }
+    if (barWidth > 200) { barWidth = 200; }
     return barWidth;
 }
 
 /**
 * returns country Name
 * @param {string} countryCode data for a specific country
-** @return {string or object} name of country
+** @return {object} name of country
 **/
 
-function getCountryName(countryCode) {
-    if (countryCode === "eu") { return "European Union"; }
-    let countryCodes = EUDATASET.map(e => e.countryCode);
-    let index = countryCodes.indexOf(countryCode);
-    return { country: EUDATASET[index].country };
+function getCountryData(countryCode, data) {
+    return data.filter(e => e.countryCode === countryCode)[0]
 }
 
 /**
@@ -258,7 +246,7 @@ function getCountryName(countryCode) {
 * @param {object} data data to display for each country
 * @param {object} countryData data for a specific country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
-** @return {number} the font size
+** @returns {number} the font size
 **/
 
 function calculateFontSize(countryData, data, metric) {
@@ -276,25 +264,28 @@ function calculateFontSize(countryData, data, metric) {
         fontSize = 12;
         textWidth = getTextWidth(text, fontSize, "sans-serif");
     }
-
     while (textWidth > 0.95 * barWidth) {
         fontSize = fontSize - 1;
         textWidth = getTextWidth(text, fontSize, "sans-serif");
     }
-
     return fontSize;
 }
 
-
+/**
+* sets the position on the x axis for the values within the bar
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {object} countryData data for a specific country
+** @returns {number} x axis position
+**/
 
 function setXPositionValueInBars(data, metric, countryData) {
-
-    let xScale = setXScale(data, metric)
+    let xScale = setXScale(data, metric);
 
     if (verticalBarChart) {
-        let adjustment = 0
-        let width = getBarWidth(countryData, data, metric)
-        if (width > 200) { adjustment = (width - 200) / 2 }
+        let adjustment = 0;
+        let width = getBarWidth(countryData, data, metric);
+        if (width > 200) { adjustment = (width - 200) / 2; }
         return xScale(countryData.countryCode) + (setBarMaxWidth(data, metric) / 2) + adjustment;
     } else {
         let fontSize = calculateFontSize(countryData, data, metric);
@@ -342,7 +333,7 @@ function decideTextToReturn(countryData, metric) {
 
 /**
 * decides positioning of text within bar
-* @param {object} event the event data
+* * @returns {string} to set positioning of text
 **/
 
 function setTextAnchor() {
@@ -352,7 +343,7 @@ function setTextAnchor() {
 
 /**
 * decides positioning of text within bar
-* @param {object} event the event data
+* * @returns {string} to set positioning of text
 **/
 
 function setAlignmentBaseline() {
@@ -363,6 +354,7 @@ function setAlignmentBaseline() {
 /**
 * adds hover effect from bar when user moves mouse out of value within bar
 * @param {object} event the event data
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
 function applyHoverEffectsToBar(event, metric) {
@@ -372,13 +364,14 @@ function applyHoverEffectsToBar(event, metric) {
     let countryCodes = allBars.map(e => e.dataset.countryCode);
     let index = countryCodes.indexOf(event.target.dataset.countryCode);
     selectedChart.getElementsByTagName("rect")[index].style.opacity = "0.5";
-    displayToolTip(allBarData[index]);
+    displayToolTip(allBarData[index], metric);
     tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
 }
 
 /**
 * removes hover effect from bar when user moves mouse out of value within bar
 * @param {object} event the event data
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
 function removeHoverEffectsFromBar(event, metric) {
@@ -598,7 +591,7 @@ function updateYAxis(data, metric) {
         .selectAll(".tick line").remove();
 
     d3.selectAll(".y.axis .tick")
-        .on("mouseover", function (event, countryCode) { displayToolTip(getCountryName(countryCode)); })
+        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data), metric))
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", tooltip.style("visibility", "hidden"));
 }
@@ -622,7 +615,7 @@ function updateXAxis(data, metric) {
         .selectAll(".tick line").remove();
 
     d3.selectAll(".x.axis .tick")
-        .on("mouseover", function (event, countryCode) { displayToolTip(getCountryName(countryCode)); })
+        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data), metric))
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
@@ -658,7 +651,7 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .attr("data-countryCode", d => d.countryCode)
         .attr("fill", d => setBarColor(d))
         .merge(selectDataForBarCharts)
-        .on("mouseover", (event, barData) => { displayComparisons(event, barData, data, metric); displayToolTip(barData); })
+        .on("mouseover", (event, barData) => { displayComparisons(event, barData, data, metric); displayToolTip(barData, metric); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => { removeComparisons(data, metric); tooltip.style("visibility", "hidden"); })
         .transition().delay(setSpeed() / 2)
@@ -714,7 +707,7 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .attr("data-countryCode", d => d.countryCode)
         .merge(selectDataForBarCharts)
         .attr("fill", d => setBarColor(d))
-        .on("mouseover", (event, barData) => { displayComparisons(event, barData, data, metric); displayToolTip(barData); })
+        .on("mouseover", (event, barData) => { displayComparisons(event, barData, data, metric); displayToolTip(barData, metric); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => { removeComparisons(data, metric); tooltip.style("visibility", "hidden"); })
         .transition().delay(500)
@@ -1023,7 +1016,7 @@ function includeEUInCasesPerCapita(allData, countryPerCapitaData) {
     if (euCasesPerCapita > 1) { euDeathsPerCapita = Math.round(euDeathsPerCapita); }
 
     countryPerCapitaData.push({
-        country: "european union",
+        country: "European Union",
         countryCode: "eu",
         casesPerCapita: euCasesPerCapita,
         deathsPerCapita: euDeathsPerCapita
@@ -1246,7 +1239,7 @@ function makeAPICalls(countries, failedCalls) {
                 document.getElementsByClassName("loading-message")[0].innerHTML = "Sorry. We can't load the data right now. Please try again later.";
                 return;
             } else {
-                document.getElementsByClassName("loading-message")[0].innerHTML = "There is a delay in loading the data. This may take 30 seconds. Please be patient";
+                document.getElementsByClassName("loading-message")[0].innerHTML = "There is a delay loading the data. This may take 30 seconds. Please be patient";
                 setTimeout(() => getData([...eu], true, []), 10000);
             }
         });
