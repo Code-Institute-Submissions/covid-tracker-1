@@ -412,6 +412,7 @@ function renderValuesInBars(data, metric, barData, countriesDownloaded, barWidth
 **/
 
 function removeComparisons(data, metric) {
+    if (!allCountriesDownloaded) { return }
     let dataWithOutComparisons = data.map(countryData => {
         delete countryData.comparison;
         return countryData;
@@ -772,6 +773,7 @@ function renderBarChart(data, metric, countriesDownloaded) {
 **/
 
 function displayComparisons(event, barData, data, metric) {
+    if (!allCountriesDownloaded) { return }
     let comparisons = calculateComparisons(data, barData, metric);
     renderValuesInBars(comparisons, metric, barData);
 }
