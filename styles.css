@@ -202,7 +202,7 @@ margin-right: 15px;
 
 
 svg {
-    display: block;
+    display: none;
     margin: 50px auto;
     border: 1px solid #293d6a;
     position: relative;

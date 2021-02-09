@@ -757,6 +757,7 @@ function setBarColor(data) {
 function renderAxis(data, metric) {
     data = sortByHighestValues(data, metric);
     if (!barChartAxisRendered[metric]) {
+        document.getElementById(metric).style.display = "block"
         setMargins();
         measurements.width = 0.95 * windowWidth;
         measurements.height = 0.8 * windowHeight;
