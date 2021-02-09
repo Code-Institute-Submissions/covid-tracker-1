@@ -603,6 +603,16 @@ function updateXAxis(data, metric) {
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
 
+function setYPositionOfBar(data, metric, countryData) {
+    const yScale = setYScale(metric, data);
+    let height = yScale.bandwidth();
+    let adjustment = 0
+    if (height > 100) { adjustment = (height - 100) / 2 }
+    if (!verticalBarChart) {
+        return yScale(countryData.countryCode) + adjustment
+    }
+}
+
 /**
 * renders horizontal bars.
 * @param {object} data data to display for each country
@@ -621,8 +631,6 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .enter()
         .append("rect")
         .attr("width", 0)
-        .attr("height", yScale.bandwidth())
-        .attr("y", (d) => yScale(d.countryCode))
         .attr("data-countryCode", d => d.countryCode)
         .attr("fill", d => setBarColor(d))
         .merge(selectDataForBarCharts)
@@ -630,9 +638,9 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => { removeComparisons(data, metric); tooltip.style("visibility", "hidden"); })
         .transition().delay(setSpeed() / 2)
-        .attr("height", yScale.bandwidth())
+        .attr("height", Math.min(yScale.bandwidth(), 100))
         .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
-        .attr("y", (d) => yScale(d.countryCode))
+        .attr("y", (countryData) => setYPositionOfBar(data, metric, countryData))
         .transition().duration(setSpeed() / 2).attr("width", (d) => xScale(d[metric]))
         .ease(d3.easeBounce)
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
