@@ -122,7 +122,8 @@ function checkDateErrors(startDate, endDate) {
 
 function changeRequestedData(changeHighlightedCountry) {
     if (changeHighlightedCountry !== true) {
-        d3.selectAll(".values-in-bar").style("opacity", "0");
+        d3.selectAll(".casesPerCapita-values-in-bar").style("opacity", "0");
+        d3.selectAll(".deathsPerCapita-values-in-bar").style("opacity", "0");
     }
 
     let startDate = new Date(document.getElementById("start-date").value);
