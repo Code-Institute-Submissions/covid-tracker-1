@@ -178,6 +178,7 @@ function sortByHighestValues(data, metric) {
 **/
 
 function displayToolTip(barData, metric) {
+    console.log('displayToolTip', metric)
     if (countriesDownloaded < 27) { return; }
     let value = ""
     if (barData.comparison !== undefined) { value = barData.comparison }
@@ -237,7 +238,12 @@ function setBarMaxWidth(data, metric, countryData) {
 ** @return {object} name of country
 **/
 
-function getCountryData(countryCode, data) {
+function getCountryData(countryCode, data, metric) {
+
+    console.log('getCountryData', metric)
+
+    // sortByHighestValues(JSON.parse(JSON.stringify(data)), metric);
+    console.log('data.filter(e => e.countryCode === countryCode)[0]', data.filter(e => e.countryCode === countryCode)[0])
     return data.filter(e => e.countryCode === countryCode)[0]
 }
 
@@ -590,8 +596,8 @@ function updateYAxis(data, metric) {
         .call(yAxis)
         .selectAll(".tick line").remove();
 
-    d3.selectAll(".y.axis .tick")
-        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data), metric))
+    d3.selectAll(`#${metric} .y.axis .tick`)
+        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data, metric), metric))
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", tooltip.style("visibility", "hidden"));
 }
@@ -603,6 +609,7 @@ function updateYAxis(data, metric) {
 **/
 
 function updateXAxis(data, metric) {
+    console.log('updateXAxis', metric)
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
     const xAxis = d3.axisBottom(xScale).ticks(0);
@@ -614,8 +621,8 @@ function updateXAxis(data, metric) {
         .call(xAxis)
         .selectAll(".tick line").remove();
 
-    d3.selectAll(".x.axis .tick")
-        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data), metric))
+    d3.selectAll(`#${metric} .x.axis .tick`)
+        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data, metric), metric))
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
