@@ -162,7 +162,7 @@ function changeRequestedData(changeHighlightedCountry) {
         JSON.parse(localStorage.getItem(country.countryCode))
     );
     //don"t filter out nulls here. You use the index in next function to assign the correct data to the correct country
-    Promise.all(countryData).then(allData => dataForGraphs(startDate, endDate, allData));
+    Promise.all(countryData).then(allData => dataForGraphs(startDate, endDate, allData)).catch(err => { });
 }
 
 function setBarChartType() {
@@ -729,7 +729,7 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .end()
         .then(() => {
             renderValuesInBars(data, metric, [], countriesDownloaded);
-        });
+        }).catch(err => { });
 
     selectDataForBarCharts.exit()
         .transition().duration(500).attr("height", 0).attr("y", d => yScale(0)).remove();
@@ -1166,7 +1166,7 @@ function displayNumberCountriesDownloaded() {
     Promise.all(CountriesDownloaded).then(countries => {
         let countriesDownloaded = countries.filter(country => country !== null).length;
         document.getElementById("downloads").innerHTML = countriesDownloaded;
-    });
+    }).catch(err => { });
 
 }
 
@@ -1223,13 +1223,13 @@ function processRawData(rawData, countries, failedCalls) {
                         let startDate = new Date("January 24, 2020 03:24:00").setHours(0, 0, 0, 0);
                         let endDate = calculateCommonLatestDate(allData);
                         dataForGraphs(startDate, endDate, allData, countriesDownloaded);
-                    });
-                });
-            });
+                    }).catch(err => { });
+                }).catch(err => { });
+            }).catch(err => { });
 
         }
         getData(countries, false, failedCalls);
-    });
+    }).catch(err => { });
 }
 
 /**
