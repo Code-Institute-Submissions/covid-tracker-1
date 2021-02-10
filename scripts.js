@@ -174,13 +174,16 @@ function checkDateErrors(startDate, endDate) {
     let isStartDateValid = isValidDate(startDate)
     let isEndDateValid = isValidDate(endDate)
 
+    console.log('endDate', endDate)
+    console.log('isEndDateValid', isEndDateValid)
+
     // The end date is before the first recorded case in the European Union
     if (!isStartDateValid) {
         error = "Start date is not valid"
     }
-    else if (!isEndDateValid) {
-        error = "End date is not valid"
-    }
+    // else if (!isEndDateValid) {
+    //     error = "End date is not valid"
+    // }
     else if (endDate < startDate) {
         error = "Start date must be before end date";
     } else if (startDate > latestCommonDate || endDate > latestCommonDate) {
