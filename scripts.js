@@ -1313,6 +1313,9 @@ function makeAPICalls(countries, failedCalls) {
             apiFailedCalls++;
             if (apiFailedCalls >= 4) {
                 document.getElementsByClassName("loader")[0].style.display = "none";
+                document.getElementById("casesPerCapita").style.display = "none"
+                document.getElementById("deathsPerCapita").style.display = "none"
+                document.getElementById("download-summary").style.display = "none"
                 document.getElementsByClassName("loading-message")[0].innerHTML = "Sorry. We can't load the data right now. Please try again later.";
                 return;
             } else {
