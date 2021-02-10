@@ -72,19 +72,36 @@ function collapseCheckboxes(checkboxType) {
     expanded = false;
 }
 
+/**
+* return list of countries that should not be displayed
+** @returns {array} list of countries that should not be displayed
+**/
+
 function getUncheckedCountries() {
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
     let unCheckedCountries = [...document.getElementsByClassName("select-country")].filter(e => !e.checked).map(e => e.id);
     return unCheckedCountries;
 }
 
+/**
+* sets list of countries to highlight
+**/
+
 function setHighlightedCountries() {
     highlightedCountries = [...document.getElementsByClassName("highlight-country")].filter(e => e.checked).map(e => e.id);
 }
 
+/**
+* displays Nav
+**/
+
 function displayNav() {
     document.getElementById("nav").style.display = "flex";
 }
+
+/**
+* sets default date values
+**/
 
 function setDefaultDates() {
     if (countriesDownloaded < 27) { return; }
@@ -92,6 +109,12 @@ function setDefaultDates() {
     document.getElementById("end-date").max = convertDateFormat(latestCommonDate).toString();
     document.getElementById("start-date").max = convertDateFormat(latestCommonDate).toString();
 }
+
+/**
+* converts date into format for use in html
+* @param {number} date date in the format of a number that is the number of seconds between the 1 Jan 1970 and the date.
+* @returns {string} date in a format for use in the html
+**/
 
 function convertDateFormat(date) {
     //https://dzone.com/articles/javascript-convert-date
@@ -107,6 +130,12 @@ function convertDateFormat(date) {
     return `${year}-${month}-${day}`;
 }
 
+/**
+* converts date into format for display on user interface
+* @param {number} date date in the format of a number that is the number of seconds between the 1 Jan 1970 and the date.
+* @returns {string} date in a format for display on user interface that user will understand
+**/
+
 function convertDateFormatForDisplay(date) {
     //https://dzone.com/articles/javascript-convert-date
     let month = new Date(date).getMonth() + 1;
@@ -120,6 +149,13 @@ function convertDateFormatForDisplay(date) {
     }
     return `${day}-${month}-${year}`;
 }
+
+/**
+* checks for errors in the dates user submitted
+* @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+* @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+* @returns {string} error message to display on user interface
+**/
 
 function checkDateErrors(startDate, endDate) {
     let error = "";
@@ -143,6 +179,10 @@ function checkDateErrors(startDate, endDate) {
     return error;
 }
 
+/**
+* update charts based on user input
+* @param {boolean} changeHighlightedCountry has the user changed the list of countries that should be highlighted?
+**/
 
 function changeRequestedData(changeHighlightedCountry) {
     if (changeHighlightedCountry !== true) {
@@ -165,9 +205,20 @@ function changeRequestedData(changeHighlightedCountry) {
     Promise.all(countryData).then(allData => dataForGraphs(startDate, endDate, allData)).catch(err => { });
 }
 
+/**
+* decides whether to display vertical or horizontal bar charts
+**/
+
 function setBarChartType() {
     if (windowWidth > windowHeight) { verticalBarChart = true; }
 }
+
+/**
+* returns data sorted by highest value
+* @param {object} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @returns {object} data sorted by highest value
+**/
 
 function sortByHighestValues(data, metric) {
     return data.sort((a, b) => b[metric] - a[metric]);
@@ -695,7 +746,13 @@ function setXPositionOfBar(data, metric, countryData) {
 
 function renderVerticalBars(data, metric, countriesDownloaded) {
 
+    console.log('data', data)
+
     let yScale = setYScale(metric, data);
+
+    console.log('range', yScale.range())
+    console.log('domain', yScale.domain())
+
     let xScale = setXScale(data, metric);
     let selectDataForBarCharts = d3.select(`#${metric}`)
         .selectAll("rect")
@@ -721,10 +778,10 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .ease(d3.easeBounce)
         .duration(setSpeed())
         .attr("height", d => {
-
-            return measurements.innerHeight - yScale((d[metric]))
+            if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return 0 }
+            else { return measurements.innerHeight - yScale((d[metric])) }
         })
-        .attr("y", (d) => yScale(d[metric]))
+        .attr("y", d => { return yScale(d[metric]) })
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
         .end()
         .then(() => {
