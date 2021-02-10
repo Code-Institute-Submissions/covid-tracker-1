@@ -784,7 +784,11 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
             if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return 0 }
             else { return measurements.innerHeight - yScale((d[metric])) }
         })
-        .attr("y", d => { return yScale(d[metric]) })
+        .attr("y", d => {
+            if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return measurements.innerHeight }
+            else { return yScale(d[metric]) }
+        })
+
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
         .end()
         .then(() => {
@@ -1313,6 +1317,7 @@ function makeAPICalls(countries, failedCalls) {
             apiFailedCalls++;
             if (apiFailedCalls >= 4) {
                 document.getElementsByClassName("loader")[0].style.display = "none";
+                document.getElementsByClassName("statistic-details")[0].style.display = "none";
                 document.getElementById("casesPerCapita").style.display = "none"
                 document.getElementById("deathsPerCapita").style.display = "none"
                 document.getElementById("download-summary").style.display = "none"
