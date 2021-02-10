@@ -174,16 +174,13 @@ function checkDateErrors(startDate, endDate) {
     let isStartDateValid = isValidDate(startDate)
     let isEndDateValid = isValidDate(endDate)
 
-    console.log('endDate', endDate)
-    console.log('isEndDateValid', isEndDateValid)
 
-    // The end date is before the first recorded case in the European Union
     if (!isStartDateValid) {
         error = "Start date is not valid"
     }
-    // else if (!isEndDateValid) {
-    //     error = "End date is not valid"
-    // }
+    else if (!isEndDateValid) {
+        error = "End date is not valid"
+    }
     else if (endDate < startDate) {
         error = "Start date must be before end date";
     } else if (startDate > latestCommonDate || endDate > latestCommonDate) {
@@ -211,13 +208,14 @@ function changeRequestedData(changeHighlightedCountry) {
     }
 
     let startDate = new Date(document.getElementById("start-date").value);
-    let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0);
+    let endDate = new Date(document.getElementById("end-date").value);
     const DATEERROR = checkDateErrors(startDate, endDate);
 
     if (DATEERROR !== "") { return; }
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
     //I want the date before the start date selected so that I get correct values when I subtract cases, deaths etc.
     startDate = new Date(startDate.setDate(startDate.getDate() - 1)).setHours(0, 0, 0, 0);
+    endDate = endDate.setHours(0, 0, 0, 0);
     let countryData = EUDATASET.map((country) =>
         JSON.parse(localStorage.getItem(country.countryCode))
     );
