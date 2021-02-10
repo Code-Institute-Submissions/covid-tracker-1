@@ -143,6 +143,7 @@ function checkDateErrors(startDate, endDate) {
     return error;
 }
 
+
 function changeRequestedData(changeHighlightedCountry) {
     if (changeHighlightedCountry !== true) {
         d3.selectAll(".casesPerCapita-values-in-bar").style("opacity", "0");
@@ -152,6 +153,7 @@ function changeRequestedData(changeHighlightedCountry) {
     let startDate = new Date(document.getElementById("start-date").value);
     let endDate = new Date(document.getElementById("end-date").value).setHours(0, 0, 0, 0);
     const DATEERROR = checkDateErrors(startDate, endDate);
+
     if (DATEERROR !== "") { return; }
     //https://stackoverflow.com/questions/25136760/from-date-i-just-want-to-subtract-1-day-in-javascript-angularjs
     //I want the date before the start date selected so that I get correct values when I subtract cases, deaths etc.
@@ -692,6 +694,7 @@ function setXPositionOfBar(data, metric, countryData) {
 
 
 function renderVerticalBars(data, metric, countriesDownloaded) {
+
     let yScale = setYScale(metric, data);
     let xScale = setXScale(data, metric);
     let selectDataForBarCharts = d3.select(`#${metric}`)
@@ -713,12 +716,14 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .transition().delay(500)
         .attr("transform", `translate(0, ${measurements.margin.top})`)
         .attr("width", setBarMaxWidth(data, metric))
-        // .attr("x", (d) => xScale(d.countryCode))
         .attr("x", countryData => setXPositionOfBar(data, metric, countryData))
         .transition()
         .ease(d3.easeBounce)
         .duration(setSpeed())
-        .attr("height", d => measurements.innerHeight - yScale(d[metric]))
+        .attr("height", d => {
+
+            return measurements.innerHeight - yScale((d[metric]))
+        })
         .attr("y", (d) => yScale(d[metric]))
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
         .end()
@@ -896,15 +901,13 @@ function calculatePerCapitaData(allData) {
             if (country.length === 0) {
                 firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
                 latestDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
-            } else if (country.length === 1) {
-                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
-                latestDateData = { casesPerCapita: [country.length - 1].casesToDate, deathsPerCapita: [country.length - 1].deathsToDate };
-            }
-            else if (country[0].firstDayOfData) {
+            } else if (country[0].firstDayOfData) {
                 firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
                 latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
-            }
-            else {
+            } else if (country.length === 1) {
+                firstDateData = { casesPerCapita: 0, deathsPerCapita: 0 };
+                latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: [country.length - 1].deathsToDate };
+            } else {
                 firstDateData = { casesPerCapita: country[0].casesToDate, deathsPerCapita: country[0].deathsToDate };
                 latestDateData = { casesPerCapita: country[country.length - 1].casesToDate, deathsPerCapita: country[country.length - 1].deathsToDate };
             }
@@ -913,6 +916,16 @@ function calculatePerCapitaData(allData) {
 
             let deathsPerCapita = ((latestDateData.deathsPerCapita - firstDateData.deathsPerCapita) / (EUDATASET[index].population / 10)).toFixed(3);
             if (deathsPerCapita > 0.49) { deathsPerCapita = Math.round(deathsPerCapita); }
+
+            // if (EUDATASET[index].countryCode === 'es' || EUDATASET[index].countryCode === 'se') {
+            //     console.log(EUDATASET[index].countryCode)
+            //     console.log('country', country)
+            //     console.log('firstDateData', firstDateData)
+            //     console.log('latestDateData', latestDateData)
+            //     console.log('casesPerCapita', casesPerCapita)
+            //     console.log('deathsPerCapita', deathsPerCapita)
+            //     console.log('--------')
+            // }
             return {
                 ["country"]: EUDATASET[index].country,
                 ["countryCode"]: EUDATASET[index].countryCode,
@@ -1048,10 +1061,14 @@ function filterDataByCountry(data) {
  **/
 function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
     if (countriesDownloaded === 0) { return; }
+
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate);
+
     let casesPerCapita = getPerCapitaData(filteredDataByDate, startDate, endDate);
+
     let filteredDataByCountry = filterDataByCountry(casesPerCapita);
     setHighlightedCountries();
+
     renderAxis(filteredDataByCountry, "casesPerCapita");
     renderBarChart(filteredDataByCountry, "casesPerCapita", countriesDownloaded);
     renderAxis(filteredDataByCountry, "deathsPerCapita");
