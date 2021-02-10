@@ -1,6 +1,5 @@
 
 //https://www.w3schools.com/jsref/prop_win_innerheight.asp
-
 let windowHeight = window.innerHeight;
 let windowWidth = window.innerWidth;
 let expanded = false;
@@ -51,7 +50,10 @@ let latestCommonDate = new Date();
 let verticalBarChart = false;
 let measurements = {};
 
-
+/**
+* copens dropbown
+* @param {string} checkboxType name of check box type
+**/
 function showCheckboxes(checkboxType) {
     let checkboxes = document.getElementById(checkboxType);
     if (!expanded) {
@@ -66,6 +68,10 @@ function showCheckboxes(checkboxType) {
     }
 }
 
+/**
+* closes dropbown
+* @param {string} checkboxType name of check box type
+**/
 function collapseCheckboxes(checkboxType) {
     let checkboxes = document.getElementById(checkboxType);
     checkboxes.style.display = "none";
@@ -180,7 +186,7 @@ function checkDateErrors(startDate, endDate) {
 }
 
 /**
-* update charts based on user input
+* filters data based on user input
 * @param {boolean} changeHighlightedCountry has the user changed the list of countries that should be highlighted?
 **/
 
@@ -215,19 +221,19 @@ function setBarChartType() {
 
 /**
 * returns data sorted by highest value
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
-** @returns {object} data sorted by highest value
+** @returns {array} data sorted by highest value
 **/
 
 function sortByHighestValues(data, metric) {
     return data.sort((a, b) => b[metric] - a[metric]);
 }
 
-
 /**
 * makes tooltip visible. This is used to display data on screen
 * @param {object} barData data for a specific country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
 function displayToolTip(barData, metric) {
@@ -255,10 +261,11 @@ function getTextWidth(text, fontSize, fontFace) {
     return context.measureText(text).width;
 }
 
+
 /**
 * gets the width of a bar
 * @param {object} countryData data for a specific country
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 ** @returns {number} width of bar
 **/
@@ -272,10 +279,10 @@ function getBarWidth(countryData, data, metric) {
 
 /**
 * sets maximum width for bar
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {object} countryData data for a specific country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
-** @return {number} the bar;s width
+** @return {number} the bar's width
 **/
 
 function setBarMaxWidth(data, metric, countryData) {
@@ -285,9 +292,11 @@ function setBarMaxWidth(data, metric, countryData) {
 }
 
 /**
-* returns country Name
+* returns country data
 * @param {string} countryCode data for a specific country
-** @return {object} name of country
+* @param {array} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @returns {array} data for country
 **/
 
 function getCountryData(countryCode, data, metric) {
@@ -296,23 +305,24 @@ function getCountryData(countryCode, data, metric) {
 
 /**
 * calculates font size so text fits within bar
-* @param {object} data data to display for each country
 * @param {object} countryData data for a specific country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 ** @returns {number} the font size
 **/
 
 function calculateFontSize(countryData, data, metric) {
+
     let text = decideTextToReturn(countryData, metric, data);
     let textWidth = 0;
-    let barWidth = getBarWidth(countryData, data, metric);;
+    let barWidth = getBarWidth(countryData, data, metric);
     let fontSize = 0;
 
     if (verticalBarChart) {
         //https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions/8876069#8876069
         fontSize = ((0.25 / data.length) * Math.max(windowWidth || 0, window.innerWidth || 0)).toString();
-        barWidth = setBarMaxWidth(data, metric);
         textWidth = getTextWidth(text, fontSize, "sans-serif");
+        barWidth = setBarMaxWidth(data, metric);
     } else {
         fontSize = 12;
         textWidth = getTextWidth(text, fontSize, "sans-serif");
@@ -326,7 +336,7 @@ function calculateFontSize(countryData, data, metric) {
 
 /**
 * sets the position on the x axis for the values within the bar
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 * @param {object} countryData data for a specific country
 ** @returns {number} x axis position
@@ -334,7 +344,6 @@ function calculateFontSize(countryData, data, metric) {
 
 function setXPositionValueInBars(data, metric, countryData) {
     let xScale = setXScale(data, metric);
-
     if (verticalBarChart) {
         let adjustment = 0;
         let width = getBarWidth(countryData, data, metric);
@@ -352,7 +361,7 @@ function setXPositionValueInBars(data, metric, countryData) {
 
 /**
 * decides y value for displaying on screen
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {object} countryData data for a specific country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 ** @return {number} value or comparison to display within bar
@@ -367,7 +376,6 @@ function setYPositionValueInBars(data, countryData, metric) {
         return (yScale(countryData.countryCode) + yScale.bandwidth() / 2 + measurements.margin.top);
     }
 }
-
 
 /**
 * decides whether to display value or comparison within bar
@@ -438,7 +446,7 @@ function removeHoverEffectsFromBar(event, metric) {
 
 /**
 * renders the values within the bars
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 * @param {object} barData data for a specific country
 * @param {number} countriesDownloaded number of countries for which data has been downloaded from the api
@@ -462,21 +470,20 @@ function renderValuesInBars(data, metric, barData, countriesDownloaded, barWidth
         .attr("data-countryCode", d => d.countryCode)
         .attr("x", countryData => setXPositionValueInBars(data, metric, countryData))
         .attr("y", countryData => setYPositionValueInBars(data, countryData, metric))
-        .style("fill", "white")
+        .style("fill", "#f7f7f7")
         .style("font-size", countryData => calculateFontSize(countryData, data, metric))
         .style("opacity", "1")
         .text(countryData => decideTextToReturn(countryData, metric, data))
         .on("mouseover", (event, barData) => { applyHoverEffectsToBar(event, metric); displayComparisons(event, barData, data, metric); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        .on("mouseout", (event, barData) => { removeHoverEffectsFromBar(event, metric); removeComparisons(data, metric); });
+        .on("mouseout", (event) => { removeHoverEffectsFromBar(event, metric); removeComparisons(data, metric); });
 
     values.exit().remove();
-
 }
 
 /**
 * removes comparisons from bars and replaces them with original values
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -514,7 +521,7 @@ function setMargins() {
 
 /**
 * sets the x scale
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -535,7 +542,7 @@ function setXScale(data, metric) {
 
 /**
 * sets the y scale
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -556,7 +563,7 @@ function setYScale(metric, data) {
 
 /**
 * renders x axis for the first time
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -575,7 +582,7 @@ function renderXAxis(data, metric) {
 
 /**
 * renders y axis for the first time.
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -594,6 +601,7 @@ function renderYAxis(data, metric) {
 /**
 * decides what the chart title should be
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+** @returns {string} the chart title
 **/
 
 function decideChartTitleText(metric) {
@@ -608,7 +616,7 @@ function decideChartTitleText(metric) {
 
 /**
 * renders chart title
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -629,7 +637,7 @@ function renderChartTitle(data, metric) {
 
 /**
 * updates already rendered y axis
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 function updateYAxis(data, metric) {
@@ -651,7 +659,7 @@ function updateYAxis(data, metric) {
 
 /**
 * updates already rendered x axis.
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -673,6 +681,14 @@ function updateXAxis(data, metric) {
         .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
 
+/**
+* determines the y position for the bar
+* @param {array} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
+** @returns {number} the y position for the bar
+**/
+
 function setYPositionOfBar(data, metric, countryData) {
     const yScale = setYScale(metric, data);
     let height = yScale.bandwidth();
@@ -685,7 +701,7 @@ function setYPositionOfBar(data, metric, countryData) {
 
 /**
 * renders horizontal bars.
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 * @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
 **/
@@ -713,15 +729,11 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .attr("y", (countryData) => setYPositionOfBar(data, metric, countryData))
         .transition().duration(setSpeed() / 2)
         .attr("width", d => {
-
             if (xScale.domain()[0] === 0 && xScale.domain()[1] === 0) {
                 return 0
             } else {
                 return xScale(d[metric])
             }
-
-
-
         })
         .ease(d3.easeBounce)
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
@@ -735,13 +747,14 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .transition().duration(500).delay(500).remove();
 }
 
+
 /**
-* renders vertical bars.
-* @param {object} data data to display for each country
+* determines the x position for the bar
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 * @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
+** @returns {number} the x position for the bar
 **/
-
 
 function setXPositionOfBar(data, metric, countryData) {
 
@@ -754,6 +767,12 @@ function setXPositionOfBar(data, metric, countryData) {
     }
 }
 
+/**
+* renders vertical bars.
+* @param {array} data data to display for each country
+* @param {string} metric what is being measured (cases per capita, deaths per capita etc)
+* @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
+**/
 
 function renderVerticalBars(data, metric, countriesDownloaded) {
     let yScale = setYScale(metric, data);
@@ -801,7 +820,7 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
 
 /**
 * decides what color each bar should be.
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 **/
 
 function setBarColor(data) {
@@ -811,7 +830,7 @@ function setBarColor(data) {
 
 /**
 * renders the axis on the screen
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
 
@@ -836,7 +855,7 @@ function renderAxis(data, metric) {
 
 /**
 * decides whether to render vertical or horizontal bars.
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 * @param {number} countriesDownloaded the number of countries for which data has been downloaded by the api
 **/
@@ -853,7 +872,7 @@ function renderBarChart(data, metric, countriesDownloaded) {
 /**
 * compares a country's data to all other countries.
 * @param {object} event the event data
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {object} barData data for a specific country
 * @param {string} metric what is being measured (cases per capita, deaths per capita etc)
 **/
@@ -866,7 +885,7 @@ function displayComparisons(event, barData, data, metric) {
 
 /**
 * compares a country's data to all other countries.
-* @param {object} data data to display for each country
+* @param {array} data data to display for each country
 * @param {object} barData data for a specific country
 * * @returns {object} compares a country's data to all other countries.
 **/
@@ -930,7 +949,7 @@ function calculateCommonLatestDate(allData) {
 /**
 * filters data by the dates the user selects
 * @param {array} allData data from the api for each country that is cleaned and formatted
- * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
+* @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
 * @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
 * * @returns {array} array containing data for each country for the dates that the user selected
 **/
@@ -951,7 +970,7 @@ function filterDataByDates(allData, startDate, endDate) {
 /**
  * calculates cases per capita and deaths per capita for countries
  * @param {array} allData data from the api for each country that is cleaned and formatted
- * * @returns {object} contains cases per capita and deaths per capita for countries
+ * * @returns {array} contains cases per capita and deaths per capita for countries
  **/
 
 function calculatePerCapitaData(allData) {
@@ -1007,7 +1026,7 @@ function calculatePerCapitaData(allData) {
  * @param {array} requestedData data for each country that user has requested
  * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
  * @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
- * * @returns {object} contains cases per capita and deaths per capita for countries
+ * * @returns {array} contains cases per capita and deaths per capita for countries
  **/
 
 function getPerCapitaData(requestedData, startDate, endDate) {
@@ -1118,21 +1137,17 @@ function filterDataByCountry(data) {
 }
 
 /**
- * renders charts on screen
+ * makes final computations to data to display on screen
  * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
  * @param {number} endDate the end date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
  * @param {array} allData data from the api for each country that is cleaned and formatted
  **/
 function dataForGraphs(startDate, endDate, allData, countriesDownloaded) {
     if (countriesDownloaded === 0) { return; }
-
     let filteredDataByDate = filterDataByDates(allData, startDate, endDate);
-
     let casesPerCapita = getPerCapitaData(filteredDataByDate, startDate, endDate);
-
     let filteredDataByCountry = filterDataByCountry(casesPerCapita);
     setHighlightedCountries();
-
     renderAxis(filteredDataByCountry, "casesPerCapita");
     renderBarChart(filteredDataByCountry, "casesPerCapita", countriesDownloaded);
     renderAxis(filteredDataByCountry, "deathsPerCapita");
@@ -1170,7 +1185,6 @@ function formatAPIData(countriesOnly) {
         //map each internal array so that only the data we are interested in is kept (as an object)
 
         let dailySummaries = country.map((dailyData, index) => {
-
             let objectToReturn = {
                 casesToDate: dailyData.Confirmed,
                 deathsToDate: dailyData.Deaths,
@@ -1179,8 +1193,6 @@ function formatAPIData(countriesOnly) {
             if (index === 0) { objectToReturn.firstDayOfData = true; }
             return objectToReturn;
         });
-
-
         //return an array of objects
 
         return {
@@ -1188,14 +1200,12 @@ function formatAPIData(countriesOnly) {
             countryCode: country[0].CountryCode.toLowerCase(),
             data: dailySummaries
         };
-
     });
-
     return cleanedData;
 }
 
 /**
- * Decides whether to make api call
+ * cleans data
  * @param {array} jsonData Lists the data returned from API in json format
  * * @returns {array} returns array of data in format required for display on screen
  **/
@@ -1207,7 +1217,7 @@ function cleanData(jsonData) {
 }
 
 /**
- * Decides whether to make api call
+ * records failed api calls
  * @param {array} rawData Lists the data returned from API
  * @param {array} failedCalls List of countries for which api calls that have been made and have failed
  * * @returns {array} Updated list of countries for which api calls that have been made and have failed
@@ -1224,6 +1234,9 @@ function recordFailedAPICalls(rawData, failedCalls) {
     return failedCalls;
 }
 
+/**
+ * displays number of countries downloaded
+ **/
 function displayNumberCountriesDownloaded() {
     let countryCodes = EUDATASET.map(countryEntry => countryEntry.countryCode);
     let CountriesDownloaded = countryCodes.map(countryCode => { return localStorage.getItem(countryCode); });
@@ -1235,7 +1248,7 @@ function displayNumberCountriesDownloaded() {
 }
 
 /**
- * Decides whether to make api call
+ * compiles data for saving
  * @param {array} countryData Lists the data for eacn country
  * * @returns {array} returns array of promises
  **/
@@ -1248,7 +1261,7 @@ function compileDataForSaving(countryData) {
 }
 
 /**
- * Decides whether to make api call
+ * reformats data from api call
  * @param {array} rawData Lists the data returned from API
  * @param {array} countries The countries for which api calls have yet to be successfully made
  * @param {array} failedCalls List of countries for which api calls that have been made and have failed
@@ -1303,7 +1316,6 @@ function processRawData(rawData, countries, failedCalls) {
  **/
 
 function makeAPICalls(countries, failedCalls) {
-
     Promise.all(
         countries
             //the api won't allow more than 10 calls from my ip within 5 seconds
@@ -1331,7 +1343,7 @@ function makeAPICalls(countries, failedCalls) {
 }
 
 /**
- * Decides whether to make api call
+ * Decides whether and how to make api call
  * @param {array} countries The countries for which api calls have yet to be successfully made
  * @param {boolean} firstCall Whether or not this is the first call to the api
  * @param {array} failedCalls List of countries for which api calls that have been made and have failed
