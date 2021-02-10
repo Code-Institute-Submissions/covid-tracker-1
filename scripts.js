@@ -178,7 +178,6 @@ function sortByHighestValues(data, metric) {
 **/
 
 function displayToolTip(barData, metric) {
-    console.log('displayToolTip', metric)
     if (countriesDownloaded < 27) { return; }
     let value = ""
     if (barData.comparison !== undefined) { value = barData.comparison }
@@ -239,11 +238,6 @@ function setBarMaxWidth(data, metric, countryData) {
 **/
 
 function getCountryData(countryCode, data, metric) {
-
-    console.log('getCountryData', metric)
-
-    // sortByHighestValues(JSON.parse(JSON.stringify(data)), metric);
-    console.log('data.filter(e => e.countryCode === countryCode)[0]', data.filter(e => e.countryCode === countryCode)[0])
     return data.filter(e => e.countryCode === countryCode)[0]
 }
 
@@ -274,7 +268,7 @@ function calculateFontSize(countryData, data, metric) {
         fontSize = fontSize - 1;
         textWidth = getTextWidth(text, fontSize, "sans-serif");
     }
-    return fontSize;
+    return Math.min(fontSize, 90);
 }
 
 /**
@@ -609,7 +603,6 @@ function updateYAxis(data, metric) {
 **/
 
 function updateXAxis(data, metric) {
-    console.log('updateXAxis', metric)
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
     const xAxis = d3.axisBottom(xScale).ticks(0);
