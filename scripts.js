@@ -11,6 +11,7 @@ let tooltip = d3.select("body")
     .attr("id", "tooltip")
     .style("position", "absolute")
     .style("z-index", "10")
+    .style("font-size", "2px")
     .style("visibility", "hidden");
 let highlightedCountries = ["eu"];
 const EUDATASET = [
