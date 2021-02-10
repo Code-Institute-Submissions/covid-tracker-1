@@ -244,7 +244,8 @@ function displayToolTip(barData, metric) {
     tooltip.text(`${barData.country}: ${value}`);
     tooltip.style("visibility", "visible");
     if (!verticalBarChart) {
-        tooltip.style("font-size", "8px")
+        tooltip.style("font-size", "12px")
+        tooltip.style("padding", "1px")
     }
 
 }
