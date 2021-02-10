@@ -163,24 +163,35 @@ function convertDateFormatForDisplay(date) {
 * @returns {string} error message to display on user interface
 **/
 
+function isValidDate(d) {
+    //https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript?page=1&tab=votes#tab-top
+    return d instanceof Date && !isNaN(d);
+}
+
 function checkDateErrors(startDate, endDate) {
     let error = "";
 
-    // The end date is before the first recorded case in the European Union
+    let isStartDateValid = isValidDate(startDate)
+    let isEndDateValid = isValidDate(endDate)
 
-    if (endDate < startDate) {
+    // The end date is before the first recorded case in the European Union
+    if (!isStartDateValid) {
+        error = "Start date is not valid"
+    }
+    else if (!isEndDateValid) {
+        error = "End date is not valid"
+    }
+    else if (endDate < startDate) {
         error = "Start date must be before end date";
-        document.getElementById("users-countries").style.display = "none";
     } else if (startDate > latestCommonDate || endDate > latestCommonDate) {
         error = `No data is available after ${convertDateFormatForDisplay(latestCommonDate)}`
-        document.getElementById("users-countries").style.display = "none";
-    } else if (endDate < new Date("2020-01-24")) {
-        error = `End date can't be before 24th January 2020`
-        document.getElementById("users-countries").style.display = "none";
+    } else if (endDate < new Date("2020-01-24") || startDate < new Date("2020-01-24")) {
+        error = `There were no covid cases in EU before 24th January 2020`
     }
     else {
         document.getElementById("users-countries").style.display = "flex";
     }
+    if (error !== "") { document.getElementById("users-countries").style.display = "none"; }
     document.getElementById("nav-error").innerHTML = error;
     return error;
 }

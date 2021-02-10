@@ -277,5 +277,7 @@ d3 bar chart: https://observablehq.com/@d3/lets-make-a-bar-chart?collection=@d3/
 
 d3 course: https://www.freecodecamp.org/learn/data-visualization/data-visualization-with-d3/
 
+check if JavaScript date is valid: https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript?page=1&tab=votes#tab-top
+
 ## Acknowledgements:
 My Code Institute Mentor, Rohit
