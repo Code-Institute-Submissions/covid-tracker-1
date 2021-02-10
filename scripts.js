@@ -11,7 +11,6 @@ let tooltip = d3.select("body")
     .attr("id", "tooltip")
     .style("position", "absolute")
     .style("z-index", "10")
-    .style("font-size", "2px")
     .style("visibility", "hidden");
 let highlightedCountries = ["eu"];
 const EUDATASET = [
@@ -244,6 +243,10 @@ function displayToolTip(barData, metric) {
     else { value = barData[metric] }
     tooltip.text(`${barData.country}: ${value}`);
     tooltip.style("visibility", "visible");
+    if (!verticalBarChart) {
+        tooltip.style("font-size", "8px")
+    }
+
 }
 
 /**
