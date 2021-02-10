@@ -711,7 +711,18 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .attr("height", Math.min(yScale.bandwidth(), 100))
         .attr("transform", `translate(${measurements.margin.left}, ${measurements.margin.top})`)
         .attr("y", (countryData) => setYPositionOfBar(data, metric, countryData))
-        .transition().duration(setSpeed() / 2).attr("width", (d) => xScale(d[metric]))
+        .transition().duration(setSpeed() / 2)
+        .attr("width", d => {
+
+            if (xScale.domain()[0] === 0 && xScale.domain()[1] === 0) {
+                return 0
+            } else {
+                return xScale(d[metric])
+            }
+
+
+
+        })
         .ease(d3.easeBounce)
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
         .end()
@@ -745,15 +756,7 @@ function setXPositionOfBar(data, metric, countryData) {
 
 
 function renderVerticalBars(data, metric, countriesDownloaded) {
-
-    console.log('data', data)
-
     let yScale = setYScale(metric, data);
-
-    console.log('range', yScale.range())
-    console.log('domain', yScale.domain())
-
-    let xScale = setXScale(data, metric);
     let selectDataForBarCharts = d3.select(`#${metric}`)
         .selectAll("rect")
         .data(data, d => d.countryCode);
