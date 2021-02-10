@@ -94,7 +94,7 @@ function getUncheckedCountries() {
 **/
 
 function setHighlightedCountries() {
-    highlightedCountries = [...document.getElementsByClassName("highlight-country")].filter(e => e.checked).map(e => e.id);
+    highlightedCountries = [...document.getElementsByClassName("highlight-country")].filter(e => e.checked).map(e => e.dataset.countryCode);
 }
 
 /**
@@ -1360,6 +1360,7 @@ function getData(countries, firstCall, failedCalls) {
         setTimeout(() => makeAPICalls(countries, failedCalls), 5000);
     }
 }
+
 
 setBarChartType();
 getData([...eu], true, []);
