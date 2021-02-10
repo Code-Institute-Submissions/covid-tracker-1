@@ -228,7 +228,7 @@ function changeRequestedData(changeHighlightedCountry) {
 **/
 
 function setBarChartType() {
-    if (windowWidth > windowHeight) { verticalBarChart = true; }
+    if (windowWidth >= 1000) { verticalBarChart = true; }
 }
 
 /**
