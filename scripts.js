@@ -49,7 +49,7 @@ let countriesDownloaded = 0;
 let barChartAxisRendered = { casesPerCapita: false, deathsPerCapita: false }
 let latestCommonDate = new Date();
 let verticalBarChart = false;
-let measurements = {}
+let measurements = {};
 
 /**
 * copens dropbown
@@ -1361,6 +1361,7 @@ function getData(countries, firstCall, failedCalls) {
         setTimeout(() => makeAPICalls(countries, failedCalls), 5000);
     }
 }
+
 
 setBarChartType();
 getData([...eu], true, []);
