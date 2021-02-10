@@ -599,7 +599,7 @@ function updateYAxis(data, metric) {
     d3.selectAll(`#${metric} .y.axis .tick`)
         .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data, metric), metric))
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        .on("mouseout", tooltip.style("visibility", "hidden"));
+        .on("mouseout", () => tooltip.style("visibility", "hidden"));
 }
 
 /**
