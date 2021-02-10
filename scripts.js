@@ -85,7 +85,7 @@ function collapseCheckboxes(checkboxType) {
 
 function getUncheckedCountries() {
     // https://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
-    let unCheckedCountries = [...document.getElementsByClassName("select-country")].filter(e => !e.checked).map(e => e.id);
+    let unCheckedCountries = [...document.getElementsByClassName("select-country")].filter(e => !e.checked).map(e => e.dataset.countryCode);
     return unCheckedCountries;
 }
 
