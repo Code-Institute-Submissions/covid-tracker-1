@@ -659,13 +659,11 @@ function decideChartTitleText(metric) {
 
 function renderChartTitle(data, metric) {
 
-    let xScale = setXScale(data, metric);
-    let xScaleMidPoint = (xScale.range()[1] + xScale.range()[0]) / 2;
     d3.select(`#${metric}`)
         .append("text")
         .attr("fill", "black")
         .attr("y", 45)
-        .attr("x", xScaleMidPoint)
+        .attr("x", measurements.width / 2)
         .attr("text-anchor", "middle")
         .attr("font-size", "16")
         .text(decideChartTitleText(metric));
