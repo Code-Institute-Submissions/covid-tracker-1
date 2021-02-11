@@ -755,8 +755,8 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .append("rect")
         .attr("width", 0)
         .attr("data-countryCode", d => d.countryCode)
-        .attr("fill", d => setBarColor(d))
         .merge(selectDataForBarCharts)
+        .attr("fill", d => setBarColor(d))
         .on("mouseover", (event, barData) => { displayComparisons(event, barData, data, metric); displayToolTip(barData, metric); })
         .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
         .on("mouseout", () => { removeComparisons(data, metric); tooltip.style("visibility", "hidden"); })
@@ -1435,7 +1435,7 @@ function addEventListeners() {
     })
 
     highlightCountryCheckboxes.forEach((element) => {
-        element.addEventListener("click", () => changeRequestedData(changeHighlightedCountry))
+        element.addEventListener("click", () => changeRequestedData(true))
     })
 }
 
