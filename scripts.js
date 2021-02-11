@@ -698,18 +698,33 @@ function updateXAxis(data, metric) {
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
     const xAxis = d3.axisBottom(xScale).ticks(0);
-    d3.select(`#${metric}`)
-        .attr("width", measurements.width)
-        .attr("height", measurements.height)
-        .selectAll("g.x.axis")
-        .transition().delay(500)
-        .call(xAxis)
-        .selectAll(".tick line").remove();
+    console.log('xAxis ', xAxis)
+    console.log('data', data)
 
-    d3.selectAll(`#${metric} .x.axis .tick`)
-        .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data, metric), metric))
-        .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
-        .on("mouseout", () => tooltip.style("visibility", "hidden"));
+    if (data.length > 0) {
+        d3.select(`#${metric}`)
+            .attr("width", measurements.width)
+            .attr("height", measurements.height)
+            .selectAll("g.x.axis")
+            .style("opacity", "1")
+            .transition().delay(500)
+            .call(xAxis)
+            .selectAll(".tick line").remove();
+
+        d3.selectAll(`#${metric} .x.axis .tick`)
+            .on("mouseover", (event, countryCode) => displayToolTip(getCountryData(countryCode, data, metric), metric))
+            .on("mousemove", (event) => tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"))
+            .on("mouseout", () => tooltip.style("visibility", "hidden"));
+
+    } else {
+
+        d3.select(`#${metric}`)
+            .attr("width", measurements.width)
+            .attr("height", measurements.height)
+            .selectAll("g.x.axis")
+            .style("opacity", "0")
+    }
+
 }
 
 /**
@@ -771,7 +786,7 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .end()
         .then(() => {
             renderValuesInBars(data, metric, [], countriesDownloaded);
-        });
+        }).catch(err => { });
 
     selectDataForBarCharts.exit()
         .transition().duration(500).attr("width", 0)
@@ -816,7 +831,7 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .append("rect")
         .attr("width", setBarMaxWidth(data, metric))
         .attr("height", 0)
-        .attr("y", d => yScale(0))
+        .attr("y", d => { return yScale(0) })
         .attr("data-countryCode", d => d.countryCode)
         .merge(selectDataForBarCharts)
         .attr("fill", d => setBarColor(d))
