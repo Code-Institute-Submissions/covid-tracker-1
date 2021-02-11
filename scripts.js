@@ -58,7 +58,7 @@ function showCheckboxes(checkboxType) {
 
     if (checkboxType === "highlight-country-checkboxes") {
         let highlightCountry = document.getElementById("highlight-country-checkboxes");
-        let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")];
+        let highlightCountryLabels = [...highlightCountry.getElementsByClassName("child-div")];
         highlightCountryLabels.forEach(e => { e.style.display = "block"; });
         removeDeletedCountriesFromHighlights();
     }
@@ -1167,14 +1167,11 @@ function filterDataByCountry(data) {
 
 function removeDeletedCountriesFromHighlights() {
     let countriesToDelete = getUncheckedCountries();
-    let countryCodes = EUDATASET.map(e => e.countryCode);
-    let countryNames = eu;
-    countriesToDelete = countriesToDelete.map(e => countryCodes.indexOf(e)).map(e => countryNames[e]);
     let highlightCountry = document.getElementById("highlight-country-checkboxes");
-    let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")];
+    let highlightCountryLabels = [...highlightCountry.getElementsByClassName("child-div")];
 
     highlightCountryLabels.forEach(e => {
-        if (countriesToDelete.includes(e.htmlFor)) {
+        if (countriesToDelete.includes(e.dataset.countryCode)) {
             e.style.display = "none";
         }
     });
