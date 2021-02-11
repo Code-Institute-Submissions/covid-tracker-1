@@ -1,4 +1,3 @@
-
 //https://www.w3schools.com/jsref/prop_win_innerheight.asp
 let windowHeight = window.innerHeight;
 let windowWidth = window.innerWidth;
@@ -45,7 +44,7 @@ const EUDATASET = [
 ];
 let eu = EUDATASET.map((e) => e.country);
 let countriesDownloaded = 0;
-let barChartAxisRendered = { casesPerCapita: false, deathsPerCapita: false }
+let barChartAxisRendered = { casesPerCapita: false, deathsPerCapita: false };
 let latestCommonDate = new Date();
 let verticalBarChart = false;
 let measurements = {};
@@ -58,10 +57,10 @@ let timer = null;
 function showCheckboxes(checkboxType) {
 
     if (checkboxType === "highlight-country-checkboxes") {
-        let highlightCountry = document.getElementById("highlight-country-checkboxes")
-        let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")]
-        highlightCountryLabels.forEach(e => { e.style.display = "block" })
-        removeDeletedCountriesFromHighlights()
+        let highlightCountry = document.getElementById("highlight-country-checkboxes");
+        let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")];
+        highlightCountryLabels.forEach(e => { e.style.display = "block"; });
+        removeDeletedCountriesFromHighlights();
     }
 
     let checkboxes = document.getElementById(checkboxType);
@@ -179,23 +178,20 @@ function isValidDate(d) {
 
 function checkDateErrors(startDate, endDate) {
     let error = "";
-
-    let isStartDateValid = isValidDate(startDate)
-    let isEndDateValid = isValidDate(endDate)
-
-
+    let isStartDateValid = isValidDate(startDate);
+    let isEndDateValid = isValidDate(endDate);
     if (!isStartDateValid) {
-        error = "Start date is not valid"
+        error = "Start date is not valid";
     }
     else if (!isEndDateValid) {
-        error = "End date is not valid"
+        error = "End date is not valid";
     }
     else if (endDate < startDate) {
         error = "Start date must be before end date";
     } else if (startDate > latestCommonDate || endDate > latestCommonDate) {
-        error = `No data is available after ${convertDateFormatForDisplay(latestCommonDate)}`
+        error = `No data is available after ${convertDateFormatForDisplay(latestCommonDate)}`;
     } else if (endDate < new Date("2020-01-24") || startDate < new Date("2020-01-24")) {
-        error = `There were no covid cases in EU before 24th January 2020`
+        error = `There were no covid cases in EU before 24th January 2020`;
     }
     else {
         document.getElementById("users-countries").style.display = "flex";
@@ -209,8 +205,8 @@ function waitForTypingToFinish(changeHighlightedCountry) {
     //https://stackoverflow.com/questions/5946707/run-function-after-user-has-stopped-typing
     clearTimeout(timer);
     timer = setTimeout(() => {
-        changeRequestedData(changeHighlightedCountry)
-    }, 1000);
+        changeRequestedData(changeHighlightedCountry);
+    }, 500);
 }
 
 /**
@@ -237,10 +233,10 @@ function changeRequestedData(changeHighlightedCountry) {
     let countryData = EUDATASET.map((country) =>
         JSON.parse(localStorage.getItem(country.countryCode))
     );
-    //don"t filter out nulls here. You use the index in next function to assign the correct data to the correct country
+    //don't filter out nulls here. You use the index in next function to assign the correct data to the correct country
     Promise.all(countryData).then(allData => {
-        dataForGraphs(startDate, endDate, allData)
-    }).catch(err => { })
+        dataForGraphs(startDate, endDate, allData);
+    }).catch(err => { });
 }
 
 /**
@@ -270,14 +266,14 @@ function sortByHighestValues(data, metric) {
 
 function displayToolTip(barData, metric) {
     if (countriesDownloaded < 27) { return; }
-    let value = ""
-    if (barData.comparison !== undefined) { value = barData.comparison }
-    else { value = barData[metric] }
+    let value = "";
+    if (barData.comparison !== undefined) { value = barData.comparison; }
+    else { value = barData[metric]; }
     tooltip.text(`${barData.country}: ${value}`);
     tooltip.style("visibility", "visible");
     if (!verticalBarChart) {
-        tooltip.style("font-size", "12px")
-        tooltip.style("padding", "1px")
+        tooltip.style("font-size", "12px");
+        tooltip.style("padding", "1px");
     }
 
 }
@@ -337,7 +333,7 @@ function setBarMaxWidth(data, metric, countryData) {
 **/
 
 function getCountryData(countryCode, data, metric) {
-    return data.filter(e => e.countryCode === countryCode)[0]
+    return data.filter(e => e.countryCode === countryCode)[0];
 }
 
 /**
@@ -406,7 +402,7 @@ function setXPositionValueInBars(data, metric, countryData) {
 
 function setYPositionValueInBars(data, countryData, metric) {
 
-    let yScale = setYScale(metric, data)
+    let yScale = setYScale(metric, data);
     if (verticalBarChart) {
         return yScale(countryData[metric]) + measurements.margin.top + setBarMaxWidth(data, metric) / 3;
     } else {
@@ -525,7 +521,7 @@ function renderValuesInBars(data, metric, barData, countriesDownloaded, barWidth
 **/
 
 function removeComparisons(data, metric) {
-    if (!allCountriesDownloaded) { return }
+    if (!allCountriesDownloaded) { return; }
     let dataWithOutComparisons = data.map(countryData => {
         delete countryData.comparison;
         return countryData;
@@ -644,10 +640,10 @@ function renderYAxis(data, metric) {
 function decideChartTitleText(metric) {
 
     if (metric === "casesPerCapita") {
-        return "Cases Per 100,000 People"
+        return "Cases Per 100,000 People";
     } else if (metric === "deathsPerCapita") {
-        return "Deaths Per Million People"
-    } else { return "title error" }
+        return "Deaths Per Million People";
+    } else { return "title error"; }
 
 }
 
@@ -727,10 +723,10 @@ function updateXAxis(data, metric) {
 function setYPositionOfBar(data, metric, countryData) {
     const yScale = setYScale(metric, data);
     let height = yScale.bandwidth();
-    let adjustment = 0
-    if (height > 100) { adjustment = (height - 100) / 2 }
+    let adjustment = 0;
+    if (height > 100) { adjustment = (height - 100) / 2; }
     if (!verticalBarChart) {
-        return yScale(countryData.countryCode) + adjustment
+        return yScale(countryData.countryCode) + adjustment;
     }
 }
 
@@ -765,9 +761,9 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
         .transition().duration(setSpeed() / 2)
         .attr("width", d => {
             if (xScale.domain()[0] === 0 && xScale.domain()[1] === 0) {
-                return 0
+                return 0;
             } else {
-                return xScale(d[metric])
+                return xScale(d[metric]);
             }
         })
         .ease(d3.easeBounce)
@@ -793,12 +789,12 @@ function renderHorizontalBars(data, metric, countriesDownloaded) {
 
 function setXPositionOfBar(data, metric, countryData) {
 
-    let width = getBarWidth(countryData, data, metric)
-    let xScale = setXScale(data, metric)
-    let adjustment = 0
-    if (width > 200) { adjustment = (width - 200) / 2 }
+    let width = getBarWidth(countryData, data, metric);
+    let xScale = setXScale(data, metric);
+    let adjustment = 0;
+    if (width > 200) { adjustment = (width - 200) / 2; }
     if (verticalBarChart) {
-        return xScale(countryData.countryCode) + adjustment
+        return xScale(countryData.countryCode) + adjustment;
     }
 }
 
@@ -835,12 +831,12 @@ function renderVerticalBars(data, metric, countriesDownloaded) {
         .ease(d3.easeBounce)
         .duration(setSpeed())
         .attr("height", d => {
-            if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return 0 }
-            else { return measurements.innerHeight - yScale((d[metric])) }
+            if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return 0; }
+            else { return measurements.innerHeight - yScale((d[metric])); }
         })
         .attr("y", d => {
-            if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return measurements.innerHeight }
-            else { return yScale(d[metric]) }
+            if (yScale.domain()[0] === 0 && yScale.domain()[1] === 0) { return measurements.innerHeight; }
+            else { return yScale(d[metric]); }
         })
 
         //https://gist.github.com/miguelmota/3faa2a2954f5249f61d9
@@ -872,7 +868,7 @@ function setBarColor(data) {
 function renderAxis(data, metric) {
     data = sortByHighestValues(data, metric);
     if (!barChartAxisRendered[metric]) {
-        document.getElementById(metric).style.display = "block"
+        document.getElementById(metric).style.display = "block";
         setMargins();
         measurements.width = 0.95 * windowWidth;
         measurements.height = 0.8 * windowHeight;
@@ -913,7 +909,7 @@ function renderBarChart(data, metric, countriesDownloaded) {
 **/
 
 function displayComparisons(event, barData, data, metric) {
-    if (!allCountriesDownloaded) { return }
+    if (!allCountriesDownloaded) { return; }
     let comparisons = calculateComparisons(data, barData, metric);
     renderValuesInBars(comparisons, metric, barData);
 }
@@ -950,20 +946,6 @@ function calculateComparisons(data, barData, metric) {
     return comparisons;
 }
 
-/**
-* checks that the most recent downloaded date for each country is the same
-* @param {array} allData data from the api for each country that is cleaned and formatted
-* * @returns {boolean} is the most recent downloaded date for each country the same?
-**/
-
-function isLatestDateTheSame(allData) {
-    let dataWithOutNulls = allData.filter(country => country !== null);
-    let latestDays = dataWithOutNulls.map(country => country[country.length - 1].date);
-    let latestDaysIgnoringTime = latestDays.map(date => new Date(date).setHours(0, 0, 0, 0));
-    //https://stackoverflow.com/questions/14832603/check-if-all-values-of-array-are-equal
-    let sameLatestDateForAll = latestDaysIgnoringTime.every((val, i, arr) => val === arr[0]);
-    return sameLatestDateForAll;
-}
 
 /**
 * calculates the most recent date for which data is available for all countries
@@ -1034,16 +1016,6 @@ function calculatePerCapitaData(allData) {
 
             let deathsPerCapita = ((latestDateData.deathsPerCapita - firstDateData.deathsPerCapita) / (EUDATASET[index].population / 10)).toFixed(3);
             if (deathsPerCapita > 0.49) { deathsPerCapita = Math.round(deathsPerCapita); }
-
-            // if (EUDATASET[index].countryCode === 'es' || EUDATASET[index].countryCode === 'se') {
-            //     console.log(EUDATASET[index].countryCode)
-            //     console.log('country', country)
-            //     console.log('firstDateData', firstDateData)
-            //     console.log('latestDateData', latestDateData)
-            //     console.log('casesPerCapita', casesPerCapita)
-            //     console.log('deathsPerCapita', deathsPerCapita)
-            //     console.log('--------')
-            // }
             return {
                 ["country"]: EUDATASET[index].country,
                 ["countryCode"]: EUDATASET[index].countryCode,
@@ -1092,7 +1064,7 @@ function calculateEUPopulation() {
 
 function calculateEUTotals(allData) {
     let totalCases = [];
-    let totalDeaths = []
+    let totalDeaths = [];
     allData
         .forEach((country) => {
             let firstDateData = {};
@@ -1178,17 +1150,17 @@ function filterDataByCountry(data) {
 
 function removeDeletedCountriesFromHighlights() {
     let countriesToDelete = getUncheckedCountries();
-    let countryCodes = EUDATASET.map(e => e.countryCode)
-    let countryNames = eu
-    countriesToDelete = countriesToDelete.map(e => countryCodes.indexOf(e)).map(e => countryNames[e])
-    let highlightCountry = document.getElementById("highlight-country-checkboxes")
-    let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")]
+    let countryCodes = EUDATASET.map(e => e.countryCode);
+    let countryNames = eu;
+    countriesToDelete = countriesToDelete.map(e => countryCodes.indexOf(e)).map(e => countryNames[e]);
+    let highlightCountry = document.getElementById("highlight-country-checkboxes");
+    let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")];
 
     highlightCountryLabels.forEach(e => {
         if (countriesToDelete.includes(e.htmlFor)) {
-            e.style.display = "none"
+            e.style.display = "none";
         }
-    })
+    });
 }
 
 
@@ -1386,9 +1358,9 @@ function makeAPICalls(countries, failedCalls) {
             if (apiFailedCalls >= 4) {
                 document.getElementsByClassName("loader")[0].style.display = "none";
                 document.getElementsByClassName("statistic-details")[0].style.display = "none";
-                document.getElementById("casesPerCapita").style.display = "none"
-                document.getElementById("deathsPerCapita").style.display = "none"
-                document.getElementById("download-summary").style.display = "none"
+                document.getElementById("casesPerCapita").style.display = "none";
+                document.getElementById("deathsPerCapita").style.display = "none";
+                document.getElementById("download-summary").style.display = "none";
                 document.getElementsByClassName("loading-message")[0].innerHTML = "Sorry. We can't load the data right now. Please try again later.";
                 return;
             } else {
@@ -1423,23 +1395,21 @@ function getData(countries, firstCall, failedCalls) {
 
 function addEventListeners() {
     //https://stackoverflow.com/questions/27609360/how-to-set-onclick-functions-to-multiple-elements
-    let selectCountry = document.getElementById("select-country-checkboxes")
-    let selectCountryCheckboxes = [...selectCountry.getElementsByClassName("select-country")]
-    let highlightCountry = document.getElementById("highlight-country-checkboxes")
-    let highlightCountryCheckboxes = [...highlightCountry.getElementsByClassName("highlight-country")]
+    let selectCountry = document.getElementById("select-country-checkboxes");
+    let selectCountryCheckboxes = [...selectCountry.getElementsByClassName("select-country")];
+    let highlightCountry = document.getElementById("highlight-country-checkboxes");
+    let highlightCountryCheckboxes = [...highlightCountry.getElementsByClassName("highlight-country")];
 
     selectCountryCheckboxes.forEach((element) => {
-        element.addEventListener("click", () => changeRequestedData())
-    })
+        element.addEventListener("click", () => changeRequestedData());
+    });
 
     highlightCountryCheckboxes.forEach((element) => {
-        element.addEventListener("click", () => changeRequestedData(true))
-    })
+        element.addEventListener("click", () => changeRequestedData(true));
+    });
 }
 
-
-
-addEventListeners()
+addEventListeners();
 setBarChartType();
 getData([...eu], true, []);
 
