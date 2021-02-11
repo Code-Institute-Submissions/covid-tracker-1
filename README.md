@@ -1,21 +1,23 @@
-## MS 2 Project
+# MS 2 Project
 
-## Purpose of Project
+# Purpose of Project
 
 Create a website that compares EU countries statistics in relation to covid 19
 
-## User Stories
+# User Stories
 
 As a user, I can see how all European countries compare in relation to covid 19 cases and deaths
 
 
-## Features
+# Features
 
-# Home Page
+## Home Page
+
+./assets/images/responsive.png
 
 The home page will display bar charts showing the number of cases and deaths in each EU country, adjusted for population.
 
-# Bar charts
+## Bar charts
 
 The bar charts will be horizontal on smaller screens and vertical on larger screens. The values for each country is shown within the bar. When user hovers on a specific bar, the values in the other bars change to display the percentage difference between the country the user hovered on and the value in each bar. 
 
@@ -23,13 +25,13 @@ The font size changes to ensure the value fits the bar.
 
 Hover on the bar or on the axis label displays a tooltip which shows the name of the country. The location of the tooltip is dependent on the location of the mouse pointer.
 
-# Header
+## Nav Bar
 
-The nav bar will be contained within the header. The user can change the dates and the data within the bar chart will update. An error will display if the user sets the end date to before the start date.
+The nav bar will appear when all data is loaded. The user can change the dates and the data within the bar chart will update. An error will display if the user sets the end date to before the start date.
 
 The user can also remove countries from the bar charts using the "select countries" dropdown and decide which countries are highlighted using the "highlight countries" dropdown.
 
-# Loading
+## Loading
 
 While fetching the data from the API, a spinning amination is displayed along with details of the number of countries for which data has been fetched. The bar chart data will update (with a transition of 5 seconds) when new data is received from the API but it is still awaiting further data.
 
@@ -37,11 +39,11 @@ If there is an unexpected error fetching the API data, a message will display te
 
 If there is an unexpected error fetching the data four times, a message will display telling the user that there is a problem and to try again later.
 
-# Product Limitations
+## Product Limitations
 
 The API will only accept 10 calls from the same API address within a 5 second period. Therefore I must make multiple calls to fetch the data.
 
-## Typography and Color Scheme
+# Typography and Color Scheme
 
 Background grey: #eeecec
 
@@ -59,11 +61,11 @@ Orange (highlighted bar): orange
 
 Fonts: Nunito and sans-serif
 
-## Skeleton
+# Skeleton
 
 Wireframe is available [here](./docs/wireframe.png)
 
-## Technology
+# Technology
 
 HTML5
 CSS3
@@ -73,7 +75,7 @@ d3 js
 
 Browser prefixes from https://autoprefixer.github.io/ 
 
-## Best Practices
+# Best Practices
 
 Used kebab-case for class selectors.
 
@@ -85,8 +87,6 @@ Validated HTML using https://validator.w3.org/.
 
 
 
-
-
 ## Testing
 
 Tested website on chrome, firefox and safari on a desktop map and tested on chrome and firefox on an andriod mobile.
@@ -95,7 +95,7 @@ Used google chrome simulator to test for responsiveness for moto g4, galaxy s5, 
 
 # Test cases:
 
-1. Fetching data works perfectly
+## Fetching data works perfectly
 
 An element will display summarising the purpose of the website.
 
@@ -121,7 +121,7 @@ When selecting countries in the "highlight country" dropdown, the bar chart will
 
 
 
-2. Fetching data doesn't work because of too many calls to the server within a short time period.
+## Fetching data doesn't work because of too many calls to the server within a short time period.
 
 To test for this, reload the page shortly after the first download of data appears.
 
@@ -130,7 +130,7 @@ The console will show a 409 error from the API.
 The code will take care of this. The data that has been displayed will appear. The countries for which the calls failed will be re-fetched after all the data for all other countries has been downloaded.
 
 
-3. Fetching data doesn't work because of unexpected errors.
+## Fetching data doesn't work because of unexpected errors.
 
 During development, it became clear that the api sometimes throws errors. Usually the api works again within a few seconds, but on rare occassions it has gone down for hours.
 
@@ -138,7 +138,7 @@ The catch in the promise all codes for this. If there is an unexpected error, th
 
 If the error occurs four times, the site stops trying to fetch data from the api, the loading animation disappers and the user is told that there is a problem and is asked to try again later.
 
-4. Invalid dates
+## Invalid dates
 
 If the user tries to select dates where:
 
@@ -148,6 +148,8 @@ If the user tries to select dates where:
 
 * The end date is before the first recorded case in the European Union
 
+* The start date or end dates are invalid
+
 An error message will appear in the nav bar and the bar chart will not update.
 
 
@@ -155,61 +157,71 @@ An error message will appear in the nav bar and the bar chart will not update.
 # Fixed Issues
 
 
-Api calls: Free version of the api only allows data for one country to be received per call. I did a promise all to get all 27 countries at once. I received an error after data for the first ten countries were received. I have now coded to get the data for all 27 countries in three batches of 9. This still requires an artificial delay using settimeout.
+## Api calls 
+Free version of the api only allows data for one country to be received per call. I did a promise all to get all 27 countries at once. I received an error after data for the first ten countries were received. I have now coded to get the data for all 27 countries in three batches of 9. This still requires an artificial delay using settimeout.
 
-Remove colonies from data: Denmark, Netherlands, France and the UK include former colonies from different parts of the world in their data. This caused errors because the data for these countries was formated differently. It was an array of objects where each object was either the country itself or one of its former colonies. The geographic location of the former colonies was refrequently on the other side of the planet - making this data irrelevant. I used `.filter` to remove this data.
+## Remove colonies from data
+Denmark, Netherlands, France and the UK include former colonies from different parts of the world in their data. This caused errors because the data for these countries was formated differently. It was an array of objects where each object was either the country itself or one of its former colonies. The geographic location of the former colonies was refrequently on the other side of the planet - making this data irrelevant. I used `.filter` to remove this data.
 
-Failed Api Calls: Occasionally, the still throws an error as a result of too many calls or throws an error when it is temporarily down. I have coded for both of these. If the problem is too many calls, the countries for which the calls failed will be re-fetched after all the data for all other countries has been downloaded. If there is an unexpected error, there is a time out for 10 seconds before restarting the download process. The user receives a message on screen telling them there is an issue and asking them to be patient. If the error occurs four times, the site stops trying to fetch data from the api, the loading animation disappers and the user is told that there is a problem and is asked to try again later.
+## Failed Api Calls
+Occasionally, the still throws an error as a result of too many calls or throws an error when it is temporarily down. I have coded for both of these. If the problem is too many calls, the countries for which the calls failed will be re-fetched after all the data for all other countries has been downloaded. If there is an unexpected error, there is a time out for 10 seconds before restarting the download process. The user receives a message on screen telling them there is an issue and asking them to be patient. If the error occurs four times, the site stops trying to fetch data from the api, the loading animation disappers and the user is told that there is a problem and is asked to try again later.
 
+## Spurious Data after error fetching data
 When there is an error fetching data because of too many calls, spurious data was displaying in the bar chart before the correct data displaying when data from all 27 countries was fetched. This is because I was calculating the per capita data by using the index of the fetched data but I had filtered out null data so the wrong population was being used on the wrong countries. I fixed this but if I was starting again I would ensure the country code was contained in every piece of data. 
 
-Axis and bars rendering everytime data is updated: This was due to a lack of understanding about the d3 general update.
+## Axis and bars rendering everytime data is updated
+This was due to a lack of understanding about the d3 general update.
 
-Wrong start date: Need to download the day before the start date that the user selected to do comparions between start date and end date. For example if there were 4 total cases on Monday, 6 total cases on Tuesday and 9 total cases on Wednesday. To get the cases between Tuesday and Wednesday I need to subtract Monday's total cases (4) from Wednesday's total cases (9). This then caused a bug for each country for the first date of recorded data for that country because no data existed for the previous day. I fixed this by placing a boolean in the first day of data for all countries.
+## Wrong start date
+Need to download the day before the start date that the user selected to do comparions between start date and end date. For example if there were 4 total cases on Monday, 6 total cases on Tuesday and 9 total cases on Wednesday. To get the cases between Tuesday and Wednesday I need to subtract Monday's total cases (4) from Wednesday's total cases (9). This then caused a bug for each country for the first date of recorded data for that country because no data existed for the previous day. I fixed this by placing a boolean in the first day of data for all countries.
 
+## Spurious Data after unselecting data
 When unselecting countries, I was getting spurious results. I had an array of index numbers to delete and I was looping doing a for each and splicing within the foreach. The problem was that the index number I wanted to delete changed as a result of the previous splice. I fixed this by sorting the array from biggest to smallest number (index) before doing the foreach with the splice.
 
-Font too large for vertical bars: For large values, especially comparisons (eg. +1000%), the text was wider than the bar. I coded to calculate the width of the text before it is rendered and, if it is wider than the bar, to reduce the font size until it fits.
+## Font too large for vertical bars
+For large values, especially comparisons (eg. +1000%), the text was wider than the bar. I coded to calculate the width of the text before it is rendered and, if it is wider than the bar, to reduce the font size until it fits.
 
-Font too large for horizontal bars: I changed the location of the value on the bar depending on the width of the text. This was challenging because it wouldn't work relative to a constant value so I set it relative to a logged value (because longer widths required less of an adjustment). If the width remained too large, I reduced the font size until it fits.
+## Font too large for horizontal bars
+I changed the location of the value on the bar depending on the width of the text. This was challenging because it wouldn't work relative to a constant value so I set it relative to a logged value (because longer widths required less of an adjustment). If the width remained too large, I reduced the font size until it fits.
 
 # Open Issues
 
-Some values can't be seen in the bars because the font size is too small or because the height of the bar is too small.
+## Some values can't be seen in the bars
+This is because the font size is too small (which is neccessary for the value to fit in the bar) or because the height of the bar is too small.
 
-TO DO: if height is too small, reduce font size until it fits.
+## API errors in console
+When there is an error from the api call, an error displays in the console even though code to handle the error is executed. This is because javascript's fetch method will still display an error in the console when the issue related to a problem with a call.
 
-TO DO: if can't be read, include it in tooltip on hover.
 
-## Version Control
+# Version Control
 
 This project was developed using Gitpod, committed to git and pushed to GitHub using the built in function within Gidpod.
 
-## Deployment:
+# Deployment:
 
 To deploy this page to GitHub Pages from its GitHub repository, the following steps were taken:
 
-Log into GitHub.
-From the list of repositories on the screen, select colmfah/covid-tracker.
-From the menu items near the top of the page, select Settings.
-Scroll down to the GitHub Pages section.
-Under Source click the drop-down menu labelled None and select Master Branch
-On selecting Master Branch the page is automatically refreshed, the website is now deployed.
-Scroll back down to the GitHub Pages section to retrieve the link to the deployed website.
+1. Log into GitHub.
+2. From the list of repositories on the screen, select colmfah/covid-tracker.
+3. From the menu items near the top of the page, select Settings.
+4. Scroll down to the GitHub Pages section.
+5. Under Source click the drop-down menu labelled None and select Master Branch
+6. On selecting Master Branch the page is automatically refreshed, the website is now deployed.
+7. Scroll back down to the GitHub Pages section to retrieve the link to the deployed website.
 To deploy locally:
 
-Follow this link to the Project GitHub repository: https://github.com/colmfah/covid-tracker
-Click the Code button.
-Copy the HTTPs URL.
-In your local IDE open Git Bash.
-Change the current working directory to the location where you want the cloned directory to be made.
-Type git clone, and then paste the HTTPs URL you copied.
-Press Enter. Your local clone will be created.
-Open the cloned folder and double click on index.html
+1. Follow [this link](https://github.com/colmfah/covid-tracker) to the Project GitHub repository
+2. Click the Code button.
+3. Copy the HTTPs URL.
+4. In your local IDE open Git Bash.
+5. Change the current working directory to the location where you want the cloned directory to be made.
+6. Type "git clone", and then paste the HTTPs URL you copied.
+7. Press Enter. Your local clone will be created.
+8. Open the cloned folder and double click on index.html
 
 
 
-## Credits
+# Credits
 
 JavaScript to Convert Date to MM/DD/YYYY Format: https://dzone.com/articles/javascript-convert-date
 
@@ -287,5 +299,5 @@ covid image: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_rphuMpMgFVV
 
 favicon: https://favicon.io/favicon-converter/
 
-## Acknowledgements:
+# Acknowledgements:
 My Code Institute Mentor, Rohit
