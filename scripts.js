@@ -581,6 +581,12 @@ function setXScale(data, metric) {
 
 function setYScale(metric, data) {
     if (verticalBarChart) {
+        if (data.length === 0) {
+            return d3
+                .scaleLinear()
+                .domain([0, 0])
+                .range([measurements.innerHeight, 0]);
+        }
         return d3
             .scaleLinear()
             .domain([0, d3.max(data, (d) => d[metric])])
@@ -698,9 +704,6 @@ function updateXAxis(data, metric) {
     if (!verticalBarChart) { return; }
     let xScale = setXScale(data, metric);
     const xAxis = d3.axisBottom(xScale).ticks(0);
-    console.log('xAxis ', xAxis)
-    console.log('data', data)
-
     if (data.length > 0) {
         d3.select(`#${metric}`)
             .attr("width", measurements.width)
@@ -717,7 +720,6 @@ function updateXAxis(data, metric) {
             .on("mouseout", () => tooltip.style("visibility", "hidden"));
 
     } else {
-
         d3.select(`#${metric}`)
             .attr("width", measurements.width)
             .attr("height", measurements.height)
