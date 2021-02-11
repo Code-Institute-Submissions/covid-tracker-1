@@ -49,6 +49,7 @@ let barChartAxisRendered = { casesPerCapita: false, deathsPerCapita: false }
 let latestCommonDate = new Date();
 let verticalBarChart = false;
 let measurements = {};
+let timer = null;
 
 /**
 * copens dropbown
@@ -204,12 +205,21 @@ function checkDateErrors(startDate, endDate) {
     return error;
 }
 
+function waitForTypingToFinish(changeHighlightedCountry) {
+    //https://stackoverflow.com/questions/5946707/run-function-after-user-has-stopped-typing
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        changeRequestedData(changeHighlightedCountry)
+    }, 1000);
+}
+
 /**
 * filters data based on user input
 * @param {boolean} changeHighlightedCountry has the user changed the list of countries that should be highlighted?
 **/
 
 function changeRequestedData(changeHighlightedCountry) {
+
     if (changeHighlightedCountry !== true) {
         d3.selectAll(".casesPerCapita-values-in-bar").style("opacity", "0");
         d3.selectAll(".deathsPerCapita-values-in-bar").style("opacity", "0");
@@ -228,7 +238,9 @@ function changeRequestedData(changeHighlightedCountry) {
         JSON.parse(localStorage.getItem(country.countryCode))
     );
     //don"t filter out nulls here. You use the index in next function to assign the correct data to the correct country
-    Promise.all(countryData).then(allData => dataForGraphs(startDate, endDate, allData)).catch(err => { });
+    Promise.all(countryData).then(allData => {
+        dataForGraphs(startDate, endDate, allData)
+    }).catch(err => { })
 }
 
 /**
@@ -1423,7 +1435,7 @@ function addEventListeners() {
     })
 
     highlightCountryCheckboxes.forEach((element) => {
-        element.addEventListener("click", () => changeRequestedData(true))
+        element.addEventListener("click", () => changeRequestedData(changeHighlightedCountry))
     })
 }
 

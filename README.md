@@ -281,5 +281,7 @@ check if JavaScript date is valid: https://stackoverflow.com/questions/1353684/d
 
 add event listeners: https://stackoverflow.com/questions/27609360/how-to-set-onclick-functions-to-multiple-elements
 
+prevent code from running until user has finished typing: https://stackoverflow.com/questions/5946707/run-function-after-user-has-stopped-typing
+
 ## Acknowledgements:
 My Code Institute Mentor, Rohit
