@@ -235,16 +235,23 @@ margin-right: 15px;
     padding-bottom: 2.5rem;
 }
 
-
+.select-country, .highlight-country{
+    margin-left: 5px;
+    margin-right: 5px;
+}
 
 svg {
     display: none;
-    margin: 50px auto;
+    margin: 0 auto;
     border: 1px solid #293d6a;
     position: relative;
     background-color: #f7f7f7;
     color: #293d6a;
     border-radius: 5px;
+}
+
+svg + svg{
+    margin-top: 130px;
 }
 
 .summary, .statistic-details {
