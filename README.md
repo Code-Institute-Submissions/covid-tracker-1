@@ -279,5 +279,7 @@ d3 course: https://www.freecodecamp.org/learn/data-visualization/data-visualizat
 
 check if JavaScript date is valid: https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript?page=1&tab=votes#tab-top
 
+add event listeners: https://stackoverflow.com/questions/27609360/how-to-set-onclick-functions-to-multiple-elements
+
 ## Acknowledgements:
 My Code Institute Mentor, Rohit

@@ -55,6 +55,14 @@ let measurements = {};
 * @param {string} checkboxType name of check box type
 **/
 function showCheckboxes(checkboxType) {
+
+    if (checkboxType === "highlight-country-checkboxes") {
+        let highlightCountry = document.getElementById("highlight-country-checkboxes")
+        let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")]
+        highlightCountryLabels.forEach(e => { e.style.display = "block" })
+        removeDeletedCountriesFromHighlights()
+    }
+
     let checkboxes = document.getElementById(checkboxType);
     if (!expanded) {
         checkboxes.style.display = "block";
@@ -1153,6 +1161,27 @@ function filterDataByCountry(data) {
     return data;
 }
 
+
+/**
+ * removes unselected countries from the list of countries that can be highlighted
+ **/
+
+function removeDeletedCountriesFromHighlights() {
+    let countriesToDelete = getUncheckedCountries();
+    let countryCodes = EUDATASET.map(e => e.countryCode)
+    let countryNames = eu
+    countriesToDelete = countriesToDelete.map(e => countryCodes.indexOf(e)).map(e => countryNames[e])
+    let highlightCountry = document.getElementById("highlight-country-checkboxes")
+    let highlightCountryLabels = [...highlightCountry.getElementsByTagName("label")]
+
+    highlightCountryLabels.forEach(e => {
+        if (countriesToDelete.includes(e.htmlFor)) {
+            e.style.display = "none"
+        }
+    })
+}
+
+
 /**
  * makes final computations to data to display on screen
  * @param {number} startDate the start date in the format of a number that is the number of seconds between the 1 Jan 1970 and the start date.
@@ -1378,37 +1407,31 @@ function getData(countries, firstCall, failedCalls) {
     }
 }
 
+/**
+ * adds event listeners to enable highlighting of countries and adding/removing countries
+ **/
+
+function addEventListeners() {
+    //https://stackoverflow.com/questions/27609360/how-to-set-onclick-functions-to-multiple-elements
+    let selectCountry = document.getElementById("select-country-checkboxes")
+    let selectCountryCheckboxes = [...selectCountry.getElementsByClassName("select-country")]
+    let highlightCountry = document.getElementById("highlight-country-checkboxes")
+    let highlightCountryCheckboxes = [...highlightCountry.getElementsByClassName("highlight-country")]
+
+    selectCountryCheckboxes.forEach((element) => {
+        element.addEventListener("click", () => changeRequestedData())
+    })
+
+    highlightCountryCheckboxes.forEach((element) => {
+        element.addEventListener("click", () => changeRequestedData(true))
+    })
+}
 
 
-let selectCountry = document.getElementById("select-country-checkboxes")
-let selectCountryCheckboxes = [...selectCountry.getElementsByClassName("select-country")]
 
-let highlightCountry = document.getElementById("highlight-country-checkboxes")
-let highlightCountryCheckboxes = [...highlightCountry.getElementsByClassName("highlight-country")]
-
-
-selectCountryCheckboxes.forEach((element) => {
-    element.addEventListener("click", () => changeRequestedData())
-})
-
-highlightCountryCheckboxes.forEach((element) => {
-    element.addEventListener("click", () => changeRequestedData(true))
-})
-
-
-
-
-
-
-
-// for (var i = 0, len = elements.length; i < len; i++) {
-//   elements[i].addEventListener("click", function() {
-//     setCookie("workshop", this.getAttribute("name"), "", "");
-//   });
-// }
-
-
+addEventListeners()
 setBarChartType();
+// displayNav()
 getData([...eu], true, []);
 
 
