@@ -13,7 +13,7 @@ As a user, I can see how all European countries compare in relation to covid 19 
 
 ## Home Page
 
-![HomePage]./assets/images/responsive.png
+![HomePage](/assets/images/responsive.png)
 
 The home page will display bar charts showing the number of cases and deaths in each EU country, adjusted for population.
 
