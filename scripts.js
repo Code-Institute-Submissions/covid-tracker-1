@@ -1379,6 +1379,35 @@ function getData(countries, firstCall, failedCalls) {
 }
 
 
+
+let selectCountry = document.getElementById("select-country-checkboxes")
+let selectCountryCheckboxes = [...selectCountry.getElementsByClassName("select-country")]
+
+let highlightCountry = document.getElementById("highlight-country-checkboxes")
+let highlightCountryCheckboxes = [...highlightCountry.getElementsByClassName("highlight-country")]
+
+
+selectCountryCheckboxes.forEach((element) => {
+    element.addEventListener("click", () => changeRequestedData())
+})
+
+highlightCountryCheckboxes.forEach((element) => {
+    element.addEventListener("click", () => changeRequestedData(true))
+})
+
+
+
+
+
+
+
+// for (var i = 0, len = elements.length; i < len; i++) {
+//   elements[i].addEventListener("click", function() {
+//     setCookie("workshop", this.getAttribute("name"), "", "");
+//   });
+// }
+
+
 setBarChartType();
 getData([...eu], true, []);
 
