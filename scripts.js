@@ -1441,7 +1441,6 @@ function addEventListeners() {
 
 addEventListeners()
 setBarChartType();
-// displayNav()
 getData([...eu], true, []);
 
 

@@ -283,5 +283,9 @@ add event listeners: https://stackoverflow.com/questions/27609360/how-to-set-onc
 
 prevent code from running until user has finished typing: https://stackoverflow.com/questions/5946707/run-function-after-user-has-stopped-typing
 
+covid image: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_rphuMpMgFVV0J-l4bs7W_009_EArenDDQg&usqp=CAU
+
+favicon: https://favicon.io/favicon-converter/
+
 ## Acknowledgements:
 My Code Institute Mentor, Rohit
